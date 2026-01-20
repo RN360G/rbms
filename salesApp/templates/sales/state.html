@@ -1,0 +1,233 @@
+{% extends "warehouse/warehouse.html" %}
+
+{% block warehouse %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        {% if message.extra_tags == 'salesAdjustmentQtyMoreThanQtyInStock' %} 
+          <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url '/sales/salesproductproperties/' productID %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div> 
+
+        {% elif message.extra_tags == 'salesProductDisableWrongProductCode' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesProduct' %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div> 
+
+        {% elif message.extra_tags == 'salesCustomerExists' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesCustomers' %}" class="btn btn-primary" style="float: right; margin: 2%;">Ok</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'salesSupplierExists' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesCustomers' %}" class="btn btn-primary" style="float: right; margin: 2%;">Ok</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'transactionAlreadyActivates' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesSelling' %}" class="btn btn-primary" style="float: right; margin: 2%;">Ok</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'noItemIsAddedToCart' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesSelling' %}" class="btn btn-primary" style="float: right; margin: 2%;">Ok</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'salesStartAndEndDate' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesProductProperties' productID %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'cutomerNameAndTelIsRequired' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesMakePayment' %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'wrongAgreementCode' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesConfirmAgreementCode' %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+          
+          {% elif message.extra_tags == 'unitCostDonnotMatchTotalCost' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesSupplierDetails' supplierID %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+        
+          {% elif message.extra_tags == 'incorrectAmountOwe' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesSupplierDetails' supplierID %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'amountOweCannotBeGreaterThanAmountPaid' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesSupplierDetails' supplierID %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+        
+          {% elif message.extra_tags == 'wrongTransactionIDOrTransactionTypeIsNotSupply' %}
+            <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'salesSupplierDetails' supplierID %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endblock warehouse %}

@@ -1,0 +1,206 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% block warehouse %}
+    <div>
+        <div class="tab-content">
+            <!--Register Products==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="addProduct">
+                    <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+                        <a href="{% url 'salesSelling' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                        <h2><span class="fa fa-money"></span> Payment Card</h2>
+                        <h4>Transaction ID: <b>{{temp.transactionID}}</b></h4>
+                            <div class="row">
+                                <div class="col-md-6 col-xl-3 mb-4">
+                                    <div class="card shadow border-left-primary py-2">
+                                        <div class="card-body">
+                                            <div class="row g-0 align-items-center">
+                                                <div class="col me-2">
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Total Amount</span></div>
+                                                    <div class="text-dark fw-bold h5 mb-0"><span><i style="color: #c67605">GH&#8373</i> <b id="totalAmount">{{temp.totalPrice}}</b></span></div>
+                                                </div>
+                                                <div class="col-auto"><i class="fas fa-money fa-2x text-gray-300"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-3 mb-4">
+                                    <div class="card shadow border-left-primary py-2">
+                                        <div class="card-body">
+                                            <div class="row g-0 align-items-center">
+                                                <div class="col me-2">
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Discount</span></div>
+                                                    <div class="text-dark fw-bold h5 mb-0"><span><i style="color: #c67605">GH&#8373</i> <b id="discount">{{temp.discount}}</b> (<i id="discountPercent">{{temp.discountRate}}%</i>)</span></div>
+                                                </div>
+                                                <div class="col-auto"><i class="fas fa-money fa-2x text-gray-300"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                        
+                                <div class="col-md-6 col-xl-3 mb-4">
+                                    <div class="card shadow border-left-primary py-2">
+                                        <div class="card-body">
+                                            <div class="row g-0 align-items-center">
+                                                <div class="col me-2">
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Amount To Pay</span></div>
+                                                    <div class="text-dark fw-bold h5 mb-0"><span><i style="color: #c67605">GH&#8373</i> <b id="amountToPay">{{temp.amountToPay}}</b></span></div>
+                                                </div>
+                                                <div class="col-auto"><i class="fas fa-money fa-2x text-gray-300"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-3 mb-4">  
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <form method="post" action="{% url 'salesDiscount' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" value="{{temp.transactionID}}" name="transactionID" />
+                                                    <label class="form-label" for="amoutnOff">Amount off (in <i style="color: #c67605">GH&#8373</i>)</label>
+                                                    <input class="form-control" type="number" id="amoutnOff" name="amoutnOff" required step='any' value="{{temp.discount}}" min="0">
+                                                    <button type="submit" class="btn btn-primary" style="background-color: brown">Give Discount</button> 
+                                                </form>                                                                              
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                        
+                        </div>
+                        <hr/>
+                        <form method="post">
+                            {% csrf_token %} 
+                            <input type="hidden" value="{{temp.transactionID}}" name="transactionID">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label class="form-label" for="paymentTerm">Payment Terms<b style="color: red">*</b></label>
+                                    <select class="form-select" id="paymentTerm" required name="paymentTerm">
+                                        <option value="Full payment (FP)">Full payment (FP)</option>
+                                        <option value="Part payment (PP)">Part payment (PP)</option>
+                                        <option value="Advance payment (AP)">Advance payment (AP)</option> 
+                                        <option value="Installment agreements (IA)">Installment agreements (IA)</option>                                      
+                                    </select>  
+                                    <hr/>                                  
+                                    <p>
+                                    <b>NOTE:</b><br/>
+                                        <b>Full payment (IP): </b> Total Amount to pay is received from the customer and the item is given to the customer. <br/>
+                                        <b>Partial payment (PP): </b> Part payment is received from the customer and the item is given to the customer<br/>
+                                        <b>Advance Payment (AP): </b> Full Payment is received from the customer and the item is to be collected later. <br/>
+                                        <b>Installment agreements (IA): </b> For the collected items (goods), the payment condition is structured on how the customer must pay the total amount owed over a specified period <br/>                                        
+                                    </p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" id="payAmountLab" for="payAmount">Payment Amount <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="payAmount" name="payAmount" required step='any' min="0" max="{{temp.amountToPay}}" style="height:100px; font-size: 60px">
+                                    <p style="font-size: large;" id="payAmountP">Cash received from the customer</p>
+                                </div>
+                            </div>                           
+                            <hr/> 
+                            <div class="row">
+                                <h5><u>Customer Details</u></h5>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="tel">Cutomer Phone Number <b style="color: red" id="telLab">*  <i style="color: black">Please add the country code: eg. +233240000000 or 233240000000</i></b></label>
+                                    <input class="form-control" type="phone2numeric" id="tel" name="tel" id="tel" list="customerTel">
+
+                                    <datalist id="customerTel">                                        
+                                        {% for cus in customerList %}
+                                            <option value="{{cus.customerContact}}">{{cus.customerContact}} -- {{cus.customerName}} -- ({{cus.customerAddress}})</option>                                            
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="name">Cutomer Name</label>
+                                    <input class="form-control" type="text" id="name" name="name"> 
+                                </div>
+                            </div><hr/>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Save Payment</button>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </form>        
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let paymentTerm = document.getElementById('paymentTerm');
+        let payAmount = document.getElementById('payAmount');
+        payAmountLab = document.getElementById('payAmountLab');
+        payAmountP = document.getElementById('payAmountP');
+        tel = document.getElementById('tel');
+        telLab = document.getElementById('telLab');
+
+        if(paymentTerm.value == 'Full payment (FP)'){
+            payAmount.hidden = true;
+            payAmountLab.hidden = true;
+            payAmountP.hidden = true;
+            payAmount.required = false;
+            tel.required = false;
+            telLab.hidden = true;
+        }
+        else if(paymentTerm.value == 'Advance Payment (AP)' || paymentTerm.value == 'Installment agreements (IA)'){
+            payAmount.hidden = true;
+            payAmountLab.hidden = true;
+            payAmountP.hidden = true;
+            payAmount.required = false;
+            tel.required = true;
+            telLab.hidden = false;
+
+        }
+        
+        paymentTerm.addEventListener('click', function(){
+        if(paymentTerm.value == 'Full payment (FP)'){            
+            payAmount.hidden = true;
+            payAmountLab.hidden = true;
+            payAmountP.hidden = true;
+            payAmount.required = false;
+            tel.required = false;
+            telLab.hidden = true;
+        }
+        
+        else if(paymentTerm.value == 'Advance Payment (AP)' || paymentTerm.value == 'Installment agreements (IA)'){
+            payAmount.hidden = true;
+            payAmountLab.hidden = true;
+            payAmountP.hidden = true;
+            payAmount.required = false;
+            tel.required = true;
+            telLab.hidden = false;
+        }
+
+        else{
+            payAmount.hidden = false;
+            payAmountLab.hidden = false;
+            payAmountP.hidden = false;
+            payAmount.required = true;
+            tel.required = true;
+            telLab.hidden = false;
+        }
+        });
+
+        const inputElement = document.getElementById('tel');
+        inputElement.addEventListener('change', (event) => {
+            $.ajax({
+                url: '/sales/salesgetcustomername',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'customerTel': `${event.target.value}`,
+                    'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val(),
+                },
+                success: function (response){
+                 //alert(response.data);
+                 document.getElementById('name').value = response.data;
+                }
+            })
+        });
+
+    </script>
+{% endblock warehouse %}
+
+
+
+
+
+

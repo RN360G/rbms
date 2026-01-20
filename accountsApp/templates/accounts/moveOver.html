@@ -1,0 +1,73 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% block warehouse %}
+    <div>
+        <div class="tab-content">
+            <!--Register Products==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="addProduct">
+                    <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+                        <a href="{% url 'accounts' 'branch' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                        <span style="float: right">Total Overs: <i style="color: #c67605">GH&#8373</i> {{totalOvers}}</span>
+                        <h4><span class="fa fa-money"></span>Move overs to branch account</h4>
+                        <form class="user" method="post">
+                            {% csrf_token %}    
+                            <input type="hidden" name="payType" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="amount">Amount <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="amount" name="amount" required min="0" max="{{totalOvers}}" step="any"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="narration">Narration <b style="color: red">*</b></label>
+                                    <textarea name="narration" class="form-control" required></textarea>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Move Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>        
+                    </div>
+
+                    <hr/>
+                    <h4>Overs Transactions</h4>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Transaction Type</th>
+                                <th>Date</th>
+                                <th>Narration</th> 
+                                <th>Amount</th>
+                                <th>Balance</th>
+                                <th>Entered By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for acc in overs %}
+                                <tr class="even gradeA">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ acc.withdrawalType}}</td>
+                                    <td>{{ acc.date}}</td>     
+                                    <td>{{ acc.narration}}</td> 
+                                    <td>{{ acc.amount}}</td>    
+                                    <td>{{ acc.balance}}</td>   
+                                    <td>{{ acc.enteredBy.userRef.firstName}} {{ acc.enteredBy.userRef.surname}} <br/> {{acc.enteredBy.userID}}</td> 
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+{% endblock warehouse %}
+
+
+
+
+
+

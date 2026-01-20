@@ -1,0 +1,102 @@
+{% extends "dashboardApp/rbms.html" %}
+
+{% block rbms %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        {% if message.extra_tags == 'loginCredentialsNotFound' %} 
+          <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/></p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'login' %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+
+        {% elif message.extra_tags == 'passwordCreated' %} 
+          <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }} <br/>
+                        <i style="color: blue;">{{ message.message.otherInfo }}</i>
+                    </p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'login' %}" class="btn btn-primary" style="float: right; margin: 2%;">Log In</a>
+                </footer>
+          </div>   
+
+          {% elif message.extra_tags == 'passwordCreationDontMatch' %} 
+          <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }}
+                    </p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'createPassword' %}" class="btn btn-primary" style="float: right; margin: 2%;">Ok</a>
+                </footer>
+          </div>   
+
+          {% elif message.extra_tags == 'passwordLessThenSixCharacters' %} 
+          <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }}
+                    </p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'createPassword' %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>
+
+          {% elif message.extra_tags == 'noLogInAccess' %} 
+          <div class="col-md-6 col-lg-4 card shadow " style="margin: 2%;">
+              <div class="card-header bg-danger">
+                  <h3 style="color: green;">{{ message.level_tag }}</h3>
+              </div>
+              <div class="card-body">
+                  <div class="card-text">
+                    <h4 class="card-title">{{message.message.title}}</h4>
+                    <hr/>
+                    <p class="card-text" style="font-size: larger;">{{ message.message.message }}
+                    </p>
+                  </div>
+                </div>
+                <footer>
+                    <a href="{% url 'login' %}" class="btn btn-primary" style="float: right; margin: 2%;">Try Again</a>
+                </footer>
+          </div>   
+
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endblock %}

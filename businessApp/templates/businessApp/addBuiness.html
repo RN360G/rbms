@@ -1,0 +1,92 @@
+{% extends "dashboardApp/rbms.html" %}
+
+{% load static %}
+{% block rbms %}
+	<div class="row justify-content-center">
+		<div class="col-md-9 col-lg-12 col-xl-10">
+			<div class="card shadow-lg o-hidden border-0 my-5">
+				<div class="card-body p-0">
+					<div class="row">
+						<div class="col-lg-6 col-xl-5 d-none d-lg-flex">
+							<div class="flex-grow-1 bg-login-image" style="background-image: url({% static "img/log.jpg" %});"></div>
+						</div>
+						<div class="col-lg-6">
+							<div class="p-5">
+                                <a href="{% url 'generalMarket' %}" class="btn btn-outline-dark fa fa-arrow-left">Back</a>
+								<div class="text-center">
+									<h4 class="text-dark mb-4">Create Business Account</h4>
+								</div>
+								<form class="user" method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label" for="busName">Business Name</label>
+                                        <input class="form-control" type="text" id="busName" name="busName" required>
+                                    </div>
+                                    <div class="mb-3"><label class="form-label" for="subject">Business Main Branch Type (<b style="color: red">This cannot be changed</b>)</label>
+                                        <select class="form-select" id="subject" required name="busType">
+                                            <option></option>
+                                            <option>Retail & Wholesale Business</option>
+                                            <option>Farming Business</option>
+                                            <option>Manufacturing Business</option>
+                                            <option>Hotel Business</option>
+                                            <option>Resturant & Bar Business</option>
+                                            <option>Transportation Business</option>
+                                            <option>Event Management</option>
+                                            <option>Real Estate Business</option>
+                                        </select>
+                                    </div>
+                                    <div class="helper-text">The main branch of your business will be created automatically. You can add more branches after creating the business account.</div>
+                                    <hr/>
+                                    <h3 class="text-center">Business Owner's Details</h3>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="email">Active Email Address</label>
+                                            <input class="form-control" type="email" id="email" name="email" required>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="tel">Active phone number</label>
+                                            <input class="form-control" type="tel" id="tel" name="tel" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="fName">First name</label>
+                                            <input class="form-control" type="text" id="fName" name="fName" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="sName">Other Names</label>
+                                            <input class="form-control" type="text" id="sName" name="sName" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="dob">Date of Birth</label>
+                                            <input class="form-control" type="date" id="dob" name="dob" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="town">Home Town/Address</label>
+                                            <input class="form-control" type="text" id="town" name="town" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-6 button">
+                                                <button class="btn btn-primary d-block w-100" type="submit">Create Now</button>
+                                            </div>
+                                        </div>
+                                    </div>
+								</form>
+								<div class="text-center"><a class="small" href="{% url 'login' %}">Log In</a></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock rbms  %}

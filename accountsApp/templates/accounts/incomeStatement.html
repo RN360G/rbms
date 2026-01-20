@@ -1,0 +1,369 @@
+
+{% extends 'warehouse/warehouse.html' %}
+{% load static %}
+
+{% block warehouse %}
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+
+        </ul>
+        <br/>
+        <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="customers">                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Statement Type</label>
+                            <select class="form-control" id="statementType" name="statementType">
+                                <option value='100'>1. Business Income Statement</option>
+                                <option value='101'>2. Branch Income Statement</option>                                
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Branch</label>
+                            <select class="form-control" id="branch" name="branch">
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>From</label>
+                                    <input type="date" class="form-control" name="fromDate" id="fromDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>To</label>
+                                    <input type="date" class="form-control" name="toDate" id="toDate" required>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block fa fa-search" type="submit"> Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </form> 
+                <a class="btn btn-primary fa fa-print" style="float: right; margin-right: 10%;" href="#">Print</a>
+                <hr/>
+                <div class="container bg-gradient-light py-5 shadow">
+                    {% if statementType == '100' %}
+                        <h2 class="text-center"><b>Income Statement</b></h2>
+                        <h3 class="text-center"><b>{{business.busName}}</b> ({{business.busID}})</h3>
+                        <h4 class="text-center"><b>For the period <u>30th June, 2024</u>, to <u>30th August, 2024</u></b></h4>
+                    {% elif statementType == '101' %}
+                        <h2 class="text-center"><b>Income Statement</b></h2>
+                        <h3 class="text-center"><b>{{business.busName}}</b> ({{business.busID}})</h3>
+                        <h3 class="text-center"><b>{{branch.branchName}}</b> ({{branch.branchID}})</h3>
+                        <h4 class="text-center"><b>For the period <u>{{startDate}}</u>, to <u>{{endDate}}</u></b></h4>
+                    {% endif %}
+                    <br/>
+                    <!--Revenue ==========================================================================================-->
+                    <h3><u><b>Revenue</b></u></h3>               
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Sales Revenue:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{revenue|floatformat:2}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Service Income:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>0.00</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b><u>Total Revenue:</u></b></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5><b><u>{{revenue|floatformat:2}}</u></b></h5>
+                        </div>
+                    </div>
+
+                    <!--cash Overages ==========================================================================================-->
+                    <br/>
+                    <h3><u><b>Cash Overages</b></u></h3>                 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Amount:</b></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5><b><u>{{overs|floatformat:2}}</u></b></h5>
+                        </div>
+                    </div>
+
+                    <!--Cost of Goods Sold ==========================================================================================-->
+                    <br/>
+                    <h3><u><b>Cost of Goods Sold</b></u></h3>                   
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Sold Goods:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{goodsSold|floatformat:2}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Damaged Goods:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{damages|floatformat:2}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Lost Goods:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{lost|floatformat:2}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Expired Goods:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{expires|floatformat:2}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b><u>Total Sold Cost:</u></b></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5><b><u>{{totalSoldCost|floatformat:2}}</u></b></h5>
+                        </div>
+                    </div>
+
+                    <!--cash Shortages==========================================================================================-->
+                    <br/>
+                    <h3><u><b>Cash Shortages</b></u></h3>                
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Amount:</b></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5><b><u>{{shortages}}</u></b></h5>
+                        </div>
+                    </div>
+
+                    <!--Operating Expenses ==========================================================================================-->
+                    <br/>
+                    <h3><u><b>Operating Expenses</b></u></h3>                  
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Branch operations:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{branchOpertion}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Internet:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{internetFees}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Transportation:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{transportation}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Fuel:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{fuel}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Electricity Bill:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{electricityBill}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Water Bill:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{waterBill}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Rent:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{rent}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Salaries and Wages:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{salariesAndWages}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Tax:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{tax}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Maintenance and Repairs:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{maintenance}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Allowance:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{allowance}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Advertising and Marketing:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{advertAndmarketing}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Meals and Entertainment:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{mealsAndEntertainment}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Security:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{security}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Other Expenses:</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>{{others}}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b><u>Total Expenses:</u></b></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5><b><u>{{totalExpenses}}</u></b></h5>
+                        </div>
+                    </div>
+
+                    <!--cash Overages ==========================================================================================-->
+                    <br/>
+                    <h3><u><b>Net Income</b></u></h3>                  
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Amount:</b></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5><b><u>{{netIncome|floatformat:2}}</u></b></h5>
+                        </div>
+                    </div>
+
+                    <!--Gross Income ==========================================================================================-->
+                    <br/>
+                    <h3><u><b>Gross Income</b></u></h3>                   
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Amount:</b></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5><b><u>{{groseIncome|floatformat:2}}</u></b></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>        
+        const performanceType = document.getElementById('statementType');
+        const subject = document.getElementById('branch');
+        var optionsList = [];        
+
+        performanceType.addEventListener('click', function(){
+            subject.options.length = 0;
+            optionsList.length = 0; 
+            $.ajax({
+                url: '/sales/salessearchperformance',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'performanceType': performanceType.value,
+                    'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val(),
+                },
+                success: function (response){                    
+                    for(var i=0; i < response.data.length; i++)
+                    {                        
+                        optionsList.push(response.data[i]);                                      
+                    } 
+                    // we will manipulate the second select here and dates here
+                    if(response.option == '101' || response.option == '104' || response.option == '109' || response.option == '115' || response.option == '116' || response.option == '119' || response.option == '120'){
+                        optionsList.forEach(function(item, index){
+                            var option = document.createElement('option');
+                            option.value = item.branchID;
+                            option.textContent = item.branchName;
+                            subject.appendChild(option);
+                        });
+                        subject.style.display = "inline";
+                    }
+                    else{
+                        subject.style.display = "none";
+                    } 
+                    
+                    
+
+                },
+                error: function (error){
+                    alert('error: operation failed!');
+                }
+            });
+        });
+    </script>
+{% endblock warehouse %}
+
+
+
+
+
+

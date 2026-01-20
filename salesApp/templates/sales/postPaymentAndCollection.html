@@ -1,0 +1,178 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% block warehouse %}    
+    <div>
+        <div class="tab-content">
+            <!--details==============================================================================================================================-->
+            {% if opt == 'details' %}
+            <div class="tab-pane active" role="tabpanel">                
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <a href="{% url 'salesSalesRecords' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                    <h2><span class="fa fa-book"></span> Transaction Details</h2>
+                    <p style="float:left">
+                        <span style="float:left">Trans ID: <b>{{transaction.transactionID}}</b></span><br/>
+                        <span style="float:left">Payment Term: <b>{{transaction.paymentTerms}}</b></span><br/>
+                        <span>Customer: <b>{{transaction.customerName}}</b></span> <br/>
+                        <span>Tel: <b>{{transaction.customerTel}}</b></span> <br/>
+                        <span>By: <b>{{transaction.transactionBy.userRef.firstName}} {{transaction.transactionBy.userRef.surname}}</b> ({{transaction.transactionBy.userID}})</span> <br/>
+                    </p>
+                    <p style="float:right">
+                        <span>Total Price: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.totalAmount|floatformat:2}}</b></span> <br/>
+                        <span>Discount <i style="color: #c67605">GH&#8373</i> <b>{{transaction.discount|floatformat:2}}</b></span> <br/>
+                        <span>Amount Due: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountToPay|floatformat:2}}</b></span> <br/>
+                        <span>Amount Paid: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountToPay|floatformat:2}}</b></span> <br/>
+                        <span>Amount Owe: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountOwe|floatformat:2}}</b></span> <br/>
+                    </p>
+                    
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>                                
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                                <tr class="even gradeA">
+                                    <td>{{ item.productName}}</td>
+                                    <td>{{ item.quantity}}</td>
+                                    <td>{{ item.pricePerUnit}}</td>
+                                    <td>{{ item.totalPrice}}</td>
+                                    <td class="center">
+                                        <a href="" class="btn btn-outline-dark fa fa-book">Return</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!--payment==============================================================================================================================-->
+            {% elif opt == 'payment' %}
+            <div class="tab-pane active" role="tabpanel">                
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <a href="{% url 'salesSalesRecords' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                    <h2><span class="fa fa-money"></span> Make Payment</h2>
+                    <p>
+                        <span>Trans ID: <b>{{transaction.transactionID}}</b></span><br/>
+                        <span>Payment Term: <b>{{transaction.paymentTerms}}</b></span><br/>
+                        <span>Customer: <b>{{transaction.customerName}}</b> (<b>{{transaction.customerTel}}</b>)</span> <br/>
+                        <span>Amount Due: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountToPay|floatformat:2}}</b></span> <br/>                        
+                        <span>Amount Owe: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountOwe|floatformat:2}}</b></span> <br/>
+                    </p>
+                    {% if transaction.amountOwe > 0 %}
+                    <form method="post" action="{% url 'postPaymentAndCollection' transaction.id 'payment' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="amount"> Amount<b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="amount" name="amount" min="0" max="{{transaction.amountOwe}}" step="any" required style="height: 70px; font-size: 50px">
+                                <p style="font-size: large; color: black;">Enter amount to pay</i> </p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="paidBy"> Paid By<b style="color: red">*</b></label>
+                                <input class="form-control" type="text" id="paidBy" name="paidBy" required value="{{transaction.customerName}}" style="height: 70px; font-size: 50px">
+                                <p style="font-size: large; color: black;">The Name of the person whom you received the cash from</i> </p>
+                            </div>
+                        </div>                        
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary" type="submit">Pay Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr/>                   
+                    
+                    {% endif %}
+
+                    <h4>Payments</h4>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>                                
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Balance</th>
+                                    <th>Paid By</th>
+                                    <th>Received By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pay in payments %}
+                                    <tr class="even gradeA">
+                                        <td>{{ pay.date}}</td>
+                                        <td>{{ pay.amountPaid|floatformat:2}}</td>
+                                        <td>{{ pay.balance|floatformat:2}}</td>
+                                        <td>{{ pay.paidBy}}</td>
+                                        <td>{{ pay.paymentBy.userRef.firstName}} {{ pay.paymentBy.userRef.surname}} <br/> {{ pay.paymentBy.userRef.userID}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                </div>                
+            </div>
+
+            <!--collect==============================================================================================================================-->
+            {% elif opt == 'collect' %}
+            <div class="tab-pane active" role="tabpanel">                
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <a href="{% url 'salesSalesRecords' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                    <p>
+                        <span>Trans ID: <b>{{transaction.transactionID}}</b></span><br/>
+                        <span>Payment Term: <b>{{transaction.paymentTerms}}</b></span><br/>
+                        <span>Customer: <b>{{transaction.customerName}}</b> (<b>{{transaction.customerTel}}</b>)</span> <br/>
+                        <span>Amount Due: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountToPay|floatformat:2}}</b></span> <br/>                        
+                        <span>Amount Paid: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountPaid|floatformat:2}}</b></span> <br/>
+                    </p>
+                    <h2><span class="fa fa-circle"></span> Item collection</h2>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>                                
+                                <th>Item</th>
+                                <th>Stock Available</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total Price</th>
+                                <th>Quantity to collect</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in advanceItem %}
+                                <tr class="even gradeA">
+                                    <td>{{ item.productRef.productName}} <br/> <sup>{{item.productRef.productCode}}</sup></td>
+                                    <td>{{ item.productRef.retailAndWholesaleRef.quantityRef.uintQty}}</td>
+                                    <td>{{ item.quatity}}</td>
+                                    <td>{{ item.pricePerUnit}}</td>
+                                    <td>{{ item.totalPrice|floatformat:2}}</td>
+                                    <td class="center">
+                                        <form method='post' action="">
+                                            {% csrf_token %}
+                                            {% if transaction.amountToPay == transaction.amountPaid and item.quatity != 0 %}
+                                                <input type="hidden" name="productRef" value="{{ item.productRef.id}}"/> 
+                                                <input type="number" name="qty" min="0" max="{{ item.quatity}}" class="form-control"/>
+                                                <button class="btn btn-primary" type="submit">Collect Now</button>                                            
+                                            {% endif %}
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% endif %}
+        </div>
+    </div>
+{% endblock warehouse %}
+
+
+
+
+
+

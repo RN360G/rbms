@@ -1,0 +1,28 @@
+.collapse {
+    width: 100%;
+}
+
+ul.navbar-nav {
+    width: 80%;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+ul.navbar-nav li {
+    display: inline-block;
+    float: none;
+}
+
+
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+ul.navbar-nav::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  ul.navbar-nav {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+

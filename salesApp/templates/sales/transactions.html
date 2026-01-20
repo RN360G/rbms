@@ -1,0 +1,52 @@
+{% extends 'warehouse/warehouse.html' %}
+{% load static %}
+
+{% block warehouse %}    
+    <div>
+        <div class="tab-content">
+            <!--Customers==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <a href="{% url 'salesSelling' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
+                    <h2><span class="fa fa-book"></span> Transactions On Hold</h2>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Transaction ID</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                                <tr class="even gradeA">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ transaction.transactionID}}</td>
+                                    <td>{{ transaction.date}}</td>
+                                    {% if transaction.isSelcted %}
+                                       <td style="color: green">Active</td>
+                                    {% else %}
+                                        <td>On Hold</td>                                    
+                                    {% endif %}                                    
+                                    <td class="center">
+                                        <a href="{% url 'salesSelectTransactionID' transaction.id 'activate' %}" class="btn btn-outline-dark fa fa-check"> Activate</a>
+                                        <a href="{% url 'salesSelectTransactionID' transaction.id 'onHold' %}" class="btn btn-outline-dark fa fa-pause"> Put on Hold</a>
+                                        <a href="{% url 'salesDeleteTransactionID' transaction.id %}" class="btn btn-outline-danger fa fa-remove"> Delete</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock warehouse %}
+
+
+
+
+
+

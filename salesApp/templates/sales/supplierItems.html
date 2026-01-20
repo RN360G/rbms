@@ -1,0 +1,39 @@
+{% extends 'warehouse/warehouse.html' %}
+{% load static %}
+
+{% block warehouse %}    
+    <div>
+        <div class="tab-content">
+            <!--Customers==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <a href="{% url 'salesSupplierDetails' sup %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                    <span style="float:right">Total Cost: <i style="color: #c67605">GH&#8373</i><b>{{supplierRecord.totalCost}}</b></span>
+                    <h2><span class="fa fa-cart-arrow-down"></span> Items Received</h2>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Cost</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in individualItems %}
+                                <tr class="even gradeA">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ item.productRef.productName}}<br/> <sup>{{item.productRef.productCode}}</sup></td> 
+                                    <td>{{ item.qty}}</td>   
+                                    <td>{{ item.unityCost}}</td>
+                                    <td>{{ item.totalCost}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

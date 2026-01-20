@@ -1,0 +1,128 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% block warehouse %}
+    <a href="{% url 'salesCustomers' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
+    <div style="margin-top: 1%;">
+        <h5><span class="fa fa-user"></span> Customer Details: {{ customer.customerName }} (<b>{{customer.customerContact }}</b>)</h5>
+    </div> 
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#customers"> Customer Transactions</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#amountFromOtherBranches"> Amount Owe From all Branches</a></li>            
+            <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#advancePayItems"> Avance Payment Items</a></li>
+        </ul>
+        <br/>
+        <div class="tab-content">
+            <!--Customers==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <h2><span class="fa fa-cart-plus"></span> Transactions <span style='float: right'>Total Owe: <b>{{thisBranch}}</b></span></h2>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Date</th>
+                                <th>Transaction ID</th>
+                                <th>Transaction Type</th>
+                                <th>Payment Terms</th>
+                                <th>Total Price</th>
+                                <th>Discount</th>
+                                <th>Amount Due</th>
+                                <th>Amount Paid</th>
+                                <th>Amount Owe</th>
+                                <th>Total Owing Bal</th>
+                                <th>Narration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trans in transactions %}
+                                <tr class="even gradeA">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ trans.transactionDate}}</td>
+                                    <td>{{ trans.transactionID}}</td>
+                                    <td>{{ trans.transactionType}}</td>
+                                    <td>{{ trans.paymentTerms}}</td>
+                                    <td>{{ trans.totalPrice}}</td>
+                                    <td>{{ trans.discount}}</td>
+                                    <td>{{ trans.amountTopay}}</td>
+                                    <td>{{ trans.amountPaid}}</td>
+                                    <td>{{ trans.amountOwe}}</td>
+                                    <td>{{ trans.oweBalance}}</td>
+                                    <td style="font-size: 13px">{{ trans.narration}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!--owe from all branches ==============================================================================================================================-->
+            <div class="tab-pane" role="tabpanel" id="amountFromOtherBranches">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <h2><span class="fa fa-money"></span> Amount Owe from all Branches<span style='float: right'>Total Owe: <b>{{allBranch}}</b></span></h2>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Branch Name</th>
+                                <th>Branch ID</th>
+                                <th>Amount To Pay</th>
+                                <th>Amount Paid</th>
+                                <th>Amount Owe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trans in oweOtherBranches %}
+                                <tr class="even gradeA">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ trans.branchRef__branchName}}</td>
+                                    <td>{{ trans.branchRef__branchID}}</td>
+                                    <td>{{ trans.amountToPay__sum}}</td>
+                                    <td>{{ trans.amountPaid__sum}}</td>
+                                    <td>{{ trans.amountOwe__sum}}</td>                                   
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Advance Payment Items ==============================================================================================================================-->
+            <div class="tab-pane" role="tabpanel" id="advancePayItems">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <h2><span class="fa fa-cart-plus"></span> Advance Payment Itesm <span style='float: right'>Total Price: <b>{{advancePayTotalPrice}}</b></span></h2>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Item</th>
+                                <th>Transaction ID</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trans in advancePayitems %}
+                                <tr class="even gradeA">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ trans.productRef.productName}} <br/> {{trans.productRef.productCode}}</td>
+                                    <td>{{ trans.payAgreemtRef.transactionID}}</td>
+                                    <td>{{ trans.quatity}}</td>
+                                    <td>{{ trans.pricePerUnit}}</td>
+                                    <td>{{ trans.totalPrice}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock warehouse %}
+
+
+
+
+
+

@@ -1,0 +1,210 @@
+{% extends "dashboardApp/index.html" %}
+
+{% block index %}
+<div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation"><a class="nav-link active fa fa-plus" role="tab" data-bs-toggle="tab" href="#businessBranches"> Branches</a></li>
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-plus" role="tab" data-bs-toggle="tab" href="#addBranch"> Add Branch</a></li>
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#busDetails"> Business Details</a></li>
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#switchBranch"> Switch Branch</a></li>
+    </ul>
+    <br/>
+    <div class="tab-content">
+        <div class="tab-pane active" role="tabpanel" id="businessBranches">
+            <div class="container-fluid bg-gradient-light py-5 shadow">
+                <h2>Business Branches</h2>
+                <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                    <thead>
+                        <tr>
+                            <th>Count</th>
+                            <th>Branch ID</th>
+                            <th>Branch Name</th>
+                            <th>Branch Type</th>
+                            <th>Operation Time</th>
+                            <th>Online Visibility</th>
+                            <th>Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dat in branches %}
+                            <tr class="even gradeA"> 
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ dat.branchID }}</td>
+                                <td>{{ dat.branchName }}</td>
+                                <td>{{ dat.branchType }}</td>
+
+                                {% if dat.operateAllTime %}
+                                <td class="center">All Time</td>
+                                {% else %}
+                                    <td class="center"><b>{{dat.fromTime}}</b> -> <b>{{dat.toTime}}</b></td>
+                                {% endif %}
+
+                                {% if dat.onlineVisibility%}
+                                <td class="center text-primary">Online</td>
+                                {% else %}
+                                    <td class="center text-danger">Offline</td>
+                                {% endif %}                                
+                                <td class="center">
+                                    <a href="#" class="btn btn-outline-dark fa fa-edit"> Edit</a>
+                                    <a href="{% url "setWorkingHours" dat.branchID "render" %}" class="btn btn-outline-dark fa fa-clock"> Working Hours</a>
+                                    <a href="{% url "onlineVisibility" dat.branchID  %}" class="btn btn-outline-dark fa fa-globe"> Online Visibility</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="tab-pane" role="tabpanel" id="busDetails">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2>Business Details</h2>
+                <form class="user" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="busType">Business ID:</label>
+                            <input class="form-control" type="text" id="busName" name="busName" value="{{business.busID}}" style="color: goldenrod;" disabled required>
+
+                            <label class="form-label" for="busName">Business Name: <b style="color: goldenrod;">{{business.busName}}</b></label>
+                            <input class="form-control" type="text" id="busName" name="busName" value="{{business.busName}}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="busType">Registration Number:</label>
+                            <input class="form-control" type="text" id="busName" name="busName" style="color: goldenrod;" value="{{business.registrationNumber}}" disabled required>
+
+                            <label class="form-label" for="busType">Business Location:</label>
+                            <input class="form-control" type="text" id="busName" name="busName" style="color: goldenrod;" value="{{business.BusinessLocation}}" disabled required>
+                        </div>
+                    </div>       
+
+                    <hr/>
+                    <h3 class="text-center">Business Owner's Details</h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="email">Active Email Address</label>
+                            <input class="form-control" type="email" id="email" name="email" style="color: goldenrod;" value="{{business.busEmail}}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="tel">Active phone number</label>
+                            <input class="form-control" type="tel" id="tel" name="tel" style="color: goldenrod;" value="{{business.busTel}}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="name">Full Name</label>
+                            <input class="form-control" type="text" id="name" name="name" style="color: goldenrod;" value="{{business.busOwner}}" required>
+                        </div>
+                    </div>
+                     <br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>           
+        </div>
+
+        <div class="tab-pane" role="tabpanel" id="addBranch">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2>Add Branch</h2>
+                <form class="user" method="post">
+                    {% csrf_token %} 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="branchName">Branch Name</label>
+                            <input class="form-control" type="text" id="branchName" name="branchName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="fName">Busines Type</label>
+                            <select class="form-select" id="subject" required name="busType">
+                                <option></option>
+                                <option>Retail & Wholesale Business</option>
+                                <option>Farming Business</option>
+                                <option>Manufacturing Business</option>
+                                <option>Hotel Business</option>
+                                <option>Resturant & Bar Business</option>
+                                <option>Transportation Business</option>
+                                <option>Event Management</option>
+                                <option>Real Estate Business</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input class="form-control" type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="tel">Branch Tel</label>
+                            <input class="form-control" type="tel" id="tel" name="tel" required>
+                        </div>
+                    </div><br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Create Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="tab-pane" role="tabpanel" id="switchBranch">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2>Switch Branch</h2>
+                <form class="user" method="post" action="{% url 'switchBranch' %}">
+                    {% csrf_token %} 
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="fName">Select Branch</label>
+                            <select class="form-select" id="branch" required name="branch">
+                                <option></option>
+                                {% for branch in branches%}
+                                    {% if branch.branchID != request.session.branchID %}                                 
+                                        <option value="{{branch.branchID}}">{{branch.branchName}} ({{branch.branchID}})</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fa fa-lock" for="email">Confirm with your Password</label>
+                            <input class="form-control" type="Password" id="Password" name="Password" required>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-outline-primary d-block w-100" type="submit">Switch Branch Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    let dob = document.getElementById("ownerDOB").value;
+    var dat1 = new Date(dob);
+    document.getElementById("dob").value=dat1;
+    //alert(dat1);
+
+</script>
+{% endblock index %}
