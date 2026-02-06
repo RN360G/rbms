@@ -35,17 +35,21 @@ urlpatterns = [
     path('salesgivediscount', views.Payment.discount, name='salesDiscount'),
     path('salesgeneraldiscount', views.SetProductProperties.generalDiscount, name='salesGeneralDiscount'),
     path('salessalesrecords', views.SalesRecordsView.as_view(), name="salesSalesRecords"),
+    path('salesrepayments', views.SalesRecordsView.repayOwe, name="salesRepayments"),
+    path('salestobecollecteditems', views.SalesRecordsView.toBeCollectedItems, name="salesToBeCollectedItems"),
     path('salesindividualdiscount/<pk>', views.SetProductProperties.individualDiscount, name='salesIndividualDiscount'),
     path('salescurrentitemsaddedtocart/<transID>', views.Selling.currentCart, name='salesCurrentItemToCart'),
     path('salesdeleteitemfromcart/<pk>', views.Selling.deleteParticularItemAddedToCart, name='deleteParticularItemAddedToCart'),
     path('salesperformanceanalysis', views.PerformanceAnalysis.as_view(), name='perfomanceAnalysis'),
     path('salessearchperformance', views.PerformanceAnalysis.search, name='salesSearchPerformance'),
     path('salesgetperfomanceresults', views.PerformanceAnalysis.getSearchResult, name='salesGetSearchResult'),
-
     path('salesgetcustomername', views.Payment.getCustomerName, name="salesGetCustomerName"),
     path('salesexecutesavepayment/<opt>/', views.Payment.executeSavePayment, name='salesExecuteSavePayment'),
     path('salesconfirmagreemwntcode/', views.Payment.confirmAgreementCode, name='salesConfirmAgreementCode'),
     path('salesdeleteagreementcode/', views.Payment.deleteCurrentAgreementCode, name='deleteCurrentAgreementCode'),
-    path('salespostpaymentcollection/<pk>/<opt>/', views.PostPaymentAndCollection.as_view(), name='postPaymentAndCollection')
+    path('salespostpaymentcollection/<pk>/<opt>/', views.PostPaymentAndCollection.as_view(), name='postPaymentAndCollection'),
+    path('salessetreturnperiod/<pk>', views.SetProductProperties.setReturnPeriod, name='salesReturnPeriod'),
+    path('salesreturncustomerproduct/<productCode>/<transID>/', views.ReturnProduct.as_view(), name='salesReturnProduct'),
+    path('salesprintcollecteditems/<transactionID>/<opt>/', views.Receipts.printCollectedItems, name='salesPrintCollectedItems')
 ]
 

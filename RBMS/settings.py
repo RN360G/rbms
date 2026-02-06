@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'manufacturingApp',
     'realEstateApp',
     'restaurantAndBarApp',
+    'richnet360',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

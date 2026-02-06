@@ -1,3 +1,4 @@
+from urllib import request
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
@@ -13,13 +14,32 @@ import random as rd
 from django.contrib import messages
 from businessApp.models import BusinessBranch, Business
 from django.views.decorators.http import require_http_methods
-
+from loginAndOutApp.views import dashboardMenuAccess
+from usersApp.views import activityLogs, haveAccess
 
 # Create your views here.
 
 class AccountsView(generic.View):
     def get(self, request, type):
+        dashboardMenuAccess(request)
+        access = {
+              '4':haveAccess(request, '4'),              
+              '400':haveAccess(request, '400'), 
+              '401':haveAccess(request, '401'), 
+              '402':haveAccess(request, '402'), 
+              '403':haveAccess(request, '403'), 
+              '404':haveAccess(request, '404'),
+
+              '5':haveAccess(request, '5'),
+              '500':haveAccess(request, '500'), 
+              '501':haveAccess(request, '501'),
+              '502':haveAccess(request, '502'),
+            }
         if type == 'business':
+            if not haveAccess(request, '5'):
+                messages.set_level(request, messages.WARNING)
+                messages.warning(request, {'message': 'You do not have access to business account management page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+                return render(request, 'user/state.html')  
             # get all accounts
             acc = Accounts.objects.filter(Q(busRef=loginSessions(request, 'business'))).order_by('-accountBalance')
             suspenseInterbranch = SuspenseAccount.objects.filter(Q(toAccountRef__accountNumber=loginSessions(request, 'business').busID) & Q(option='interBranch'))
@@ -33,8 +53,12 @@ class AccountsView(generic.View):
 
             totalShortages = branchShortages.aggregate(Sum('shortageAmount'))['shortageAmount__sum']
             totalOvers = branchShortages.aggregate(Sum('overAmount'))['overAmount__sum']
-            return render(request, 'accounts/accounts.html', {'accounts': acc, 'suspenesAccountFunds': suspenseInterbranch, 'totalAmt': totalAmountTobeAuthorize, 'toAccounts': toAccounts, 'businessAccountBal': businessAccountBal, 'branchShortages': branchShortages, 'totalShortages': totalShortages, 'totalOvers': totalOvers})
+            return render(request, 'accounts/accounts.html', {'accounts': acc, 'uAccess':access,'suspenesAccountFunds': suspenseInterbranch, 'totalAmt': totalAmountTobeAuthorize, 'toAccounts': toAccounts, 'businessAccountBal': businessAccountBal, 'branchShortages': branchShortages, 'totalShortages': totalShortages, 'totalOvers': totalOvers})
         else:
+            if not haveAccess(request, '4'):
+                messages.set_level(request, messages.WARNING)
+                messages.warning(request, {'message': 'You do not have access to branch account management page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+                return render(request, 'user/state.html')
             acc = Accounts.objects.filter(Q(busRef=loginSessions(request, 'business')) & Q(branchRef=loginSessions(request, 'branch')))
             transactions = AccountTransaction.objects.filter(Q(accountRef__accountNumber=loginSessions(request, 'branch').branchID)).order_by('-id')
             toAccounts = Accounts.objects.filter(Q(busRef=loginSessions(request, 'business'))).exclude(Q(accountNumber=loginSessions(request, 'branch').branchID) | Q(accountType='Staff Account'))
@@ -47,19 +71,21 @@ class AccountsView(generic.View):
             totalOver = shortages.aggregate(Sum('overAmount'))['overAmount__sum']
 
             totalAmountTobeAuthorize = suspenseCashOnHand.aggregate(Sum('amount'))['amount__sum']
-            return render(request, 'accounts/branchAccount.html', {'accounts': acc, 'branchAccountTransactions': transactions, 'toAccounts': toAccounts, 'branchAccountBal': branchAccountBal, 'suspenesAccountFunds': suspenseCashOnHand, 'totalAmt': totalAmountTobeAuthorize, 'suspenseInterbranch': suspenseInterbranch, 'shortages': shortages, 'totalShortages': totalShortages, 'totalOvers': totalOver})
+            return render(request, 'accounts/branchAccount.html', {'accounts': acc, 'uAccess':access, 'branchAccountTransactions': transactions, 'toAccounts': toAccounts, 'branchAccountBal': branchAccountBal, 'suspenesAccountFunds': suspenseCashOnHand, 'totalAmt': totalAmountTobeAuthorize, 'suspenseInterbranch': suspenseInterbranch, 'shortages': shortages, 'totalShortages': totalShortages, 'totalOvers': totalOver})
     
     def post(self, request, type):
         return HttpResponse()
     
     # Get branch account transactions
     def branchAccountTransactions(request, pk):
+        dashboardMenuAccess(request)
         account = Accounts.objects.get(Q(id=pk))
         transactions = AccountTransaction.objects.filter(Q(accountRef__accountNumber=account.accountNumber)).order_by('-id')
         return render(request, 'accounts/branchAccountTransactions.html', {'account': account, 'transactions': transactions})
     
     # Get business account transactions
     def businessAccountTransactions(request, pk):
+        dashboardMenuAccess(request)
         account = Accounts.objects.get(Q(id=pk))
         transactions = AccountTransaction.objects.filter(Q(accountRef__accountNumber=account.accountNumber)).order_by('-id')
         return render(request, 'accounts/businesAccountTransactions.html', {'account': account, 'transactions': transactions})
@@ -110,11 +136,20 @@ class AccountsView(generic.View):
 # expenses view
 class ExpensesView(generic.View):
     def get(self, request):
+        if not haveAccess(request, '13'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to expenses page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
+        dashboardMenuAccess(request)
         exp = OperationExpenses.objects.filter(Q(branchRef=loginSessions(request, 'branch')) & Q(enteredBy=loginSessions(request, 'user'))).order_by('-id')
         account = Accounts.objects.get(Q(accountNumber=loginSessions(request, 'branch').branchID))
         return render(request, 'accounts/expenses.html', {'expenses': exp, 'account': account})
 
     def post(self, request):
+        if not haveAccess(request, '13'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to expenses page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
         # Process form data here
         expenesType = request.POST.get('expenesType')
         amount = request.POST.get('amount')
@@ -141,6 +176,10 @@ class ExpensesView(generic.View):
                 return redirect('expenses')         
     
     def deleteExpense(request, pk):
+        if not haveAccess(request, '13'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to expenses page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
         exp = OperationExpenses.objects.get(Q(id=pk))
         accountTransactions(request, loginSessions(request, 'branch').branchID, 'Credit', exp.amount, f'Reversed Expenses performed on {exp.dateIncurred}')
         exp.delete()
@@ -173,6 +212,11 @@ def accountTransactions(request, accountNumber, transactiontType, amount, narrat
 
 class CashAnalysisView(generic.View):
     def get(self, request):
+        if not haveAccess(request, '7'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to cash analysis page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
+        dashboardMenuAccess(request)
         checkCashOnHand = CashOnhand.objects.filter(Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
         if not checkCashOnHand.exists():
             return redirect('dashboard')
@@ -196,6 +240,10 @@ class CashAnalysisView(generic.View):
             return render(request, 'accounts/cashanalysis.html', {'cashAnalysis': cashAnalysis, 'cashStatus': cashStatus, 'status': status})
 
     def post(self, request):
+        if not haveAccess(request, '7'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to cash analysis page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
         cash200 = request.POST.get('cash200')
         cash100 = request.POST.get('cash100')
         cash50 = request.POST.get('cash50')
@@ -655,11 +703,20 @@ class SuspenseAccountView(generic.View):
 # pay for shortages
 class ShortagePayment(generic.View):
     def get(self, request, pk, payType):
+        if not haveAccess(request, '400'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to cash shortage payment page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
+        dashboardMenuAccess(request)
         shortage = OversAndShortages.objects.get(Q(id=pk))
         shortagePaymentRecord = ShortagePaymentRecord.objects.filter(Q(oversAndShortagesRef=shortage)).order_by('-id')
         return render(request, 'accounts/shortagePayments.html', {'shortage': shortage, 'payType': payType, 'payments': shortagePaymentRecord})
     
-    def post(self, request, pk, payType):        
+    def post(self, request, pk, payType):  
+        if not haveAccess(request, '400'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to cash shortage payment page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html')       
         narration = request.POST.get('narration')
         amount = request.POST.get('amount')
         if payType == 'Pay':
@@ -712,11 +769,20 @@ class ShortagePayment(generic.View):
 # move overs to branch account after thorogh inverstigaion
 class MoveOversToBranchAccount(generic.View):
     def get(self, request, pk):
+        if not haveAccess(request, '401'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to cash overage movement page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
+        dashboardMenuAccess(request)
         over = OversAndShortages.objects.get(Q(id=pk))
         overWithdrawalRecord = OverWithdrawalRecord.objects.filter(Q(accountRef=over.fromAccountRef)).order_by('-id')
         return render(request, 'accounts/moveOver.html', {'overs': overWithdrawalRecord, 'totalOvers': over.overAmount})
     
     def post(self, request, pk):
+        if not haveAccess(request, '401'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to cash overage movement page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html') 
         with atomic():
             narration = request.POST.get('narration')
             amount = request.POST.get('amount')
@@ -750,7 +816,12 @@ class PayRoll(generic.View):
 
 # income statement
 class IncomeStatementView(generic.View):
-    def get(self, request):
+    def get(self, request):   
+        if not haveAccess(request, '9'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to income statement page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html')   
+        dashboardMenuAccess(request)   
         request.session.setdefault('incomeStatementStartDate', '')
         request.session.setdefault('incomeStatementEndDate', '')
         request.session.setdefault('incomeStatementType', '')
@@ -760,8 +831,9 @@ class IncomeStatementView(generic.View):
         branchID = request.session['incomeStatementBranch']
         startDate = request.session['incomeStatementStartDate']
         endDate = request.session['incomeStatementEndDate']
-        print(f'statementType: {statementType}, branchID: {branchID}, startDate: {startDate}, endDate: {endDate}')
 
+        if startDate == '' or endDate == '' or statementType == '':
+            return render(request, 'accounts/incomeStatement.html')
         
         title = ''
         goods = None
@@ -852,9 +924,8 @@ class IncomeStatementView(generic.View):
                    foundLost = Sum(F('quantity') * F('retailAndWholesaleRef__currentCostPriceRef__unitCostPrice'), filter=Q(adjustmentType='Found Lost Products'), output_field=FloatField())
                 ).filter(Q(retailAndWholesaleRef__branchRef__busRef=loginSessions(request, 'business')) & Q(retailAndWholesaleRef__branchRef__branchID=branchID) & (Q(date__gte=startDate) & Q(date__lte=endDate)))
 
-
         # revenue from goods sold================================================
-        revenue = goods.aggregate(Sum('totalSoldPrice'))['totalSoldPrice__sum']
+        revenue = float(goods.aggregate(Sum('totalSoldPrice'))['totalSoldPrice__sum'] or 0)
 
         # cash overs and shortage ===============================================
         cashOver = overs.aggregate(Sum('overage'))['overage__sum']
@@ -947,5 +1018,4 @@ class IncomeStatementView(generic.View):
         request.session['incomeStatementEndDate'] = endDate
         request.session['incomeStatementType'] = statementType
         request.session['incomeStatementBranch'] = branchID
-
         return redirect('salesIncomeState')

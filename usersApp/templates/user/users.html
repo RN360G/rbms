@@ -49,10 +49,10 @@
                                 {% endif %}
                                 <td class="center">
                                     {% if uAccess.101 %}
-                                        <a href="{% url "editUser" dat.userID %}" class="btn btn-outline-dark fa fa-edit"> Edit</a>
+                                        <a href="{% url 'editUser' dat.userID %}" class="btn btn-outline-dark fa fa-edit"> Edit</a>
                                     {% endif %}
                                     {% if uAccess.102  %}
-                                        <a href="{% url "accessAndRoles" dat.userID %}" class="btn btn-outline-dark fa fa-clock"> Access and Roles</a>                                        
+                                        <a href="{% url 'accessAndRoles' dat.userID %}" class="btn btn-outline-dark fa fa-clock"> Access and Roles</a>                                        
                                     {% endif %}
                                 </td>
                             </tr>
@@ -65,7 +65,7 @@
         <div class="tab-pane" role="tabpanel" id="tab-2">
             <div class="container bg-gradient-light py-5 shadow">
                 <h2><span class="fa fa-user-plus"></span> Add User</h2>
-                <form class="user" method="post" action="{% url "newUser" %}">
+                <form class="user" method="post" action="{% url 'newUser' %}">
                     {% csrf_token %}
 
                     <div class="row">

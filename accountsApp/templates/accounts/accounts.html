@@ -3,11 +3,25 @@
 {% block warehouse %}
     <div>
         <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#accounts"> Accounts</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#fundTransfer"> Transfer Fund</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#shortages"> Overs & Shortages</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#authorizeFundTransfer"> Authorize Transfered Funds</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#depositAndWthdrawal"> Deposit & Withdrawal</a></li>
+            {% if uAccess.5 %}
+                <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#accounts"> Accounts</a></li>
+            {% endif %}
+            
+            {% if uAccess.500 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#fundTransfer"> Transfer Fund</a></li>
+            {% endif %}
+
+            {% if uAccess.5 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#shortages"> Overs & Shortages</a></li>
+            {% endif %}
+
+            {% if uAccess.502 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#authorizeFundTransfer"> Authorize Transfered Funds</a></li>
+            {% endif %}
+            
+            {% if uAccess.501 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#depositAndWthdrawal"> Deposit & Withdrawal</a></li>
+            {% endif %}
         </ul>
         <br/>
         <div class="tab-content">

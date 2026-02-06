@@ -4,11 +4,11 @@
     <div>
         <div class="tab-content">
             <!--details==============================================================================================================================-->
-            {% if opt == 'details' %}
+            {% if opt == 'items' %}
             <div class="tab-pane active" role="tabpanel">                
                 <div class="container-fluid bg-gradient-light py-5 shadow">
                     <a href="{% url 'salesSalesRecords' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
-                    <h2><span class="fa fa-book"></span> Transaction Details</h2>
+                    <h2><span class="fa fa-book"></span> Transaction Items</h2>
                     <p style="float:left">
                         <span style="float:left">Trans ID: <b>{{transaction.transactionID}}</b></span><br/>
                         <span style="float:left">Payment Term: <b>{{transaction.paymentTerms}}</b></span><br/>
@@ -42,7 +42,9 @@
                                     <td>{{ item.pricePerUnit}}</td>
                                     <td>{{ item.totalPrice}}</td>
                                     <td class="center">
-                                        <a href="" class="btn btn-outline-dark fa fa-book">Return</a>
+                                        {% if item.quantity > 0 %}
+                                        <a href="{% url 'salesReturnProduct' item.productCode transaction.transactionID %}" class="btn btn-outline-dark fa fa-book">Return</a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -55,7 +57,7 @@
             {% elif opt == 'payment' %}
             <div class="tab-pane active" role="tabpanel">                
                 <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <a href="{% url 'salesSalesRecords' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                    <a href="{% url 'salesRepayments' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
                     <h2><span class="fa fa-money"></span> Make Payment</h2>
                     <p>
                         <span>Trans ID: <b>{{transaction.transactionID}}</b></span><br/>
@@ -121,7 +123,7 @@
             {% elif opt == 'collect' %}
             <div class="tab-pane active" role="tabpanel">                
                 <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <a href="{% url 'salesSalesRecords' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                    <a href="{% url 'salesToBeCollectedItems' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
                     <p>
                         <span>Trans ID: <b>{{transaction.transactionID}}</b></span><br/>
                         <span>Payment Term: <b>{{transaction.paymentTerms}}</b></span><br/>
@@ -129,7 +131,7 @@
                         <span>Amount Due: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountToPay|floatformat:2}}</b></span> <br/>                        
                         <span>Amount Paid: <i style="color: #c67605">GH&#8373</i> <b>{{transaction.amountPaid|floatformat:2}}</b></span> <br/>
                     </p>
-                    <h2><span class="fa fa-circle"></span> Item collection</h2>
+                    <h2><span class="fa fa-circle"></span> Item collection <a href="{% url 'salesPrintCollectedItems' transaction.transactionID 'awaitCollect' %}" class="fa fa-print btn btn-outline-dark" style="color:blue; float: right"></a></h2>
                     <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
                         <thead>
                             <tr>                                

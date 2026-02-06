@@ -38,11 +38,12 @@
                                     <td>{{ transaction.amountOwe|floatformat:2}}</td>
                                     <td>{{ transaction.transactionBy.userRef.firstName}} {{ transaction.transactionBy.userRef.surname}} <br/> <sup>{{ transaction.transactionBy.userID}}</sup></td>                                 
                                     <td class="center">
-                                        <a href="{% url 'postPaymentAndCollection' transaction.id 'details' %}" class="btn btn-outline-dark fa fa-book"> Details</a>
-                                        <a href="{% url 'postPaymentAndCollection' transaction.id 'payment' %}" class="btn btn-outline-primary fa fa-money"> Payment</a>                                        
+                                        <a href="{% url 'salesPrintCollectedItems' transaction.transactionID 'salesRecord' %}" class="btn btn-outline-dark fa fa-print" style="color: blue"></a>
+                                        <a href="{% url 'postPaymentAndCollection' transaction.id 'items' %}" class="btn btn-outline-dark fa fa-book"> Items</a>
+                                        <!--<a href="{% url 'postPaymentAndCollection' transaction.id 'payment' %}" class="btn btn-outline-primary fa fa-money"> Payment</a>                                        
                                         {% if transaction.paymentTerms == 'Advance payment (AP)' %}
                                             <a href="{% url 'postPaymentAndCollection' transaction.id 'collect' %}" class="btn btn-outline-danger fa fa-money"> Collect Items</a>                                            
-                                        {% endif %}                                      
+                                        {% endif %} -->                                      
                                     </td>
                                 </tr>
                             {% endfor %}

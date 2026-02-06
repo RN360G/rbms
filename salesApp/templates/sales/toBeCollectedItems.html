@@ -1,0 +1,51 @@
+{% extends 'warehouse/warehouse.html' %}
+{% load static %}
+
+{% block warehouse %}    
+    <div>
+        <div class="tab-content">
+            <!--Customers==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <h2><span class="fa fa-book"></span> Awaiting Collection (Paid)</h2>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Payment</th>
+                                <th>Trans ID & Date</th>
+                                <th>Customer</th>
+                                <th>Total Amount</th>
+                                <th>Discount</th>
+                                <th>Amount Due</th>
+                                <th>Amount Paid</th>
+                                <th>Amount Owe</th>
+                                <th>Transaction By</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                                <tr class="even gradeA">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ transaction.paymentTerms}}</td>    
+                                    <td>{{ transaction.transactionDate}} <br/><sup style='color: brown'>{{ transaction.transactionID}}</sup></td>                                                                      
+                                    <td>{{ transaction.customerTel}} <br> <sup>{{ transaction.customerName}}</sup></td>
+                                    <td>{{ transaction.totalAmount|floatformat:2}}</td>
+                                    <td>{{ transaction.discount}}</td>
+                                    <td>{{ transaction.amountToPay|floatformat:2}}</td>
+                                    <td>{{ transaction.amountPaid|floatformat:2}}</td>
+                                    <td>{{ transaction.amountOwe|floatformat:2}}</td>
+                                    <td>{{ transaction.transactionBy.userRef.firstName}} {{ transaction.transactionBy.userRef.surname}} <br/> <sup>{{ transaction.transactionBy.userID}}</sup></td>                                 
+                                    <td class="center"> 
+                                        <a href="{% url 'postPaymentAndCollection' transaction.id 'collect' %}" class="btn btn-outline-danger fa fa-money"> Collect Items</a>                                                             
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

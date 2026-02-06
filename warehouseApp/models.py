@@ -1,5 +1,6 @@
 from django.db import models
 from businessApp.models import Business, BusinessBranch
+from imageApp.models import Images
 
 # Create your models here.
 
@@ -10,6 +11,8 @@ class Product(models.Model):
     productCode = models.CharField(max_length=50)
     productDescription = models.CharField(max_length=200, null=True)
     productCategory = models.CharField(max_length=30)
+    belongsToModel = models.CharField(max_length=50, default='Retail & Wholesale Business')
+    productImageRef = models.ForeignKey(Images, on_delete=models.DO_NOTHING, null=True)
     measureUnit = models.CharField(max_length=20)
     disbleRef = models.ForeignKey('DisabledProducts', on_delete=models.DO_NOTHING, null=True)
     discountRate = models.FloatField(default=0.0)    

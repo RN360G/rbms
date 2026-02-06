@@ -1,0 +1,206 @@
+{% extends "marketPlace/rbms.html" %}
+{% load static %}
+
+{% block rbmsM %}
+<section id="portfolio" class="portfolio">
+    <div class="container-fluid shadow" style="height: 1000px; overflow-y: hidden; overflow-y: scroll;">
+        <div class="text-center">
+            <h1 class="fw-bold">Business Name</h1>
+        </div>
+        <div class="row" style="margin: 1%;" id='products'>            
+            {% for product in products %}
+               {% if product.belongsToModel == 'Retail & Wholesale Business' %}
+                    <div class="col-md-6 col-lg-4 card shadow" style="margin-bottom: 2%;">
+                        <a class="d-block mx-auto portfolio-item" href="#portfolio-modal-1" data-bs-toggle="modal" style="position:relative;">
+                            <div class="d-flex portfolio-item-caption position-absolute h-100 w-100">
+                                <div class="text-center text-white my-auto portfolio-item-caption-content w-100"></div>
+                            </div>
+                            <!-- overlay icons placed inside the image (top-right) -->
+                            <div class="overlay-actions" style="position:absolute;top:8px;right:8px;z-index:50;display:flex;gap:6px;">
+                                <button type="button" class="btn btn-sm p-1 share-btn" aria-label="Share" data-title="{{ product.name }}" data-id="{{ product.id }}" style="background:rgba(255,255,255,0.9);border-radius:4px;border:1px solid rgba(0,0,0,0.08);">
+                                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm p-1 copy-btn" aria-label="Copy link" data-id="{{ product.id }}" style="background:rgba(255,255,255,0.9);border-radius:4px;border:1px solid rgba(0,0,0,0.08);">
+                                    <i class="fa fa-copy" aria-hidden="true"></i>
+                                </button>
+                            </div>
+
+                            <img class="img-thumbnail img-fluid shadow" src="{% static 'imgM/team/safe.png' %}">
+                        </a>
+                        
+                        <div class="card-body px-4 py-4 px-md-5" style="margin-top: 5px;">
+                            <!-- product title / supplier -->
+                            <div class="fw-bold card-title d-flex justify-content-between align-items-start" style="height: auto; gap:8px; margin-bottom:8px;">
+                                <div style="flex-grow:1; overflow: hidden;">
+                                    <span class="product-name d-block" title="{{ product.name }}">{{ product.productName|default:"Product Name" }}</span>
+                                    <div class="small text-muted">
+                                        <i>Supplier:</i> <b class="supplier-name">{{ product.busRef.busName|default:"Supplier" }}</b><br/>
+                                        <sup>{{ product.retailAndWholesaleRef.branchRef.branchName|default:"Supplier" }}</sup>
+                                    </div>
+                                </div>
+                                <!-- pricing row: aligned to the right -->
+                                <div class="mb-2 d-flex justify-content-end align-items-center gap-2">
+                                    {% if product.discountRate == 0 and product.retailAndWholesaleRef.discountRef.discount == 0 %}
+                                        <span  style='color:white'><i>&#8373</i><b class="product-price">{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</b></span>
+                                    {% else %}
+                                        <span class="fw-bold product-price" style='color:brown'><s><i>&#8373</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2|default:"0.00" }}</s></span>
+                                        <span class="fw-bold product-price" style='color:white'><i>&#8373</i><b>{{ product.priceAfterDiscount|floatformat:2 |default:"0.00" }}</b></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- description + action buttons on right -->
+                            <div class="d-flex align-items-start gap-3">
+                                <p class="text-muted card-text mb-0 clamped-text flex-grow-1" style="height: 50px; overflow: hidden;">
+                                    {{ product.productDescription|default:"" }}
+                                </p>
+                                <div class="d-flex gap-2 ms-2 buttons-right align-items-start" style="min-width:48px;">
+                                    <button type="button" class="btn btn-sm btn-outline-primary share-btn p-1" aria-label="Share" data-title="{{ product.name }}" data-id="{{ product.id }}" title="Share">
+                                        <i class="fa fa-share-alt" aria-hidden="true" style="font-size:0.95rem;"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary copy-btn p-1" aria-label="Copy link" data-id="{{ product.id }}" title="Copy link">
+                                        <i class="fa fa-copy" aria-hidden="true" style="font-size:0.95rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="ellipsis-indicator" aria-hidden="true">…</div>
+                        </div>
+                    </div>
+               {% elif product.belongsToModel == 'Hotel'  %}
+               
+               {% endif %}
+
+  
+                
+            {% endfor %} 
+        </div>
+    </div>
+</section>
+
+<!--Product details=============================================================================================================================================-->
+<div class="modal text-center" role="dialog" tabindex="-1" id="portfolio-modal-1">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="col-lg-8 mx-auto">
+                            <h2 class="text-uppercase text-secondary mb-0">Project Name</h2>
+                            <hr class="star-dark mb-5"><img class="img-fluid mb-5" src="{% static 'imgM/team/avatar2.jpg' %}">
+                            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer pb-5"><a class="btn btn-primary btn-lg mx-auto rounded-pill" role="button" data-bs-dismiss="modal"><i class="fa fa-close"></i>&nbsp;Close Project</a></div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // toast
+    function showToast(msg = 'Link copied') {
+        const t = document.createElement('div');
+        t.className = 'copy-toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        requestAnimationFrame(() => t.style.opacity = '1');
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 1400);
+    }
+
+    // clipboard helper (Clipboard API + textarea fallback)
+    async function copyToClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+        }
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            return true;
+        } catch (e) {
+            document.body.removeChild(ta);
+            return false;
+        }
+    }
+
+    function buildUrlForBtn(btn) {
+        const id = btn.dataset.id || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim() || '';
+        const title = btn.dataset.title || btn.closest('.card')?.querySelector('h5')?.innerText?.trim() || document.title;
+        const url = window.location.origin + window.location.pathname + '#biz-' + (id || '');
+        return { id, title, url };
+    }
+
+    // Copy button: silently copy link
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const { url } = buildUrlForBtn(btn);
+            const ok = await copyToClipboard(url);
+            showToast(ok ? 'Link copied' : 'Copy failed');
+        });
+    });
+
+    // Share button: open WhatsApp (mobile/desktop) — Shift+click opens email instead
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const { title, url } = buildUrlForBtn(btn);
+            if (e.shiftKey) {
+                // open email client
+                const mailto = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(title + '\n' + url);
+                window.location.href = mailto;
+                return;
+            }
+            // open WhatsApp (wa.me works on mobile and opens web on desktop)
+            const wa = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
+            // user gesture -> should not be blocked
+            window.open(wa, '_blank', 'noopener,noreferrer');
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // existing copy/share handlers...
+    // ...existing code...
+
+    // show non-blocking ellipsis when text is clipped
+    function updateEllipsisIndicators() {
+        document.querySelectorAll('.clamped-text').forEach(el => {
+            // ensure computed height used
+            const isClipped = el.scrollHeight > el.clientHeight + 1;
+            const cardBody = el.closest('.card-body');
+            if (!cardBody) return;
+            let indicator = cardBody.querySelector('.ellipsis-indicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.className = 'ellipsis-indicator';
+                indicator.setAttribute('aria-hidden','true');
+                indicator.textContent = '…';
+                cardBody.appendChild(indicator);
+            }
+            indicator.style.display = isClipped ? 'block' : 'none';
+        });
+    }
+
+    // run on load and resize (debounced)
+    updateEllipsisIndicators();
+    let rto;
+    window.addEventListener('resize', () => { clearTimeout(rto); rto = setTimeout(updateEllipsisIndicators, 150); });
+});
+</script>
+{% endblock rbmsM %}
+

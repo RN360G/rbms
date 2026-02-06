@@ -97,6 +97,8 @@
                             <h5 class="text-center text-primary"><u>Add User Access</u></h5>
                             <button type="submit" class="btn btn-outline-primary fa fa-plus">Add Access</button>
                             <input type="hidden" name="opt" value="add"/>
+
+                            <h3 style="color:black">User Management</h3>
                             <table width="100%" class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
@@ -108,19 +110,174 @@
                                 </thead>
                                 <tbody>
                                     {% for dat in access %}
-                                        <tr class="even gradeA">
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ dat.accessTitle }}<br/><sup>{{dat.accessCode}}</sup></td>
-                                            <td>{{ dat.accessDescription }}</td>
-                                            <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>
-                                            </td>
-                                        </tr>                                        
+                                        {% if dat.accessGroupCode == '1' and dat.accessCode == '1' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '1' and not dat.accessCode == '1' %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessTitle }}<br/><sup>{{dat.accessCode}}</sup></td>
+                                                <td>{{ dat.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
                                     {% endfor %}
                                 </tbody>
                             </table>
+
+                            <hr/>
+                            <h3 style="color:black">Business Branches Management</h3>
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '2' and dat.accessCode == '2' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '2' and not dat.accessCode == '2'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessTitle }}<br/><sup>{{dat.accessCode}}</sup></td>
+                                                <td>{{ dat.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                            <hr/>
+                            <h3 style="color:black">Warehouse/Product Management</h3>
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '3' and dat.accessCode == '3' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '3' and not dat.accessCode == '3'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessTitle }}<br/><sup>{{dat.accessCode}}</sup></td>
+                                                <td>{{ dat.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                            <hr/>
+                            <h3 style="color:black">Branch Accounts Management</h3>
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '4' and dat.accessCode == '4' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '4' and not dat.accessCode == '4'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessTitle }}<br/><sup>{{dat.accessCode}}</sup></td>
+                                                <td>{{ dat.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                            <hr/>
+                            <h3 style="color:black">Business Account Management</h3>
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '5' and dat.accessCode == '5' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '5' and not dat.accessCode == '5'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessTitle }}<br/><sup>{{dat.accessCode}}</sup></td>
+                                                <td>{{ dat.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <hr/>
+                            <h3 style="color:black">Other access</h3>
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in access %}
+                                        {% if not dat.accessGroupCode == '1' and not dat.accessGroupCode == '2' and not dat.accessGroupCode == '3' and not dat.accessGroupCode == '4' and not dat.accessGroupCode == '5' %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessTitle }}<br/><sup>{{dat.accessCode}}</sup></td>
+                                                <td>{{ dat.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
                             <button type="submit" class="btn btn-outline-primary fa fa-plus">Add Access</button>
                         </form>
-                    </div>
+                    </div>                    
+
+
+                    
 
                     <div class="col-md-6">
                         <form method="post">
@@ -137,23 +294,194 @@
                                         <th>Select</th>
                                     </tr>
                                 </thead>
+                            </table>
+
+                            {% if checkGroup.1 %}
+                               <h3 style="color:black">User Management</h3>                            
+                            {% endif %}                         
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
                                 <tbody>
                                     {% for dat in userAccess %}
-                                        <tr class="even gradeA">
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ dat.accessRef.accessTitle }}<br/><sup>{{dat.accessRef.accessCode}}</sup></td>
-                                            <td>{{ dat.accessRef.accessDescription }}</td>
-                                            <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>
-                                            </td>
-                                        </tr>
+                                        {% if dat.accessRef.accessGroupCode == '1' and dat.accessRef.accessCode == '1' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessRef.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessRef.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '1' and not dat.accessRef.accessCode == '1' %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessRef.accessTitle }}<br/><sup>{{dat.accessRef.accessCode}}</sup></td>
+                                                <td>{{ dat.accessRef.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>                           
+
+                            {% if checkGroup.2 %}
+                               <hr/>
+                               <h3 style="color:black">Business Branches Management</h3>                            
+                            {% endif %}                              
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '2' and dat.accessRef.accessCode == '2' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessRef.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessRef.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '2' and not dat.accessRef.accessCode == '2'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessRef.accessTitle }}<br/><sup>{{dat.accessRef.accessCode}}</sup></td>
+                                                <td>{{ dat.accessRef.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>                            
+                            
+                            {% if checkGroup.3 %}
+                               <hr/>
+                               <h3 style="color:black">Warehouse/Product Management</h3>                            
+                            {% endif %} 
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '3' and dat.accessRef.accessCode == '3' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessRef.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessRef.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '3' and not dat.accessRef.accessCode == '3'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessRef.accessTitle }}<br/><sup>{{dat.accessRef.accessCode}}</sup></td>
+                                                <td>{{ dat.accessRef.accessDescription }}</td>                                      
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>                            
+                            
+                            {% if checkGroup.4 %}
+                               <hr/>
+                               <h3 style="color:black">Branch Accounts Management</h3>                           
+                            {% endif %} 
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '4' and dat.accessRef.accessCode == '4' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessRef.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessRef.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '4' and not dat.accessRef.accessCode == '4'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessRef.accessTitle }}<br/><sup>{{dat.accessRef.accessCode}}</sup></td>
+                                                <td>{{ dat.accessRef.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
                                     {% endfor %}
                                 </tbody>
                             </table>
+
+                            {% if checkGroup.5 %}
+                               <hr/>
+                               <h3 style="color:black">Business Account Management</h3>                          
+                            {% endif %} 
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '5' and dat.accessRef.accessCode == '5' %}
+                                            <tr class="even gradeA">
+                                                <td style="color: green">{{ forloop.counter }}</td>
+                                                <td style="color: green">{{ dat.accessRef.accessTitle }}<br/><sup style="color: green;">Base Access</sup></td>
+                                                <td style="color: green">{{ dat.accessRef.accessDescription }}</td>
+                                                <td style="color: green"><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for dat in userAccess %}
+                                        {% if dat.accessRef.accessGroupCode == '5' and not dat.accessRef.accessCode == '5'  %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessRef.accessTitle }}<br/><sup>{{dat.accessRef.accessCode}}</sup></td>
+                                                <td>{{ dat.accessRef.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            {% if checkGroup.6 %}
+                               <hr/>
+                               <h3 style="color:black">Other access</h3>                         
+                            {% endif %} 
+                            <table width="100%" class="table table-striped table-bordered table-hover">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+                                    {% for dat in userAccess %}
+                                        {% if not dat.accessRef.accessGroupCode == '1' and not dat.accessRef.accessGroupCode == '2' and not dat.accessRef.accessGroupCode == '3' and not dat.accessRef.accessGroupCode == '4' and not dat.accessRef.accessGroupCode == '5' %}
+                                            <tr class="even gradeA">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ dat.accessRef.accessTitle }}<br/><sup>{{dat.accessRef.accessCode}}</sup></td>
+                                                <td>{{ dat.accessRef.accessDescription }}</td>
+                                                <td><input type="checkbox" name="access" class="form-check" value="{{dat.accessRef.accessCode}}" style="width: 50px; height: 50px;"/></td>                                           
+                                            </tr>                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
                             {% if hideRemoveButton %}
                                <button type="submit" class="btn btn-outline-danger fa fa-remove">Remove Access</button>
                             {% endif %}
-                        </form>
-       
+                        </form>       
                     </div>
                 </div>
                 {% endif %}

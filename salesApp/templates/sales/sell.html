@@ -78,7 +78,7 @@
                 </form> 
                 <a href="{% url 'transactionOnHold' %}" class="btn btn-outline-dark fa fa-circle">Select Transaction</a>
 
-                <a style="font-size: small; margin-left: 10px; color: bisque; font-size: 100%;" href="#" class="btn btn-primary fa fa-print" onclick="receipt2()"></a>  
+                <a style="font-size: small; margin-left: 10px; color: bisque; font-size: 100%;" href="{% url 'salesPrintCollectedItems' 'current' 'currentTransaction' %}" class="btn btn-primary fa fa-print"></a>  
                 <a href="{% url 'salesCurrentItemToCart' transactionID %}" class="btn btn-primary fa fa-cart-arrow-down" style="margin-left: 2%" id="cartBut"> </a> 
                 <span style="float: right">Discount On all Products: <b>{{generalDiscount}}</b>%</span>
             </div>
@@ -96,11 +96,17 @@
                             <td class="center" style="padding: 2%; font-size: 20px; background-color: whitesmoke;">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <img src="{% static 'img/log.jpg' %}" class="rounded card-img-top img-fluid" style="width: 100%; height: 150px; padding: 0%" alt="...">
+                                        {% if not dat.productImageRef.image %}
+                                            <img src="{% static 'img/rn360.jpeg' %}" class="rounded card-img-top img-fluid" style="width: 100%; height: 250px; padding: 0%" alt="...">
+                                        {% else %}
+                                            <img src="{{dat.productImageRef.image.url}}" class="rounded card-img-top img-fluid" style="width: 100%; height: 250px; padding: 0%" alt="...">
+                                        
+                                        {% endif %}
+                                        
                                         <sup style="color: brown; font-size: small">{{ dat.productCode }}</sup><br/><b style="font-size: large;">{{ dat.productName }}</b> <br/><i style="font-size: small">{{dat.productCategory}}</i> 
                                         {% if dat.totalDiscaount > 0 %}
                                             <div style="color: black; font-size: small; float: right; border: ridge"> 
-                                                <i style="color: #c67605">GH&#8373</i><b><strike>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</strike></b> 
+                                                <i style="color: #c67605">GH&#8373</i><b><s>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</s></b> 
                                                 <br/>  
                                                 <i style="color: #c67605">GH&#8373</i><b>{{dat.priceAfterDiscount|floatformat:2}}</b> <br/>                                         
                                                 Discount: <b>{{dat.totalDiscaount|floatformat:2}}</b> %                                            

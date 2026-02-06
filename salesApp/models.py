@@ -15,6 +15,7 @@ class RetailAndWholesale(models.Model):
     measureRef = models.ForeignKey('MeasuringUnits', on_delete=models.DO_NOTHING, null=True)
     quantityRef = models.ForeignKey('Quantities', on_delete=models.DO_NOTHING, null=True)
     discountRef = models.ForeignKey('DiscountRate', on_delete=models.DO_NOTHING, null=True)
+    returnPeriod = models.IntegerField(default=0) # period in days a customer can return the product
 
 
 # discount on individual product under individual branch
@@ -188,6 +189,23 @@ class CustomerItemsPurchased(models.Model):
     date = models.DateField(null=True, auto_now_add=True) 
 
 
+# return purchase items
+class ReturnedProductsRecord(models.Model):
+    salesRef = models.ForeignKey('SalesRecords', on_delete=models.CASCADE) 
+    productRef = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.FloatField()
+    pricePerUnit = models.FloatField(default=0.0) 
+    totalPrice = models.FloatField(default=0.0)
+    date = models.DateField(null=True, auto_now_add=True)
+    returnedBy = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING)
+    reason = models.CharField(max_length=300)
+
+# total amount to be returned to customer from return items of a particular sales
+class ReturnAmountToCustomer(models.Model):
+    salesRef = models.ForeignKey('SalesRecords', on_delete=models.CASCADE)
+    amountToPay = models.FloatField(default=0.00)
+
+
 # store all transactions made by a customer
 class AllCustomerTransactions(models.Model):
     customerRef = models.ForeignKey(RetailAndWholesaleCustomers, on_delete=models.CASCADE)
@@ -297,6 +315,7 @@ class SalesRecords(models.Model):
     amountToPay = models.FloatField(default=0.0) 
     amountPaid = models.FloatField(default=0.0) 
     amountOwe = models.FloatField(default=0.0) 
+    amountReturned = models.FloatField(default=0.0)
     transactionDate = models.DateField()
     transactionBy = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING)
     transactionIsConfirm = models.BooleanField(default=False)

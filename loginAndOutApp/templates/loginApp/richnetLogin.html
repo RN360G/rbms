@@ -1,0 +1,38 @@
+{% extends "dashboardApp/rbms.html" %}
+{% load static %}
+{% block rbms %}
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-md-9 col-lg-12 col-xl-10">
+			<div class="card shadow-lg o-hidden border-0 my-5">
+				<div class="card-body p-0">
+					<div class="row">
+						<div class="col-lg-6 col-xl-5 d-none d-lg-flex">
+							<div class="flex-grow-1 bg-login-image" style="background-image: url({% static 'img/rn360_2.jpeg' %});"></div>
+						</div>
+						<div class="col-lg-6">
+							<h1 class="text-center"><b style='color: blue'>RN</b><b style='color: red'>360</b><b style='color: black'>B</b></h1>
+							<div class="p-5">
+								<div class="text-center">
+									<h4 class="text-dark mb-4"><span class="fa fa-lock"></span>Sign In</h4>
+								</div>
+								<form class="user" method="post">
+									{% csrf_token %}
+									<div class="mb-3"><input class="form-control form-control-user" type="text" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter User ID..." name="userID"></div>
+									<div class="mb-3"><input class="form-control form-control-user" type="password" id="exampleInputPassword" placeholder="Password" name="passW"></div>
+									<div class="mb-3">
+										<div class="custom-checkbox small">
+											<!--<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Remember Me</label></div>-->
+										</div>
+									</div><button class="btn btn-primary d-block btn-user w-100" type="submit">Login</button>
+									<hr>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock rbms  %}

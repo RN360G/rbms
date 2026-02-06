@@ -7,6 +7,7 @@ from businessApp.models import Business
 from usersApp.models import UserRef
 from django.db.models import Q, Count
 from django.db import transaction
+from warehouseApp.models import Product
 import cv2
 
 # Create your views here.
@@ -45,8 +46,10 @@ class ImageUpload():
 
         if self.uploadType == 'product':
             count = Images.objects.filter(Q(subjectID=subjectID)).annotate(Count('subjectID'))
+            product = Product.objects.get(Q(busRef=self.busRef) & Q(productCode=subjectID))            
             if int(count.count()) + 1 < 6:
-                self.storeDetails(subjectID)
+                product.productImageRef = self.storeDetails(subjectID)
+                product.save()
                 self.fileName = self.fs.save(self.fileName + '.' + self.fileExtension, file)
             else:
                 pass
@@ -87,6 +90,7 @@ class ImageUpload():
         db.extention = self.fileExtension
         db.date = dt.datetime.now()
         db.save()
+        return db
 
 
     def update(self, id, file):

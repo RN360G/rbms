@@ -7,4 +7,6 @@ urlpatterns = [
     path('workinghours/<branchID>/<opt>', views.BusinessSettings.setWorkingHours, name='setWorkingHours'),
     path('onlinevisibility/<branchID>', views.BusinessSettings.onlineVisibility, name='onlineVisibility'),
     path('switchbranch', views.BusinessSettings.switchBranch, name='switchBranch'),
+    path('editbusiness', views.BusinessSettings.editBusinessInfo, name='editBusinessInfo'),
+    path('salesselectprinter', views.BusinessSettings.assignPriter, name='assignPrinter'),    
 ]

@@ -26,13 +26,39 @@
 <hr/>
 <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item" role="presentation"><a class="nav-link active fa fa-list" role="tab" data-bs-toggle="tab" href="#tally"> Tally</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link fa fa-plus" role="tab" data-bs-toggle="tab" href="#addStock"> Add Stock</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#changePrice"> Change Price</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link fa fa-image" role="tab" data-bs-toggle="tab" href="#image"> Image</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#retockLevel"> Restock Level</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link fa fa-edit" role="tab" data-bs-toggle="tab" href="#adjustment"> Stock Adjustment</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link fa fa-globe" role="tab" data-bs-toggle="tab" href="#visibility"> Online Visibility</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link fa fa-percent" role="tab" data-bs-toggle="tab" href="#discount"> Discount</a></li>
+    
+    {% if uAccess.301 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-plus" role="tab" data-bs-toggle="tab" href="#addStock"> Add Stock</a></li>
+    {% endif %}
+
+    {% if uAccess.303 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#changePrice"> Change Price</a></li>
+    {% endif %}
+
+    {% if uAccess.313 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-image" role="tab" data-bs-toggle="tab" href="#image"> Image</a></li>
+    {% endif %}
+
+    {% if uAccess.312 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#retockLevel"> Restock Level</a></li>
+    {% endif %}
+
+    {% if uAccess.311 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-edit" role="tab" data-bs-toggle="tab" href="#adjustment"> Stock Adjustment</a></li>
+    {% endif %}
+
+    {% if uAccess.315 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-globe" role="tab" data-bs-toggle="tab" href="#visibility"> Online Visibility</a></li>
+    {% endif %}
+
+    {% if uAccess.309 %}  
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-percent" role="tab" data-bs-toggle="tab" href="#discount"> Discount</a></li>
+    {% endif %}
+    
+    {% if uAccess.316 %}  
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#returnPeriod"> Return Period</a></li>
+    {% endif %}
+
 </ul>
 <br/>
 
@@ -90,7 +116,7 @@
                 <div class="mb-3">
                     <div class="row">
                         <div class="col-md-6 button">
-                            <button class="btn btn-primary d-block w-100" type="submit">Add Stock</button>
+                            <button class="btn btn-primary" type="submit">Add Stock</button>
                         </div>
                     </div>
                 </div>
@@ -153,7 +179,7 @@
                     <div class="mb-3">
                         <div class="row">
                             <div class="col-md-6 button">
-                                <button class="btn btn-primary d-block w-100" type="submit">Set Price</button>
+                                <button class="btn btn-primary" type="submit">Set Price</button>
                             </div>
                         </div>
                     </div>
@@ -217,7 +243,7 @@
                     <div class="mb-3">
                         <div class="row">
                             <div class="col-md-6 button">
-                                <button class="btn btn-primary d-block w-100" type="submit">Upload</button>
+                                <button class="btn btn-primary" type="submit">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -247,7 +273,35 @@
                     <div class="mb-3">
                         <div class="row">
                             <div class="col-md-6 button">
-                                <button class="btn btn-primary d-block w-100" type="submit">Set Level</button>
+                                <button class="btn btn-primary" type="submit">Set Level</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+
+    <!--Return Period =============================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="returnPeriod">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-circle"></span> Set Return Period</h2>
+            <form class="user" method="post" action="{% url 'salesReturnPeriod' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="returnPeriod">Set Return Period <b style="color: red">*</b></label>
+                        <input class="form-control" type="number" id="returnPeriod" name="returnPeriod" value="{{product.retailAndWholesaleRef.returnPeriod}}" required min='0'>
+                    </div>
+                    <div class="col-md-6">
+                    <p style="font-size: large; color: black;">
+                        <b>NOTE: </b>This is the period (in days) a customer can return this product after purchase.                              
+                    </p>
+                    </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary" type="submit">Save</button>
                             </div>
                         </div>
                     </div>

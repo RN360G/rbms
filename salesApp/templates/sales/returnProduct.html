@@ -1,0 +1,40 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% block warehouse %}  
+<a href="{% url 'postPaymentAndCollection' sales.id 'items' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>  
+<hr/>
+<h5><b style="color: black">{{product.productName}}</b> <span>{{product.productCode}}</span></h5>
+<h5>Quantity: <b style="color: black">{{item.quantity}} {{item.measureUnit}}</b> | Price: <b style="color: black">{{item.totalPrice}}</b></h5>
+
+<div class="tab-content">
+     <!--Return Period =============================================================================================================================-->
+    <div class="tab-pane active" role="tabpanel" id="returnPeriod">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-circle"></span> Return Product</h2>
+            <form class="user" method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="quantity">Quantity To return<b style="color: red">*</b></label>
+                        <input class="form-control" type="number" id="quantity" name="quantity" required min='0' max='{{item.quantity}}'>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="reason">reason for returning the product</label>
+                        <textarea name='reason' id="reason" class="form-control" placeholder="Why are you returning this product?"></textarea>
+                    </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary" type="submit">Return</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+</div>
+{% endblock warehouse %}
+
+
+

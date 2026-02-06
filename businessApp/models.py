@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 class Business(models.Model):
@@ -8,7 +9,11 @@ class Business(models.Model):
     busTel = models.CharField(max_length=20)
     busEmail = models.CharField(max_length=50)
     busOwner = models.CharField(max_length=50)
-    registrationNumber = models.CharField(max_length=100, null=True) # this part wll be entered and verified by RN360 only    
+    billRef = models.ForeignKey('richnet360.Bill', on_delete=models.DO_NOTHING, null=True)
+    registrationNumber = models.CharField(max_length=100, null=True) # this part wll be entered and verified by RN360 only  
+    status = models.CharField(max_length=30, default='Active') # Active, Inactive, Closed
+    description = models.CharField(max_length=500, default='')
+
 
 
 class BusinessBranch(models.Model):
@@ -38,3 +43,15 @@ class BusinessAccess(models.Model):
     accessGroupCode = models.CharField(max_length=2)    
     thisAccessIsPayable = models.BooleanField(default=False)
     date = models.DateField()
+
+
+class Printers(models.Model):
+    branchRef = models.ForeignKey(BusinessBranch, on_delete=models.CASCADE)
+    printerType = models.CharField(max_length=30)
+    id1 = models.CharField(max_length=100, null=True) # vendor ID , IP, devfile
+    id2 = models.CharField(max_length=30, null=True) # Product ID, port number
+    printerLabel = models.CharField(max_length=30)
+
+class AssignPrinterToUser(models.Model):
+    printerRef = models.ForeignKey(Printers, on_delete=models.CASCADE)
+    userRef = models.ForeignKey('usersApp.UserRef', on_delete=models.CASCADE)

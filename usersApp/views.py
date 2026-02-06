@@ -17,7 +17,12 @@ from sms import sendSMS
 
 # Create your views here.
 
-def user(request):
+def user(request):    
+    if not haveAccess(request, '1'):
+        messages.set_level(request, messages.WARNING)
+        messages.warning(request, {'message': 'You do not have access to user management page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+        return render(request, 'user/state.html')   
+    loginViews.dashboardMenuAccess(request)
     user = UserRef.objects.get(Q(userID=str(request.session['userID'])))
     users = UserRef.objects.filter(Q(busRef__busRef__busID=str(request.session['busID'])))
     branch = BusinessBranch.objects.filter(Q(busRef__busID=user.busRef.busRef.busID)).order_by('branchName')
@@ -34,6 +39,7 @@ def user(request):
 
 class NewUser(generic.View):
     def get(self, request):
+        loginViews.dashboardMenuAccess(request)
         return render(request, 'user/newUser.html')
 
     def post(self, request):
@@ -58,6 +64,7 @@ class NewUser(generic.View):
 
 class EditUser(generic.View):
     def get(self, request, userID):
+        loginViews.dashboardMenuAccess(request)
         if haveAccess(request, '101'):
             user = UserRef.objects.get(Q(userID=str(userID)))
             return render(request, 'user/editUser.html', {'user': user})
@@ -164,25 +171,43 @@ def setNewUser(request, busID, busRef, firstName, lastName, dob, country, homeTo
 
 class AccessAndRoles(generic.View):
     def get(self, request, userID):
+        loginViews.dashboardMenuAccess(request)
         uAccess = {'100':haveAccess(request, '100'), '101':haveAccess(request, '101'),
               '102':haveAccess(request, '102'), '103':haveAccess(request, '103')}
+        
         if haveAccess(request, '102') or haveAccess(request, '103'):
             user = UserRef.objects.get(Q(userID=str(userID)))
             admin = UserRef.objects.get(Q(userID=str(request.session['userID'])))
             branches = BusinessBranch.objects.filter(Q(busRef__busID=admin.busRef.busRef.busID))
             access = BusinessAccess.objects.all()
             userAccess = UserAccess.objects.filter(Q(userRef__userID=userID))
+            
+            # check access group
+            checkGroup = {'1':False, '2':False, '3':False, '4':False, '5':False, '6':False}
+            for uA in userAccess:
+                if uA.accessRef.accessGroupCode == '1':
+                    checkGroup['1'] = True
+                if uA.accessRef.accessGroupCode == '2':
+                    checkGroup['2'] = True
+                if uA.accessRef.accessGroupCode == '3':
+                    checkGroup['3'] = True
+                if uA.accessRef.accessGroupCode == '4':
+                    checkGroup['4'] = True
+                if uA.accessRef.accessGroupCode == '5':
+                    checkGroup['5'] = True
+                if uA.accessRef.accessGroupCode == '6':
+                    checkGroup['6'] = True
+
             hideRemoveButton = True
             if userAccess.count() < 5:
                 hideRemoveButton = False
             return render(request, 'user/accessAndRole.html', {'user': user, 'branches': branches, 'access': access, 'uAccess': uAccess,
-                                                           'userAccess': userAccess, 'hideRemoveButton': hideRemoveButton})
+                                                           'userAccess': userAccess, 'hideRemoveButton': hideRemoveButton, 'checkGroup': checkGroup})
         else:
             messages.set_level(request, messages.WARNING)
             messages.warning(request, {'message': 'You do not have access to this page', 'title': 'Access Denied'}, 
                              extra_tags='roleAndAccessDenied')
             return render(request, 'user/state.html')
-
 
     def post(self, request, userID):
         user = UserRef.objects.get(Q(userID=userID))
@@ -275,6 +300,7 @@ def activityLogs(request, userID, title, details):
 
 
 def yourActivityLogs(request):
+    loginViews.dashboardMenuAccess(request)
     activities = UserLogs.objects.filter(Q(userRef__userID=str(request.session['userID']))).order_by('-id')
     return render(request, 'user/activityLogs.html', {'activities': activities})
 
@@ -291,6 +317,7 @@ def profile(request):
 
 class UploadProfileImage(generic.View):
     def get(self, request):
+        loginViews.dashboardMenuAccess(request)
         return render(request, 'user/profilePicture.html')
 
     def post(self, request):

@@ -29,7 +29,8 @@ urlpatterns = [
     path('images/', include('imageApp.urls')),
     path('sales/', include('salesApp.urls')),
     path('accounts/', include('accountsApp.urls')),
-    # path('admin/', admin.site.urls),
+    path('richnet360', include('richnet360.urls')),
+    path('admin/', admin.site.urls),
 ]
 
 if settings.DEBUG:
