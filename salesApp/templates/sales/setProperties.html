@@ -59,6 +59,10 @@
         <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#returnPeriod"> Return Period</a></li>
     {% endif %}
 
+    {% if uAccess.315 %}
+       <li class="nav-item" role="presentation"><a class="nav-link fa fa-cart-plus" role="tab" data-bs-toggle="tab" href="#onlineOder"> Online Order & Min Order</a></li>
+    {% endif %}
+
 </ul>
 <br/>
 
@@ -66,7 +70,7 @@
     <!--Add new stock =============================================================================================================================-->
     <div class="tab-pane" role="tabpanel" id="addStock">
         <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
-            <h2><span class="fa fa-plus"></span>Add New Stock</h2>
+            <h2><span class="fa fa-plus"></span>Add to Stock</h2>
             <form class="user" method="post" action="{% url 'salesProductaddStock' product.id %}">
                 {% csrf_token %}
                 <div class="row">
@@ -228,27 +232,62 @@
     <!--upload image =============================================================================================================================-->
     <div class="tab-pane" role="tabpanel" id="image">
         <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
-            <h2><span class="fa fa-money"></span> Add Product Image</h2>
+            <h2><span class="fa fa-image"></span> Upload Product Flyer</h2>
             <form class="user" method="post" action="{% url 'salesUploadImage' product.id %}"  enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="row">
                     <div class="col-md-6">
                         <label class="form-label" for="sellingPrice">Select Image <b style="color: red">*</b></label>
                         <input type="file" class="form-control" name="upload" id="electImage" onchange="loadImage(event)" accept="image/*" required>
-                    </div>
-                    <div class="col-md-6">
-                        <img src="" height="300" width="300" id="electImageOutput">
-                    </div>
-                    <hr/>
-                    <div class="mb-3">
-                        <div class="row">
-                            <div class="col-md-6 button">
-                                <button class="btn btn-primary" type="submit">Upload</button>
+                        <button class="btn btn-primary" type="submit">Upload</button>                        
+                        <div class="card shadow-sm">
+                            <img src="{{ image.image.url }}" class="card-img-top img-fluid" id="electImageOutput" alt="Product Image" height="300" width="300">
+                            <div class="card-body p-2">
+                                <p class="mb-0"><small>Uploaded on {{ image.date|date:"Y-m-d H:i" }}</small></p>
                             </div>
                         </div>
                     </div>
+                    <hr/>
                 </div>
-            </form>                   
+            </form>           
+            
+            {% if image  %}
+                <h2><span class="fa fa-image"></span> Upload Other Images</h2>
+                <form class="user" method="post" action="{% url 'salesUploadOtherProductImages' product.id %}"  enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="sellingPrice">Select Image <b style="color: red">*</b></label>
+                            <input type="file" class="form-control" name="upload" id="electImage" accept="image/*" required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary" type="submit">Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="container my-4">
+                    <h4><span class="fa fa-image"></span> Product Images</h4>
+                    <div class="row">
+                        {% for img in otherImages %}
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <div class="card shadow-sm">
+                                <img src="{{ img.image.url }}" class="card-img-top img-fluid" alt="Product Image">
+                                <div class="card-body p-2">
+                                    <p class="mb-0"><small>Uploaded on {{ img.date|date:"Y-m-d H:i" }}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No images uploaded for this product yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>                
+            {% endif %}
         </div>
     </div>
 
@@ -381,7 +420,7 @@
             </form> 
             <br/>
             <hr/>
-            <h4><span class="fa fa-list"></span> Adjustment Tally Card</h4>
+            <h4><span class="fa fa-list"></span> Adjustment Table</h4>
             <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example2">
                 <thead>
                     <tr>
@@ -488,6 +527,36 @@
                         <div class="row">
                             <div class="col-md-6 button">
                                 <button class="btn btn-primary d-block w-100" type="submit">Set Discount</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+
+    <!--Set online oder and minimum order =================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="onlineOder">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-cart-plus"></span> Online Order & Minimum Order</h2>
+            <form class="user" method="post" action="{% url 'salesMinimumAndOnlineOrder' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Enable or disable online order <b></b></label>
+                        <select name="onlineOder" class="form-control" required>                                
+                            <option value="enable" {% if product.retailAndWholesaleRef.enableOnlineOrder %} selected {% endif %}>Enabled</option>
+                            <option value="disable" {% if not product.retailAndWholesaleRef.enableOnlineOrder %} selected {% endif %}>Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Minimum Order in <b></b></label>
+                        <input type="number" class="form-control" name="minOrder" value="{{product.retailAndWholesaleRef.minimumOrder}}" required>
+                    </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Save</button>
                             </div>
                         </div>
                     </div>

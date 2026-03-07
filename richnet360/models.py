@@ -1,12 +1,12 @@
 from django.db import models
+from businessApp.models import Business
 
 # Create your models here.
 
 # sum of all charges
 class Bill(models.Model):
     currentBill = models.FloatField(default=0.00)
-    arrears = models.FloatField(default=0.00)
-    nextBillDate = models.DateField()
+    arrears = models.FloatField(default=0.00)   
 
 
 # payment detail
@@ -19,7 +19,7 @@ class BillPayments(models.Model):
     date = models.DateField()
 
 
-# charges
+# charges 
 class Charges(models.Model):
     busID = models.CharField(max_length=50)
     product = models.CharField(max_length=30, default='Monthly Charges')  # Monthly Charges, SMS Charges, IT Support, etc
@@ -27,13 +27,19 @@ class Charges(models.Model):
     date = models.DateTimeField()
 
 
-# store the products for referennce when charging
-class Products(models.Model):
-    productName = models.CharField(max_length=50) 
-    chargePerProduct = models.FloatField(default=0.00)
-    
+# store the products for referennce when charging 
+class ChargesType(models.Model):
+    product = models.CharField(max_length=50) 
+    amount = models.FloatField(default=0.00)
+    period = models.CharField(max_length=30, default='Not Set')
+    narration = models.CharField(max_length=500)
 
-    
+
+# check next bill date
+class CheckNextBillDate(models.Model):
+    busRef = models.ForeignKey(Business, on_delete=models.CASCADE)
+    chargeRef = models.ForeignKey(ChargesType, on_delete=models.DO_NOTHING)
+    nextBillDate = models.DateField()
 
 
 

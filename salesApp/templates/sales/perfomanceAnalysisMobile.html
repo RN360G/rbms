@@ -1,0 +1,723 @@
+
+{% extends 'warehouse/warehouse.html' %}
+{% load static %}
+
+{% block warehouseMobile %}
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+
+        </ul>
+        <br/>
+        <div class="tab-content">
+            <!--Customers==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">                
+                <form method="post" action="#" class="w-100">
+                    {% csrf_token %}
+                    <div class="card mb-3 shadow-sm w-100">
+                        <div class="card-body">
+                        <!-- Performance Type -->
+                        <div class="mb-3">
+                            <label for="performanceType" class="form-label">Performance Type</label>
+                            <select class="form-control" id="performanceType" name="performanceType">
+                            <option value='100'>Most profitable Products</option>
+                            <option value='101'>Most profitable Products at Branch</option>
+                            <option value='103'>Most Purchased Products</option>
+                            <option value='104'>Most Purchased Products at Branch</option>
+                            <option value='105'>Branches Performance based on Revenue</option>
+                            <option value='106'>Branches Performance based on Profit</option>
+                            <option value='107'>Branches Performance based on Transactions</option>
+                            <option value='108'>Amount Owed at each Branch</option>
+                            <option value='115'>Amount Owed at Branch</option>
+                            <option value='109'>Expenses at Branch</option>
+                            <option value='110'>Expenses at each Branch</option>
+                            <option value='111'>Business Performance based on Profit</option>
+                            <option value='117'>Business Performance based on Revenue</option>
+                            <option value='118'>Business Performance based on Transactions</option>
+                            <option value='112'>Business Expenses</option>
+                            <option value='113'>Cash Shortages at each Branch</option>
+                            <option value='114'>Cash Overs at each Branch</option>
+                            <option value='116'>Profit made at Branch</option>
+                            <option value='119'>Revenue generated at Branch</option>
+                            <option value='120'>Transactions made at Branch</option>
+                            </select>
+                        </div>
+
+                        <!-- Subject -->
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <select class="form-control" id="subject" name="subject">
+                            <option></option>
+                            </select>
+                        </div>
+
+                        <!-- Date Range -->
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                            <label for="fromDate" class="form-label">From</label>
+                            <input type="date" class="form-control" name="fromDate" id="fromDate">
+                            </div>
+                            <div class="col-6 mb-3">
+                            <label for="toDate" class="form-label">To</label>
+                            <input type="date" class="form-control" name="toDate" id="toDate">
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="d-grid">
+                            <button class="btn btn-primary fa fa-search" type="submit"> Search</button>
+                        </div>
+                        </div>
+                    </div>
+                </form>
+              
+
+
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <!--Charts ==============================================================================================================================-->
+                    <h3><span class="fa fa-bar-chart"></span> Chart Analysis</h3>
+                     <canvas id="chart" width="500" height="200"></canvas>
+
+                    <hr/>
+
+                    <!--tables ==============================================================================================================================-->
+                    <h3><span class="fa fa-book"></span>Table Analysis</h3>
+                    
+                    {% if performanceType == '101' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Profit: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Products</th>
+                                    <th>Quantity Sold</th>
+                                    <th>Total Cost Price</th>
+                                    <th>Total Sold Price</th>
+                                    <th>Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.productName}}</td>
+                                        <td>{{ dat.totaltQty}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.totalSoldPrice|floatformat:2}}</td>
+                                        <td>{{ dat.profit|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    
+                    {% elif performanceType == '104' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Quantity Purchased: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Products</th>
+                                    <th>Total Cost Price</th>
+                                    <th>Total Sold Price</th>
+                                    <th>Quantity Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.productName}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.totalSoldPrice|floatformat:2}}</td>
+                                        <td>{{ dat.quantityPurchase|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+                        
+                    {% elif performanceType == '115' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Amount Owed: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Transaction Dates</th>
+                                    <th>Total Amt to Pay</th>
+                                    <th>Total Amt Paid</th>
+                                    <th>Total Amt Owed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.transactionDate}}</td>
+                                        <td>{{ dat.amountToPay|floatformat:2}}</td>
+                                        <td>{{ dat.amountPaid|floatformat:2}}</td>
+                                        <td>{{ dat.owe|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table> 
+
+                    {% elif performanceType == '109' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Expenses: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date Incurred</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.dateIncurred}}</td>
+                                        <td>{{ dat.expenses|floatformat:2}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '116' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Profit: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Dates</th>
+                                    <th>Total Revenue</th>
+                                    <th>Cost of products Sold </th>
+                                    <th>Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.date}}</td>
+                                        <td>{{ dat.totalSoldPrice|floatformat:2}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.profit|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                    {% elif performanceType == '119' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Revenue: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Dates</th>
+                                    <th>Quantity Sold</th>
+                                    <th>Cost of products Sold</th>
+                                    <th>Total Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.date}}</td>
+                                        <td>{{ dat.totaltQty|floatformat:2}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.revenue|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '120' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Transactions: <b>{{ totalTarget|floatformat:0 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date</th>
+                                    <th>Total Transactions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.date}}</td>
+                                        <td>{{ dat.transactions|floatformat:0}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '100' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Profit: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Products</th>
+                                    <th>Quantity Sold</th>
+                                    <th>Total Cost Price</th>
+                                    <th>Total Sold Price</th>
+                                    <th>Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.productName}}</td>
+                                        <td>{{ dat.totaltQty}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.totalSoldPrice|floatformat:2}}</td>
+                                        <td>{{ dat.profit|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    
+                    {% elif performanceType == '103' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Quantity Purchased: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Products</th>
+                                    <th>Total Cost Price</th>
+                                    <th>Total Sold Price</th>
+                                    <th>Quantity Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.productName}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.totalSoldPrice|floatformat:2}}</td>
+                                        <td>{{ dat.quantityPurchase|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                    {% elif performanceType == '105' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Revenue: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Branches</th>
+                                    <th>Cost of products Sold</th>
+                                    <th>Total Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.branchRef__branchName}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.revenue|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+                        
+                    {% elif performanceType == '106' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Profit: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Branches</th>
+                                    <th>Total Revenue</th>
+                                    <th>Cost of products Sold </th>
+                                    <th>Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.branchRef__branchName}}</td>
+                                        <td>{{ dat.totalSoldPrice|floatformat:2}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.profit|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '107' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Transactions: <b>{{ totalTarget|floatformat:0 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Branches</th>
+                                    <th>Total Transactions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.branchRef__branchName}}</td>
+                                        <td>{{ dat.transactions|floatformat:0}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '108' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Amount Owed: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Branches</th>
+                                    <th>Total Amt to Pay</th>
+                                    <th>Total Amt Paid</th>
+                                    <th>Total Amt Owed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.branchRef__branchName}}</td>
+                                        <td>{{ dat.amountToPay|floatformat:2}}</td>
+                                        <td>{{ dat.amountPaid|floatformat:2}}</td>
+                                        <td>{{ dat.owe|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table> 
+                    
+                    {% elif performanceType == '110' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Expenses: <b>{{ totalTarget|floatformat:0 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Branches</th>
+                                    <th>Total Expenses</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.branchRef__branchName}}</td>
+                                        <td>{{ dat.expenses|floatformat:0}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '111' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Profit: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date</th>
+                                    <th>Total Revenue</th>
+                                    <th>Cost of products Sold </th>
+                                    <th>Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.date}}</td>
+                                        <td>{{ dat.totalSoldPrice|floatformat:2}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.profit|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '117' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Revenue: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date</th>
+                                    <th>Cost of products Sold</th>
+                                    <th>Total Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.date}}</td>
+                                        <td>{{ dat.totalCost|floatformat:2}}</td>
+                                        <td>{{ dat.revenue|floatformat:2}}</td>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '118' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Transactions: <b>{{ totalTarget|floatformat:0 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date</th>
+                                    <th>Total Transactions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.date}}</td>
+                                        <td>{{ dat.transactions|floatformat:0}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '112' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Expenses: <b>{{ totalTarget|floatformat:0 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date Incurred</th>
+                                    <th>Total Expenses</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.dateIncurred}}</td>
+                                        <td>{{ dat.expenses|floatformat:0}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '113' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">total Shortages: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Branches</th>
+                                    <th>Total Shortages</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.oversAndShortagesRef__branchRef__branchName}}</td>
+                                        <td>{{ dat.shortages|floatformat:2}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% elif performanceType == '114' %}
+                        <div class="panel-heading">
+                            {{title}}
+                            <span style="float: right;">Total Overs: <b>{{ totalTarget|floatformat:2 }}</b></span>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Branches</th>
+                                    <th>Total Overs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dat in results %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ dat.oversAndShortagesRef__branchRef__branchName}}</td>
+                                        <td>{{ dat.overs|floatformat:2}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                    
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        
+        const performanceType = document.getElementById('performanceType');
+        const subject = document.getElementById('subject');
+        var optionsList = [];        
+
+        performanceType.addEventListener('click', function(){
+            subject.options.length = 0;
+            optionsList.length = 0; 
+            $.ajax({
+                url: '/sales/salessearchperformance',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'performanceType': performanceType.value,
+                    'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val(),
+                },
+                success: function (response){                    
+                    for(var i=0; i < response.data.length; i++)
+                    {                        
+                        optionsList.push(response.data[i]);                                      
+                    } 
+                    // we will manipulate the second select here and dates here
+                    if(response.option == '101' || response.option == '104' || response.option == '109' || response.option == '115' || response.option == '116' || response.option == '119' || response.option == '120'){
+                        optionsList.forEach(function(item, index){
+                            var option = document.createElement('option');
+                            option.value = item.branchID;
+                            option.textContent = item.branchName;
+                            subject.appendChild(option);
+                        });
+                        subject.style.display = "inline";
+                    }
+                    else{
+                        subject.style.display = "none";
+                    } 
+
+                },
+                error: function (error){
+                    alert('error: operation failed!');
+                }
+            });
+        });
+
+        // Charts =======================================================================================================================================
+        window.addEventListener('load', (event) => {
+                $.ajax({
+                    url: '/sales/salesgetperfomanceresults',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'performanceType': performanceType.value,
+                        'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success: function (response){ 
+                        // Bar chart =====================================================================================================================
+                        let ctx = document.getElementById("chart").getContext("2d");
+                        let chart = new Chart(ctx, {
+                        type: response.data.chartType,
+                        data: {
+                            labels: response.data.x,
+                            datasets: [
+                                {
+                                label: response.data.title,
+                                backgroundColor: "#79AEC8",
+                                borderColor: "#417690",
+                                data: response.data.y
+                                }
+                            ]
+                        },
+                        options: {
+                            title: {
+                                text: "Gross Volume in 2020",
+                                display: true
+                            }
+                        }
+                        });
+                    },
+                    error: function (error){
+                        alert('error: operation failed!');
+                    }
+                });
+        });
+
+
+    </script>
+{% endblock warehouseMobile %}
+
+
+
+
+
+

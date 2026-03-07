@@ -5,6 +5,7 @@
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation"><a class="nav-link active fa fa-building" role="tab" data-bs-toggle="tab" href="#businesses"> Businesses</a></li>
         <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#confirmPayment"> Confirm Bill Payment</a></li>
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#addCharges"> Update Charges</a></li>
         <li class="nav-item" role="presentation"><a class="nav-link fa fa-check" role="tab" data-bs-toggle="tab" href="#confirmRegister"> Confirm Registration Number</a></li>
         <li class="nav-item" role="presentation"><a class="nav-link fa fa-remove" role="tab" data-bs-toggle="tab" href="#changeStatus"> Change Business Status</a></li>
         <li class="nav-item" role="presentation"><a class="nav-link fa fa-user" role="tab" data-bs-toggle="tab" href="#addBranch"> Users</a></li>  
@@ -37,7 +38,14 @@
                                 <td>{{ dat.busTel }} <br/>{{ dat.busEmail }}</td>
                                 <td>{{ dat.billRef.currentBill }}</td>
                                 <td>{{ dat.billRef.arrears  }}</td>   
-                                <td>{{ dat.status }}</td>                              
+                                {% if dat.status == 'Active' %}
+                                    <td><b style='color:green'>{{ dat.status }}</b></td> 
+                                {% elif dat.status == 'Inactive' %}
+                                    <td><b style='color:goldenrod'>{{ dat.status }}</b></td> 
+                                {% else %}
+                                    <td><b style='color:red'>{{ dat.status }}</b></td> 
+                                {% endif %}                
+
                                 <td>{{ dat.registrationNumber }}</td>
                                 <td>{{ dat.busOwner }}</td>
                                 <td><a href="" class="btn btn-outline-dark fa fa-money"> Transactions</a></td>
@@ -51,7 +59,7 @@
         <div class="tab-pane" role="tabpanel" id="confirmRegister">
             <div class="container bg-gradient-light py-5 shadow">
                 <h2>Confirm/Remove Business Registration Number</h2>
-                <form class="user" method="post" action="{% url 'editBusinessInfo' %}">
+                <form class="user" method="post" action="{% url 'registrationNumber' %}">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
@@ -89,7 +97,7 @@
         <div class="tab-pane" role="tabpanel" id="confirmPayment">
             <div class="container bg-gradient-light py-5 shadow">
                 <h2>Confirm Bill Payment</h2>
-                <form class="user" method="post" action="{% url 'editBusinessInfo' %}">
+                <form class="user" method="post" action="">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
@@ -133,12 +141,63 @@
                     </div>
                 </form>
             </div>           
+        </div>        
+        
+        <div class="tab-pane" role="tabpanel" id="addCharges">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2>Charges</h2>
+                <form method="post" action="{% url 'addCharges' %}">
+                    {% csrf_token %}
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <thead>
+                            <tr>
+                                <th>Count</th>
+                                <th>Product</th>
+                                <th>Charge</th>
+                                <th>Period</th>
+                                <th>Narration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dat in charges %}
+                                <tr class="even gradeA"> 
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><b>{{ dat.product }}</b> <input type="hidden" name="product" value="{{ dat.product }}" /></td>
+                                    <td><input class="form-control" type="number" id="amount" name="amount" step="any" value="{{ dat.amount }}" required></td>
+                                    <td>
+                                        <select class="form-select" id="period" required name="period">
+                                                <option></option>                                
+                                                <option {% if dat.period == 'Hourly' %} selected {% endif %}>Hourly</option>
+                                                <option {% if dat.period == 'Daily' %} selected {% endif %}>Daily</option>
+                                                <option {% if dat.period == 'Weekly' %} selected {% endif %}>Weekly</option>
+                                                <option {% if dat.period == 'Monthly' %} selected {% endif %}>Monthly</option>                                
+                                                <option {% if dat.period == 'Quarterly' %} selected {% endif %}>Quarterly</option>
+                                                <option {% if dat.period == 'Semi-Annually' %} selected {% endif %}>Semi-Annually</option>
+                                                <option {% if dat.period == 'Annually' %} selected {% endif %}>Annually</option>
+                                                <option {% if dat.period == 'Per usage' %} selected {% endif %}>Per usage</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>{{ dat.narration }}</td> 
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary" type="submit">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>           
         </div>
 
         <div class="tab-pane" role="tabpanel" id="changeStatus">
             <div class="container bg-gradient-light py-5 shadow">
                 <h2>Change Business Status</h2>
-                <form class="user" method="post" action="{% url 'editBusinessInfo' %}">
+                <form class="user" method="post" action="{% url 'changeBusStatus' %}">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
@@ -149,7 +208,7 @@
                             <label class="form-label" for="busType">Business ID:</label>
                             <select class="form-select" id="opt" required name="opt">
                                 <option></option>
-                                <option value="Activate">Activate Business</option>
+                                <option value="Active">Activate Business</option>
                                 <option value="Inactive">deactivate Business</option>
                                 <option value="Closed">Close Business</option>
                             </select>

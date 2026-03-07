@@ -1,5 +1,7 @@
 {% extends "dashboardApp/index.html" %}
 
+
+{% if not request.user_agent.is_mobile %}
 {% block index %}
 <section>
     <div class="container-fluid bg-gradient-light py-5 shadow">
@@ -490,3 +492,645 @@
     </div>
 </section>
 {% endblock index %}
+
+
+
+
+<!--Mobile ==================================================================================================================================-->
+{% else %}
+{% block mobile %}
+<section>
+    <div class="container-fluid bg-gradient-light py-5 shadow">
+        <a href="{% url 'user' %}" class="btn btn-outline-dark fa fa-backwad-arrow">Back</a>
+        <h4 class="fw-bold">Access and Role for : <b>{{user.userRef.firstName}} {{user.userRef.surname}}</b> (<i style="color: goldenrod;">{{user.userID}}</i>)</h4>
+        <div class="row">
+            <div class="col-md-8 col-xl-6 text-center mx-auto">
+
+            </div>
+        </div>
+        <div class="py-5 p-lg-5">
+            <div class="card-body">
+                {% if uAccess.103 %}
+                    <form method="post" class="w-100">
+                        {% csrf_token %}
+                        <input type="hidden" name="opt" value="branch"/>
+
+                        <div class="card mb-3 shadow-sm w-100">
+                            <div class="card-body p-3">
+                            <h3 class="card-title"><u><b>Change Branch</b></u></h3>
+                            <h5 class="mb-3">Current Branch: 
+                                <b>{{ user.busRef.branchName }} ({{ user.busRef.branchID }})</b>
+                            </h5>
+
+                            <label for="currentBranch"><strong>Select Branch</strong></label>
+                            <select id="currentBranch" name="currentBranch" 
+                                    class="form-control mb-3 w-100" required>
+                                <option></option>
+                                {% for dat in branches %}
+                                <option value="{{ dat.branchID }}">{{ dat.branchName }} ({{ dat.branchID }})</option>
+                                {% endfor %}
+                            </select>
+
+                            <button type="submit" class="btn btn-outline-primary fa fa-circle w-100">
+                                Change Branch
+                            </button>
+                            </div>
+                            <div class="card shadow-sm w-100">
+                                <div class="card-body p-3">
+                                <p class="mb-0" style="font-size: large;">
+                                    <b>NOTE:</b> User will not have access to the resources of the current branch after being changed.
+                                </p>
+                            </div>
+                        </div>
+                        </div>
+                    </form>
+                {% endif %}
+
+                {% if uAccess.102 %}
+                <div class="row">
+                    <form method="post" class="w-100">
+                        {% csrf_token %}
+                        <input type="hidden" name="opt" value="accessLevel"/>
+
+                        <!-- Access Level Card -->
+                        <div class="card mb-3 shadow-sm w-100">
+                            <div class="card-body p-3">
+                            <h3 class="card-title"><u><b>Administrator Access Level</b></u></h3>
+                            <h5 class="mb-3">This user is an administrator: <b>{{ user.userIsAdmin }}</b></h5>
+
+                            <label for="accessLevel"><strong>Do you want to make this user an administrator?</strong></label>
+                            <select id="accessLevel" name="accessLevel" class="form-control mb-3 w-100" required>
+                                <option></option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+
+                            <button type="submit" class="btn btn-outline-primary fa fa-circle w-100">
+                                Change Level
+                            </button>
+                            </div>
+                            <!-- Note Card -->
+                            <div class="card shadow-sm w-100">
+                                <div class="card-body p-3">
+                                <p class="mb-0" style="font-size: large;">
+                                    <b>NOTE:</b> After making this user an administrator, he/she can access all modules.
+                                </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+
+
+                    <form method="post" class="w-100">
+                        {% csrf_token %}
+                        <input type="hidden" name="opt" value="disableUser"/>
+
+                        <!-- Status Card -->
+                        <div class="card mb-3 shadow-sm w-100">
+                            <div class="card-body p-3">
+                            <h3 class="card-title"><u><b>Set User Status</b></u></h3>
+                            <h5 class="mb-3">Current Status: <b>{{ user.status }}</b></h5>
+
+                            <label for="disableUser"><strong>Select Status</strong></label>
+                            <select id="disableUser" name="disableUser" class="form-control mb-3 w-100" required>
+                                <option></option>
+                                <option value="Disabled">Disable</option>
+                                <option value="Enabled">Enable</option>
+                            </select>
+
+                            <button type="submit" class="btn btn-outline-primary fa fa-circle w-100">
+                                Change Status
+                            </button>
+                            </div>
+                            <!-- Note Card -->
+                            <div class="card shadow-sm w-100">
+                                <div class="card-body p-3">
+                                <p class="mb-0" style="font-size: large;">
+                                    <b>NOTE:</b> After disabling this user, they will not have access to log in again until enabled.  
+                                    <br/><i style="color: saddlebrown;">You cannot disable a user with an <u>Administrator Access Level</u>.</i>
+                                </p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+
+                    <h3><u><b>Add or Remove Access</b></u></h3>
+                    <div class="col-md-6">
+                        <form method="post">
+                            {% csrf_token %}
+                            <h5 class="text-center text-primary"><u>Add User Access</u></h5>
+                            <button type="submit" class="btn btn-outline-primary fa fa-plus">Add Access</button>
+                            <input type="hidden" name="opt" value="add"/>
+
+                            <h3 style="color:black">User Management</h3>
+                            <div class="table-responsive mx-0 px-0">
+                                <table class="table table-bordered table-hover w-100 mb-0">
+                                    <!-- Hide header on mobile -->
+                                    <thead class="d-none d-md-table-header-group">
+                                    <tr>
+                                        <th>Access</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '1' %}
+                                        <tr>
+                                        <td>
+                                            <div class="card mb-2 shadow-sm w-100">
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title mb-1">
+                                                {{ dat.accessTitle }}
+                                                {% if dat.accessCode == '1' %}
+                                                    <sup class="text-success">Base Access</sup>
+                                                {% else %}
+                                                    <sup>{{ dat.accessCode }}</sup>
+                                                {% endif %}
+                                                </h6>
+                                                <p class="mb-1"><strong>Description:</strong> {{ dat.accessDescription }}</p>
+                                                <div>
+                                                <input type="checkbox" name="access" class="form-check-input" 
+                                                        value="{{ dat.accessCode }}"/>
+                                                <label>Select</label>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <hr/>
+
+                            <h3 style="color:black">Business Branches Management</h3>
+                            <div class="table-responsive mx-0 px-0">
+                                <table class="table table-bordered table-hover w-100 mb-0">
+                                    <!-- Hide header on mobile -->
+                                    <thead class="d-none d-md-table-header-group">
+                                    <tr><th>Access</th></tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '2' %}
+                                        <tr>
+                                        <td>
+                                            <div class="card mb-2 shadow-sm w-100">
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title mb-1">
+                                                {{ dat.accessTitle }}
+                                                {% if dat.accessCode == '2' %}
+                                                    <sup class="text-success">Base Access</sup>
+                                                {% else %}
+                                                    <sup>{{ dat.accessCode }}</sup>
+                                                {% endif %}
+                                                </h6>
+                                                <p class="mb-1"><strong>Description:</strong> {{ dat.accessDescription }}</p>
+                                                <div>
+                                                <input type="checkbox" name="access" class="form-check-input" 
+                                                        value="{{ dat.accessCode }}"/>
+                                                <label>Select</label>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <hr/>
+                            <h3 style="color:black">Warehouse/Product Management</h3>
+                            <div class="table-responsive mx-0 px-0">
+                                <table class="table table-bordered table-hover w-100 mb-0">
+                                    <!-- Hide header on mobile -->
+                                    <thead class="d-none d-md-table-header-group">
+                                    <tr><th>Access</th></tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for dat in access %}
+                                        {% if dat.accessGroupCode == '3' %}
+                                        <tr>
+                                        <td>
+                                            <div class="card mb-2 shadow-sm w-100">
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title mb-1">
+                                                {{ dat.accessTitle }}
+                                                {% if dat.accessCode == '3' %}
+                                                    <sup class="text-success">Base Access</sup>
+                                                {% else %}
+                                                    <sup>{{ dat.accessCode }}</sup>
+                                                {% endif %}
+                                                </h6>
+                                                <p class="mb-1"><strong>Description:</strong> {{ dat.accessDescription }}</p>
+                                                <div>
+                                                <input type="checkbox" name="access" class="form-check-input" 
+                                                        value="{{ dat.accessCode }}"/>
+                                                <label>Select</label>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            
+                            <hr/>
+                            <h3 style="color:black">Branch Accounts Management</h3>
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in access %}
+                                    {% if dat.accessGroupCode == '4' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessTitle }}
+                                            {% if dat.accessCode == '4' %}
+                                                <sup class="text-success">Base Access</sup>
+                                            {% else %}
+                                                <sup>{{ dat.accessCode }}</sup>
+                                            {% endif %}
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+
+                            
+                            <hr/>
+                            <h3 style="color:black">Business Account Management</h3>
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in access %}
+                                    {% if dat.accessGroupCode == '5' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessTitle }}
+                                            {% if dat.accessCode == '5' %}
+                                                <sup class="text-success">Base Access</sup>
+                                            {% else %}
+                                                <sup>{{ dat.accessCode }}</sup>
+                                            {% endif %}
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+
+
+                            <hr/>
+                            <h3 style="color:black">Other Access</h3>
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in access %}
+                                    {% if not dat.accessGroupCode == '1' and not dat.accessGroupCode == '2' and not dat.accessGroupCode == '3' and not dat.accessGroupCode == '4' and not dat.accessGroupCode == '5' %}
+                                            <tr>
+                                                <td>
+                                                    <div class="card mb-2 shadow-sm w-100">
+                                                        <div class="card-body p-2">
+                                                            <h6 class="card-title mb-1">
+                                                            {{ dat.accessTitle }}
+                                                            <sup>{{ dat.accessCode }}</sup>
+                                                            </h6>
+                                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessDescription }}</p>
+                                                            <div>
+                                                                <input type="checkbox" name="access" class="form-check-input" 
+                                                                        value="{{ dat.accessCode }}"/>
+                                                                <label>Select</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary fa fa-plus">Add Access</button>
+                        </form>
+                    </div>                    
+
+
+                    
+
+                    <div class="col-md-6">
+                        <form method="post">
+                            {% csrf_token %}
+                            <h5 class="text-center text-danger"><u>Remove User Access</u></h5>
+                            <button type="submit" class="btn btn-outline-danger fa fa-remove">Remove Access</button>
+                            <input type="hidden" name="opt" value="remove"/>
+
+                            {% if checkGroup.1 %}
+                               <h3 style="color:black">User Management</h3>                            
+                            {% endif %}
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in userAccess %}
+                                    {% if dat.accessRef.accessGroupCode == '1' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessRef.accessTitle }}
+                                            {% if dat.accessRef.accessCode == '1' %}
+                                                <sup class="text-success">Base Access</sup>
+                                            {% else %}
+                                                <sup>{{ dat.accessRef.accessCode }}</sup>
+                                            {% endif %}
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessRef.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessRef.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+                         
+
+                            {% if checkGroup.2 %}
+                               <hr/>
+                               <h3 style="color:black">Business Branches Management</h3>                            
+                            {% endif %}
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in userAccess %}
+                                    {% if dat.accessRef.accessGroupCode == '2' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessRef.accessTitle }}
+                                            {% if dat.accessRef.accessCode == '2' %}
+                                                <sup class="text-success">Base Access</sup>
+                                            {% else %}
+                                                <sup>{{ dat.accessRef.accessCode }}</sup>
+                                            {% endif %}
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessRef.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessRef.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+                          
+                            
+                            {% if checkGroup.3 %}
+                               <hr/>
+                               <h3 style="color:black">Warehouse/Product Management</h3>                            
+                            {% endif %} 
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in userAccess %}
+                                    {% if dat.accessRef.accessGroupCode == '3' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessRef.accessTitle }}
+                                            {% if dat.accessRef.accessCode == '3' %}
+                                                <sup class="text-success">Base Access</sup>
+                                            {% else %}
+                                                <sup>{{ dat.accessRef.accessCode }}</sup>
+                                            {% endif %}
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessRef.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessRef.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+                           
+                            
+                            {% if checkGroup.4 %}
+                               <hr/>
+                               <h3 style="color:black">Branch Accounts Management</h3>                           
+                            {% endif %} 
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in userAccess %}
+                                    {% if dat.accessRef.accessGroupCode == '4' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessRef.accessTitle }}
+                                            {% if dat.accessRef.accessCode == '4' %}
+                                                <sup class="text-success">Base Access</sup>
+                                            {% else %}
+                                                <sup>{{ dat.accessRef.accessCode }}</sup>
+                                            {% endif %}
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessRef.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessRef.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+
+
+                            {% if checkGroup.5 %}
+                               <hr/>
+                               <h3 style="color:black">Business Account Management</h3>                          
+                            {% endif %} 
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in userAccess %}
+                                    {% if dat.accessRef.accessGroupCode == '5' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessRef.accessTitle }}
+                                            {% if dat.accessRef.accessCode == '5' %}
+                                                <sup class="text-success">Base Access</sup>
+                                            {% else %}
+                                                <sup>{{ dat.accessRef.accessCode }}</sup>
+                                            {% endif %}
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessRef.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessRef.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+
+
+                            {% if checkGroup.6 %}
+                               <hr/>
+                               <h3 style="color:black">Other access</h3>                         
+                            {% endif %} 
+                            <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr><th>Access</th></tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in userAccess %}
+                                    {% if not dat.accessRef.accessGroupCode == '1' and not dat.accessRef.accessGroupCode == '2'  and not dat.accessRef.accessGroupCode == '3' and not dat.accessRef.accessGroupCode == '4' and not dat.accessRef.accessGroupCode == '5' %}
+                                    <tr>
+                                    <td>
+                                        <div class="card mb-2 shadow-sm w-100">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                            {{ dat.accessRef.accessTitle }}
+                                            <sup>{{ dat.accessRef.accessCode }}</sup>
+                                            </h6>
+                                            <p class="mb-1"><strong>Description:</strong> {{ dat.accessRef.accessDescription }}</p>
+                                            <div>
+                                            <input type="checkbox" name="access" class="form-check-input" 
+                                                    value="{{ dat.accessRef.accessCode }}"/>
+                                            <label>Select</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+
+                            {% if hideRemoveButton %}
+                               <button type="submit" class="btn btn-outline-danger fa fa-remove">Remove Access</button>
+                            {% endif %}
+                        </form>       
+                    </div>
+                </div>
+                {% endif %}
+                <br/>
+        </div>
+    </div>
+</section>
+{% endblock mobile %}
+    
+{% endif %}
+    

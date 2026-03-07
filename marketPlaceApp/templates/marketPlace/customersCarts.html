@@ -1,0 +1,57 @@
+{% extends "marketPlace/rbms.html" %} 
+{% block rbmsM %}
+<div class="container my-4">
+  <h2 class="mb-4"><i class="fa fa-shopping-cart"></i> Your Cart</h2>
+
+  {% if carts %}
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Product</th>
+          <th>Image</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in carts %}
+          <tr>
+            <td style="color: white">
+              <b>{{ item.productRef.productName }}</b><br>
+              <small>Code: {{ item.productRef.productCode }}</small>
+            </td>
+            <td>
+              {% if item.product.productImageRef %}
+                <img src="{{ item.productRef.productImageRef.image.url }}" alt="{{ item.product.productName }}" class="img-thumbnail" style="width:80px;">
+              {% endif %}
+            </td>
+            <td style="color: white">{{ item.quantity }}</td>
+            <td style="color: white">₵{{ item.unitPrice}}</td>
+            <td style="color: white">{{item.totalPrice}}</td>
+            <td>
+              <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger">
+                  <i class="fa fa-trash"></i> Remove
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Cart Summary -->
+    <div class="text-end mt-3">
+      <h4>Total: ₵3333</h4>
+      <a href="" class="btn btn-primary">
+        <i class="fa fa-credit-card"></i> Proceed to Checkout
+      </a>
+    </div>
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+</div>
+{% endblock rbmsM %}

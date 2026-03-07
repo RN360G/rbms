@@ -1,64 +1,133 @@
 {% extends "dashboardApp/index.html" %}
 
-{% block index %}
-<section>
-    <div class="container bg-gradient-light py-5 shadow">
-        <a href="{% url 'businessSettings' %}" class="btn btn-outline-dark fa fa-backwad-arrow">Back</a>
-        <div class="row">
-            <div class="col-md-8 col-xl-6 text-center mx-auto">
-                <h3 class="fw-bold">Set Operation Time for:<br/><b>{{branch.branchName}}</b> (<i style="color: goldenrod;">{{branch.branchID}}</i>)</h3>
+
+{% if not request.user_agent.is_mobile %}
+    {% block index %}
+    <section>
+        <div class="container bg-gradient-light py-5 shadow">
+            <a href="{% url 'businessSettings' %}" class="btn btn-outline-dark fa fa-back-arrow">Back</a>
+            <div class="row">
+                <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <h3 class="fw-bold">Set Operation Time for:<br/><b>{{branch.branchName}}</b> (<i style="color: goldenrod;">{{branch.branchID}}</i>)</h3>
+                </div>
+            </div>
+            <div class="py-5 p-lg-5">
+                <div class="card-body">
+                    <form class="user" method="post" action="{% url 'setWorkingHours' branch.branchID 'process' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="email">Set Period</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="allTime" style="font-size: 30px;">
+                                            All Time
+                                            <input type="radio" name="opType" id="allTime" value="allTime" id="allTime" checked style="width: 30px; height: 30px;" required/>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="specTime" style="font-size: 30px;">
+                                            Specific Time
+                                            <input type="radio" name="opType" value="specTime" id="specTime" style="width: 30px; height: 30px;" required/>
+                                        </label>
+                                        <hr/>
+                                        <label class="form-label" for="fromTime" id="fromTimeLab">Business Start At: </label>
+                                        <input class="form-control" type="time" name="fromTime" id="fromTime" required>
+
+                                        <label class="form-label" for="toTime" id="toTimeLab">Business End At: </label>
+                                        <input class="form-control" type="time" name="toTime" id="toTime" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <p><b>NOTE: <br/></b>Selecting <i style="color: goldenrod;">All Time</i> means, your business operate all time and you do not have pause operation. 
+                                    <br/>
+                                    Selecting <i style="color: goldenrod;">Specific Time</i> means, your business operate from specific time and close at a specific time. 
+
+                                </p>
+
+                            </div>
+                        </div><br/>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary d-block w-100" type="submit">Set Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
             </div>
         </div>
-        <div class="py-5 p-lg-5">
-            <div class="card-body">
-                <form class="user" method="post" action="{% url "setWorkingHours" branch.branchID 'process' %}">
-                    {% csrf_token %}
+    </section>
+    <script>
+
+    </script>
+    {% endblock index %}
+
+    <!--Mobile===============================================================================================================================-->
+    {% else %}
+        {% block mobile %}
+            <section>
+                <div class="container bg-gradient-light py-5 shadow">
+                    <a href="{% url 'businessSettings' %}" class="btn btn-outline-dark fa fa-backward">Back</a>
                     <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label" for="email">Set Period</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label" for="allTime" style="font-size: 30px;">
-                                        All Time
-                                        <input type="radio" name="opType" id="allTime" value="allTime" id="allTime" checked style="width: 30px; height: 30px;" required/>
-                                    </label>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="specTime" style="font-size: 30px;">
-                                        Specific Time
-                                        <input type="radio" name="opType" value="specTime" id="specTime" style="width: 30px; height: 30px;" required/>
-                                    </label>
-                                    <hr/>
-                                    <label class="form-label" for="fromTime" id="fromTimeLab">Business Start At: </label>
-                                    <input class="form-control" type="time" name="fromTime" id="fromTime" required>
-
-                                    <label class="form-label" for="toTime" id="toTimeLab">Business End At: </label>
-                                    <input class="form-control" type="time" name="toTime" id="toTime" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <p><b>NOTE: <br/></b>Selecting <i style="color: goldenrod;">All Time</i> means, your business operate all time and you do not have pause operation. 
-                                <br/>
-                                Selecting <i style="color: goldenrod;">Specific Time</i> means, your business operate from specific time and close at a specific time. 
-
-                            </p>
-
-                        </div>
-                    </div><br/>
-                    <div class="mb-3">
-                        <div class="row">
-                            <div class="col-md-6 button">
-                                <button class="btn btn-primary d-block w-100" type="submit">Set Now</button>
-                            </div>
+                        <div class="col-md-8 col-xl-6 text-center mx-auto">
+                            <h3 class="fw-bold">Set Operation Time for:<br/><b>{{branch.branchName}}</b> (<i style="color: goldenrod;">{{branch.branchID}}</i>)</h3>
                         </div>
                     </div>
-                </form>
-        </div>
-    </div>
-</section>
-<script>
+                    <div class="py-5 p-lg-5">
+                        <div class="card-body">
+                            <form class="user" method="post" action="{% url 'setWorkingHours' branch.branchID 'process' %}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="email">Set Period</label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="allTime" style="font-size: 30px;">
+                                                    All Time
+                                                    <input type="radio" name="opType" id="allTime" value="allTime" id="allTime" checked style="width: 30px; height: 30px;" required/>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="specTime" style="font-size: 30px;">
+                                                    Specific Time
+                                                    <input type="radio" name="opType" value="specTime" id="specTime" style="width: 30px; height: 30px;" required/>
+                                                </label>
+                                                <hr/>
+                                                <label class="form-label" for="fromTime" id="fromTimeLab">Business Start At: </label>
+                                                <input class="form-control" type="time" name="fromTime" id="fromTime" required>
 
-</script>
-{% endblock index %}
+                                                <label class="form-label" for="toTime" id="toTimeLab">Business End At: </label>
+                                                <input class="form-control" type="time" name="toTime" id="toTime" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <p><b>NOTE: <br/></b>Selecting <i style="color: goldenrod;">All Time</i> means, your business operate all time and you do not have pause operation. 
+                                            <br/>
+                                            Selecting <i style="color: goldenrod;">Specific Time</i> means, your business operate from specific time and close at a specific time. 
+
+                                        </p>
+
+                                    </div>
+                                </div><br/>
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6 button">
+                                            <button class="btn btn-primary d-block w-100" type="submit">Set Now</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                    </div>
+                </div>
+            </section>
+    <script>
+
+    </script>
+    {% endblock mobile %}    
+{% endif %}
+    

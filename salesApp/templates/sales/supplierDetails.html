@@ -1,252 +1,331 @@
 {% extends 'warehouse/warehouse.html' %}
 {% load static %}
 
-{% block warehouse %}
-    <a href="{% url 'salesSuppliers' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
-    <div style="margin-top: 1%;">
-        <h5><span class="fa fa-user"></span> Supplier Details: {{ supplier.supplierName }} (<b>{{supplier.supplierContact}}</b>) <span style="float: right">Amount Owe: <i style="color: #c67605">GH&#8373</i> <b>{{supplier.amountOwed}}</b></span></h5>
-    </div> 
-    <div>
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#transactions"> Transactions</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#payment"> Record Payment</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#supply"> Record Supply</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#wrongTransaction"> Wrong Transaction</a></li>
-        </ul>
-        <br/>
-        <div class="tab-content">
-            <!--supplies detals==============================================================================================================================-->
-            <div class="tab-pane active" role="tabpanel" id="transactions">
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <h2><span class="fa fa-book"></span> Transactions</h2>
-                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
-                        <thead>
-                            <tr>
-                                <th>Count</th>
-                                <th>Transaction ID</th>
-                                <th>Transaction type</th>
-                                <th>Receipt Number</th>
-                                <th>Total Cost</th>
-                                <th>Amount Paid</th>
-                                <th>Amount Owe</th>
-                                <th>Balance</th>
-                                <th>Narration</th>
-                                <th>By</th>
-                                <th>Date</th>                                
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for sup in suppliesRecords %}
-                                {% if not sup.isDisabled %}                        
-                                    <tr class="even gradeA">
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ sup.transactionID}}</td>
-                                        <td>{{ sup.transactionType}}</td>
-                                        <td>{{ sup.receiptNumber}}</td>
-                                        <td>{{ sup.totalCost}}</td>
-                                        <td>{{ sup.amountPaid}}</td>
-                                        <td>{{ sup.amountOwe}}</td>
-                                        <td>{{ sup.Balance}}</td>
-                                        <td>{{ sup.narration}}</td>
-                                        <td>{{ sup.receivedBy.userRef.firstName}} {{ sup.receivedBy.userRef.surname}} <br/>{{ sup.receivedBy.userID}}</td>
-                                        <td>{{ sup.supplyDate}}</td>
-                                        <td class="center">
-                                            {% if sup.transactionType == 'Supply' %}
-                                                <a href="{% url 'suppliesItemsDetails' supplier.id  sup.id %}" class="btn btn-outline-dark fa fa-book">Products</a>                                          
-                                            {% endif %}                                        
-                                        </td>
-                                    </tr>
-                                {% else %}
-                                    <tr class="even gradeA" style="background-color: red">
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ sup.transactionID}}</td>
-                                        <td>{{ sup.transactionType}}</td>
-                                        <td>{{ sup.receiptNumber}}</td>
-                                        <td>{{ sup.totalCost}}</td>
-                                        <td>{{ sup.amountPaid}}</td>
-                                        <td>{{ sup.amountOwe}}</td>
-                                        <td>{{ sup.Balance}}</td>
-                                        <td>{{ sup.narration}}</td>
-                                        <td>{{ sup.receivedBy.userRef.firstName}} {{ sup.receivedBy.userRef.surname}} <br/>{{ sup.receivedBy.userID}}</td>
-                                        <td>{{ sup.supplyDate}}</td>
-                                        <td class="center">
-                                            {% if sup.transactionType == 'Supply' %}
-                                                <a href="{% url 'suppliesItemsDetails' supplier.id  sup.id %}" class="btn btn-outline-dark fa fa-book">Products</a>                                          
-                                            {% endif %}                                        
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
+
+
+    {% block warehouse %}
+        <a href="{% url 'salesSuppliers' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
+        <div style="margin-top: 1%;">
+            <h5><span class="fa fa-user"></span> Supplier Details: {{ supplier.supplierName }} (<b>{{supplier.supplierContact}}</b>) <span style="float: right">Amount Owe: <i style="color: #c67605">GH&#8373</i> <b>{{supplier.amountOwed}}</b></span></h5>
+        </div> 
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#transactions"> Transactions</a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#payment"> Record Payment</a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#supply"> Record Supply</a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#wrongTransaction"> Wrong Transaction</a></li>
+            </ul>
+            <br/>
+            <div class="tab-content">
+                <!--supplies detals==============================================================================================================================-->
+                <div class="tab-pane active" role="tabpanel" id="transactions">
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h2><span class="fa fa-book"></span> Transactions</h2>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Transaction ID</th>
+                                    <th>Transaction type</th>
+                                    <th>Receipt Number</th>
+                                    <th>Total Cost</th>
+                                    <th>Amount Paid</th>
+                                    <th>Amount Owe</th>
+                                    <th>Balance</th>
+                                    <th>Narration</th>
+                                    <th>By</th>
+                                    <th>Date</th>                                
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sup in suppliesRecords %}
+                                    {% if not sup.isDisabled %}                        
+                                        <tr class="even gradeA">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ sup.transactionID}}</td>
+                                            <td>{{ sup.transactionType}}</td>
+                                            <td>{{ sup.receiptNumber}}</td>
+                                            <td>{{ sup.totalCost}}</td>
+                                            <td>{{ sup.amountPaid}}</td>
+                                            <td>{{ sup.amountOwe}}</td>
+                                            <td>{{ sup.Balance}}</td>
+                                            <td>{{ sup.narration}}</td>
+                                            <td>{{ sup.receivedBy.userRef.firstName}} {{ sup.receivedBy.userRef.surname}} <br/>{{ sup.receivedBy.userID}}</td>
+                                            <td>{{ sup.supplyDate}}</td>
+                                            <td class="center">
+                                                {% if sup.transactionType == 'Supply' %}
+                                                    <a href="{% url 'suppliesItemsDetails' supplier.id  sup.id %}" class="btn btn-outline-dark fa fa-book">Products</a>                                          
+                                                {% endif %}                                        
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr class="even gradeA" style="background-color: red">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ sup.transactionID}}</td>
+                                            <td>{{ sup.transactionType}}</td>
+                                            <td>{{ sup.receiptNumber}}</td>
+                                            <td>{{ sup.totalCost}}</td>
+                                            <td>{{ sup.amountPaid}}</td>
+                                            <td>{{ sup.amountOwe}}</td>
+                                            <td>{{ sup.Balance}}</td>
+                                            <td>{{ sup.narration}}</td>
+                                            <td>{{ sup.receivedBy.userRef.firstName}} {{ sup.receivedBy.userRef.surname}} <br/>{{ sup.receivedBy.userID}}</td>
+                                            <td>{{ sup.supplyDate}}</td>
+                                            <td class="center">
+                                                {% if sup.transactionType == 'Supply' %}
+                                                    <a href="{% url 'suppliesItemsDetails' supplier.id  sup.id %}" class="btn btn-outline-dark fa fa-book">Products</a>                                          
+                                                {% endif %}                                        
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!--Record supply==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="supply">
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h2><span class="fa fa-money"></span> Record Supplies</h2>
+                        <form method="post" action="{% url 'salesSupplierRecords' %}">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{supplier.id}}" id="supplierKey" name="supplierID" />
+                            <div class="row">                            
+                                <div class="col-md-8">
+                                    <label class="form-label" for="customerName">Products<b style="color: red">*</b></label>
+                                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example2">
+                                        <thead>
+                                            <tr>
+                                                <th>Item</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Cost</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for product in products %}
+                                                <tr class="even gradeA">
+                                                    <td>{{ product.productName}} <br/> {{product.productCode}} <input type="hidden" name="product" id="{{product.productCode}}" value="{{product.productCode}}"/></td>
+                                                    <td><input type='number' class="form-control" value="0" name='qty' id="qty{{product.productCode}}" placeholder='quanty received' min="0" step="any"/></td>
+                                                    <td><input type='number' class="form-control" value="0" name='cost' id="cost{{product.productCode}}" placeholder='Cost' min="0" step="any"/></td>
+                                                    <td>   
+                                                        
+                                                        {% for supp in  tempSupplies  %}
+                                                            {% if product.productCode == supp.productRef.productCode %}
+                                                                <i class="fa fa-check text-success"></i>
+                                                            {% else %}
+                                                                <i class="fa fa-times text-danger"></i>                                        
+                                                            {% endif %}                                                            
+                                                        {% endfor %}
+                                                                                                                    
+
+                                                        <a href="#0" class="btn btn-sm btn-outline-success" onclick="storeTempSupply('{{product.productCode}}', 'add')">Save</a> 
+                                                        <a href="#0" class="btn btn-sm btn-outline-danger" onclick="storeTempSupply('{{product.productCode}}', 'remove')">Remove</a>  
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label class="form-label" for="totalCost">Total Cost<b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="totalCost" name="totalCost" required step="any">
+                                    <p>The total cost of all goods received from the supplier</p>
+                                    <hr/>
+                                    <label class="form-label" for="amount">Amount Paid<b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="amount" name="amount" required step="any">
+                                    <p>The total amount paid to the supplier for this/these item(s)</p>
+                                    <hr/>
+                                    <label class="form-label" for="owe">Amount Owe<b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="owe" name="owe" required step="any">
+                                    <p>Amount owing the supplier for this/these item(s)</p>
+                                    <hr/>
+                                    <label class="form-label" for="receiptNumber">Receipt Number<b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="receiptNumber" name="receiptNumber" required>
+                                    <hr/>
+                                    <label class="form-label" for="receiptNumber">Give details of this supply</label>
+                                    <textarea class="form-control" name="narration" placeholder="transaction details here"></textarea>
+
+                                    <hr/>
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-6 button">
+                                                <button class="btn btn-primary d-block w-100" type="submit">Record Now</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>            
+                </div>
+
+                <!--Record payment==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="payment">
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h2><span class="fa fa-money"></span> Record Payments</h2>
+                        <form method="post" action="{% url 'salesRepaySuppliers' %}">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{supplier.id}}" name="supplierID" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
+                                    <select class="form-control" name='optType'>
+                                        <option>Repayment</option>
+                                        <option>Reverse Repayment</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <p style="font-size: large; color: black;"><b>NOTE: </b> By default the transaction is set to repayment.
+                                        <br/>You can select Reverse Repayment to reverse a transaction made by error.
+                                    </p>
+                                </div>
+                            </div>
+                            <hr/>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="amount" name="amount" min="0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p style="font-size: large; color: black;"><b>NOTE: </b> Amount paid to the supplier.
+                                        <br/><i>Please make sure the amount entered is correct.</i> 
+                                    </p>
+                                </div>
+                            </div>
+                            <hr/>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="receipt">Receipt Number <b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="receipt" name="receipt" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p style="font-size: large; color: black;"><b>NOTE: </b> The number on the receipt received from the supplier.
+                                    </p>
+                                </div>
+                            </div>
+                            <hr/>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="address">Narration<b style="color: red">*</b></label>
+                                    <textarea name="narration" class="form-control" required></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <p style="font-size: large; color: black;"><b>NOTE: </b> Give details information about this transaction.
+                                    </p>
+                                </div>
+                            </div>
+                            <hr/>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Save Payment</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>            
+                </div>
+
+
+                <!--Wrong Transaction==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="wrongTransaction">
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h2><span class="fa fa-money"></span> Disable Wrong Transaction</h2>
+                        <form method="post" action="{% url 'salesDisableWrongTransaction' %}">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{supplier.id}}" name="supplierID" />
+                            <div class="row">                           
+                                <div class="col-md-6">
+                                    <label class="form-label" for="totalCost">Transaction ID<b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="transID" name="transID" required step="any">
+                                    <p>Copy and past Transaction ID of the wrong transaction</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="totalCost">Click to disable</label>
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-6 button">                                            
+                                                <button class="btn btn-primary" type="submit">Disable Transaction</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>            
                 </div>
             </div>
-
-            <!--Record supply==============================================================================================================================-->
-            <div class="tab-pane" role="tabpanel" id="supply">
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <h2><span class="fa fa-money"></span> Record Supplies</h2>
-                    <form method="post" action="{% url 'salesSupplierRecords' %}">
-                        {% csrf_token %}
-                        <input type="hidden" value="{{supplier.id}}" name="supplierID" />
-                        <div class="row">                            
-                            <div class="col-md-8">
-                                <label class="form-label" for="customerName">Products<b style="color: red">*</b></label>
-                                <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example2">
-                                    <thead>
-                                        <tr>
-                                            <th>Item</th>
-                                            <th>Quantity</th>
-                                            <th>Total Cost</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for product in products %}
-                                            <tr class="even gradeA">
-                                                <td>{{ product.productName}} <br/> {{product.productCode}} <input type="hidden" name="product" value="{{product.productCode}}"/></td>
-                                                <td><input type='number' class="form-control" value="0" name='qty' placeholder='quanty received' min="0" required/></td>
-                                                <td><input type='number' class="form-control" value="0" name='cost' placeholder='Cost' min="0" required/></td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label" for="totalCost">Total Cost<b style="color: red">*</b></label>
-                                <input class="form-control" type="number" id="totalCost" name="totalCost" required step="any">
-                                <p>The total cost of all goods received from the supplier</p>
-                                <hr/>
-                                <label class="form-label" for="amount">Amount Paid<b style="color: red">*</b></label>
-                                <input class="form-control" type="number" id="amount" name="amount" required step="any">
-                                <p>The total amount paid to the supplier for this/these item(s)</p>
-                                <hr/>
-                                <label class="form-label" for="owe">Amount Owe<b style="color: red">*</b></label>
-                                <input class="form-control" type="number" id="owe" name="owe" required step="any">
-                                <p>Amount owing the supplier for this/these item(s)</p>
-                                <hr/>
-                                <label class="form-label" for="receiptNumber">Receipt Number<b style="color: red">*</b></label>
-                                <input class="form-control" type="text" id="receiptNumber" name="receiptNumber" required>
-                                <hr/>
-                                <label class="form-label" for="receiptNumber">Give details of this supply</label>
-                                <textarea class="form-control" name="narration" placeholder="transaction details here"></textarea>
-
-                                <hr/>
-                                <div class="mb-3">
-                                    <div class="row">
-                                        <div class="col-md-6 button">
-                                            <button class="btn btn-primary d-block w-100" type="submit">Record Now</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </form>
-                </div>            
-            </div>
-
-            <!--Record payment==============================================================================================================================-->
-            <div class="tab-pane" role="tabpanel" id="payment">
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <h2><span class="fa fa-money"></span> Record Payments</h2>
-                    <form method="post" action="{% url 'salesRepaySuppliers' %}">
-                        {% csrf_token %}
-                        <input type="hidden" value="{{supplier.id}}" name="supplierID" />
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
-                                <select class="form-control" name='optType'>
-                                    <option>Repayment</option>
-                                    <option>Reverse Repayment</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <p style="font-size: large; color: black;"><b>NOTE: </b> By default the transaction is set to repayment.
-                                    <br/>You can select Reverse Repayment to reverse a transaction made by error.
-                                </p>
-                            </div>
-                        </div>
-                        <hr/>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
-                                <input class="form-control" type="number" id="amount" name="amount" min="0" required>
-                            </div>
-                            <div class="col-md-6">
-                                <p style="font-size: large; color: black;"><b>NOTE: </b> Amount paid to the supplier.
-                                    <br/><i>Please make sure the amount entered is correct.</i> 
-                                </p>
-                            </div>
-                        </div>
-                        <hr/>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="receipt">Receipt Number <b style="color: red">*</b></label>
-                                <input class="form-control" type="text" id="receipt" name="receipt" required>
-                            </div>
-                            <div class="col-md-6">
-                                <p style="font-size: large; color: black;"><b>NOTE: </b> The number on the receipt received from the supplier.
-                                </p>
-                            </div>
-                        </div>
-                        <hr/>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="address">Narration<b style="color: red">*</b></label>
-                                <textarea name="narration" class="form-control" required></textarea>
-                            </div>
-                            <div class="col-md-6">
-                                <p style="font-size: large; color: black;"><b>NOTE: </b> Give details information about this transaction.
-                                </p>
-                            </div>
-                        </div>
-                        <hr/>
-                        <div class="mb-3">
-                            <div class="row">
-                                <div class="col-md-6 button">
-                                    <button class="btn btn-primary" type="submit">Save Payment</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>            
-            </div>
-
-
-            <!--Wrong Transaction==============================================================================================================================-->
-            <div class="tab-pane" role="tabpanel" id="wrongTransaction">
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <h2><span class="fa fa-money"></span> Disable Wrong Transaction</h2>
-                    <form method="post" action="{% url 'salesDisableWrongTransaction' %}">
-                        {% csrf_token %}
-                        <input type="hidden" value="{{supplier.id}}" name="supplierID" />
-                        <div class="row">                           
-                            <div class="col-md-6">
-                                <label class="form-label" for="totalCost">Transaction ID<b style="color: red">*</b></label>
-                                <input class="form-control" type="text" id="transID" name="transID" required step="any">
-                                <p>Copy and past Transaction ID of the wrong transaction</p>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="totalCost">Click to disable</label>
-                                <div class="mb-3">
-                                    <div class="row">
-                                        <div class="col-md-6 button">                                            
-                                            <button class="btn btn-primary" type="submit">Disable Transaction</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </form>
-                </div>            
-            </div>
         </div>
-    </div>
-{% endblock warehouse %}
+        <script>
+            function storeTempSupply(productCode, opt)
+            {
+                let qty = document.getElementById('qty'+productCode).value;
+                let cost = document.getElementById('cost'+productCode).value;
+                let product = document.getElementById(productCode).value;
+                let supplierKey = document.getElementById('supplierKey').value;
+
+                $.ajax({
+                    url: '/sales/salesstoretemporarilysupply',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'productCode': product,
+                        'cost': cost,
+                        'qty': qty,
+                        'opt': opt,
+                        'supplierKey': supplierKey,
+                        'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success: function (response){
+                        document.getElementById('qty'+productCode).value = response.quantity;
+                        document.getElementById('cost'+productCode).value = response.cost;
+                        alert('2');
+                    },
+                    error: function (error){
+                        alert('error: operation failed!')
+                    }
+                });
+            }
+
+            function displayTemsSupplies()
+            {
+                
+                let supplierKey = document.getElementById('supplierKey').value;
+                $.ajax({
+                    url: '/sales/salesdisplaytemporarilysupply',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        'supplierKey': supplierKey,
+                    },
+                    success: function (response){
+                        for(let i=0; i<response.tempSupplies.length; i++)
+                        {
+                            let productCode = response.tempSupplies[i].productRef.productCode;
+                            document.getElementById('qty'+productCode).value = response.tempSupplies[i].quantity;
+                            document.getElementById('cost'+productCode).value = response.tempSupplies[i].cost;
+                        }
+                    },
+                    error: function (error){
+                        alert('error: operation failed!')
+                    }
+                });
+            }
+            displayTemsSupplies();
+            
+            
+        </script>
+    {% endblock warehouse %}
+
+    
+
 
 
 

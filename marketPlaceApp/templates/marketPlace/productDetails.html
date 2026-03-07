@@ -1,0 +1,127 @@
+{% extends "marketPlace/rbms.html" %} 
+
+{% block rbmsM %}
+    <div class="container my-4">
+        <!-- Back button -->
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+            <i class="fa fa-arrow-left"></i> Back
+        </a>
+
+        <div class="row">
+
+            <!-- Images -->
+            <div class="col-md-6" style="margin-bottom: 10px">
+                <!-- Flyer -->
+                {% if flyer %}
+                    <img src="{{ flyer.image.url }}" class="img-fluid rounded shadow-sm mb-3" alt="Product Flyer">
+                {% else %}
+                    <p>No flyer available for this product.</p>
+                {% endif %}
+
+                <!-- Other Images Carousel -->
+                {% if otherImages %}
+                    <div id="otherImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for img in otherImages %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ img.image.url }}" class="d-block w-100 rounded shadow-sm" alt="Product Image">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#otherImagesCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#otherImagesCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                    </div>
+                {% else %}
+                    <p>No additional images available for this product.</p>
+                {% endif %}
+            </div>
+
+            <!-- Product Details-->
+            <div class="col-md-6">
+                <h2>{{ product.productName }}</h2>
+                <p><b>Product Code:</b> {{ product.productCode }}</p>
+                <p><b>Category:</b> {{ product.productCategory }}</p>
+                <p><b>Minimum Order:</b> {{ product.retailAndWholesaleRef.minimumOrder }} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</p>
+                <hr>           
+                
+                {% if product.totalDiscount > 0 %}
+                    <p><b>Discount:</b> {{ product.totalDiscount }}%</p>
+                    <p><b>Old Price:</b> 
+                        <span class="text-decoration-line-through text-muted"><i style="color: #c67605">GH&#8373</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice }}</span>
+                    </p>
+                    <p><b>New Price:</b> 
+                        <span class="text-success fw-bold"><i style="color: #c67605">GH&#8373</i>{{ product.priceAfterDiscount }}</span>
+                    </p>
+                {% else %}
+                    <p><b>Price:</b> 
+                        <span class="text-success fw-bold"><i style="color: #c67605">GH&#8373</i>{{ product.priceAfterDiscount }}</span>
+                    </p>                
+                {% endif %}
+                <hr/>
+
+                <!-- Customer Phone Input -->
+                {% if product.retailAndWholesaleRef.enableOnlineOrder %}                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="customerPhone" class="form-label"><b>Your Phone Number</b></label>
+                            <input type="tel" class="form-control" id="customerPhone" name="customerPhone" placeholder="Enter your phone number" required>
+                        </div>
+                        <!-- Quantity -->
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label"><b>Quantity</b></label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" min="{{ product.retailAndWholesaleRef.minimumOrder }}" value="{{ product.retailAndWholesaleRef.minimumOrder }}" required>
+                        </div>
+                        <!-- Add to Cart Button -->
+                        <button type="submit" class="btn btn-primary" id='saveBtn'>
+                            <i class="fa fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </form>
+                    <hr/>           
+                {% endif %}
+
+                <p>Supplier: <b>{{ branch.busRef.busName}}</b> <i>({{branch.branchName }})</i></p>
+                <!-- Contact Options -->
+                <div class="d-flex gap-2 mt-3">
+                    <!-- WhatsApp Contact -->
+                    <a href="https://wa.me/{{ branch.branchTel }}?text=Interested in {{ product.productName }} ({{ product.productCode }})" 
+                        target="_blank" 
+                        class="btn btn-success">
+                        <i class="fa fa-whatsapp"></i> WhatsApp
+                    </a>
+
+                    <!-- Phone Call Contact -->
+                    <a href="tel:{{ branch.branchTel }}" class="btn btn-outline-primary">
+                        <i class="fa fa-phone"></i> Call
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById("customerPhone");
+        const saveBtn = document.getElementById("saveBtn");
+
+        // Save value to localStorage
+        saveBtn.addEventListener("click", () => {
+        const value = input.value;
+        localStorage.setItem("customerTel", value);
+        input.value = value; // update immediately
+        });
+
+        // Load value from localStorage when page loads
+        window.addEventListener("DOMContentLoaded", () => {
+        const storedValue = localStorage.getItem("customerTel");
+        if (storedValue) {
+            input.value = storedValue; // optional: prefill input
+        }
+        });
+    </script>
+
+
+{% endblock rbmsM %}

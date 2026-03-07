@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'realEstateApp',
     'restaurantAndBarApp',
     'richnet360',
+    'django_user_agents',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
 ]
 
 ROOT_URLCONF = 'RBMS.urls'
@@ -161,3 +163,5 @@ STATICFILES_DIRS = [
 ]
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 429916160
+
+

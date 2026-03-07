@@ -7,18 +7,20 @@ from loginAndOutApp.views import loginSessions, dashboardMenuAccess
 from django.db.models import Q, F, Value, FloatField, ExpressionWrapper, Count
 from django.db.models.functions import ExtractYear, ExtractMonth
 from salesApp.models import RetailAndWholesale, CurrentCostAndPrice, RetailWholesalesTally, ReturnAmountToCustomer, ReturnedProductsRecord, StockAdjustment, CustomMeasuringUnit, MeasuringUnits, Quantities, AddToCart, TransactionIDs
-from salesApp.models import RetailAndWholesaleCustomers, CustomerPayments, CustomerItemsPurchased, ProductSuppliers, SupplyQuantityRecords, TemporalPurchaseDetails, SalesRecords, AdvancePaymentItems, AdvancePaymentItemsDetails
+from salesApp.models import RetailAndWholesaleCustomers, CustomerPayments, CustomerItemsPurchased, ProductSuppliers, SupplyQuantityRecords, TempSupplyQuantity, TemporalPurchaseDetails, SalesRecords, AdvancePaymentItems, AdvancePaymentItemsDetails
 from salesApp.models import CashOnhand, PaymentAgreement, PaymentAgreementDetails, AgreementConfirmationCode, ExcludeDays, DatesForPayments, CustomerOwingDetails, AllCustomerTransactions, IndividualItemsSupplied
 from businessApp.models import BusinessBranch
 from accountsApp.views import accountTransactions
 from accountsApp.models import OperationExpenses, OversAndShortagesRecord
 from salesApp.models import DiscountRate as IndividualDiscount
+from imageApp.models import Images, OtherFiles
 from django.db.transaction import atomic
 import datetime as dt
 from imageApp.views import ImageUpload
 from django.contrib import messages
 from usersApp.views import activityLogs, haveAccess
 from django.db.transaction import atomic
+from django.contrib.auth.hashers import check_password
 import random as rd
 from sms import sendSMS
 import pytz
@@ -53,6 +55,11 @@ def products(request):
     products = Product.objects.filter(Q(busRef=loginSessions(request, 'business')) & 
                                       Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & 
                                       Q(disbleRef__productIsDisabled=False))
+    restockAlerts = Product.objects.filter(Q(busRef=loginSessions(request, 'business')) & 
+                                           Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & 
+                                           Q(disbleRef__productIsDisabled=False) & 
+                                           Q(retailAndWholesaleRef__quantityRef__packQty__lte=F('retailAndWholesaleRef__reorderLevel')) & 
+                                           Q(retailAndWholesaleRef__reorderLevel__gt=0))
     disabled = Product.objects.filter(Q(busRef=loginSessions(request, 'business')) & 
                                       Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & 
                                       Q(disbleRef__productIsDisabled=True))    
@@ -68,7 +75,10 @@ def products(request):
         disc.addedBy = loginSessions(request, 'user')
         disc.discount = 0.00
         disc.save()
-    return render(request, 'sales/products.html', {'products': products, 'uAccess':access, 'disabledProducts': disabled, 'measureUnits': meassureUnits, 'discount': discount})
+    if request.user_agent.is_mobile:
+        return render(request, 'sales/productsMobile.html', {'products': products, 'uAccess':access, 'disabledProducts': disabled, 'measureUnits': meassureUnits, 'discount': discount, 'restockAlerts': restockAlerts})
+    else:
+        return render(request, 'sales/products.html', {'products': products, 'uAccess':access, 'disabledProducts': disabled, 'measureUnits': meassureUnits, 'discount': discount, 'restockAlerts': restockAlerts})
 
 
 class AddProduct(generic.View):
@@ -157,7 +167,7 @@ class AddProduct(generic.View):
                 product.productDescription = description
                 product.productCategory = category
                 product.measureUnit = measureUnit
-                product.belongsToModel = product.branhRef.branchType
+                product.belongsToModel = loginSessions(request, 'branch').branchType
                 product.addedBy = loginSessions(request, 'user')
                 product.dateAdded = dt.datetime.now()
                 product.retailAndWholesaleRef = retailWholesale
@@ -236,7 +246,14 @@ class SetProductProperties(generic.View):
         tally = RetailWholesalesTally.objects.filter(Q(retailAndWholesaleRef=product.retailAndWholesaleRef)).order_by('-id')
         adjustments = StockAdjustment.objects.filter(Q(retailAndWholesaleRef=product.retailAndWholesaleRef)).order_by('-id')
         discount = IndividualDiscount.objects.get(Q(branchRef=loginSessions(request, 'branch')) & Q(productRef=product))
-        return render(request, 'sales/setProperties.html', {'product': product, 'tally': tally, 'uAccess':access, 'adjustments': adjustments, 'discount': discount})
+        otherImages = OtherFiles.objects.filter(Q(imageRef__busRef = loginSessions(request, 'business')) & Q(imageRef__subjectID=product.productCode))
+        image = Images.objects.filter(Q(subjectID=product.productCode))
+        if image.exists():
+            image = image[0]
+        if request.user_agent.is_mobile:
+            return render(request, 'sales/setPropertiesMobile.html', {'product': product, 'tally': tally, 'uAccess':access, 'adjustments': adjustments, 'discount': discount, 'image': image, 'otherImages': otherImages})
+        else:
+            return render(request, 'sales/setProperties.html', {'product': product, 'tally': tally, 'uAccess':access, 'adjustments': adjustments, 'discount': discount, 'image': image, 'otherImages': otherImages})
 
 
     # set price of the product
@@ -332,6 +349,31 @@ class SetProductProperties(generic.View):
             product.retailAndWholesaleRef.discountRef = db
             product.retailAndWholesaleRef.save()
         return HttpResponseRedirect('/sales/salesproductproperties/' + str(product.id))
+
+    
+    # set minimum and online order
+    def minimumAndOnlineOrder(request, pk):
+        if not haveAccess(request, '315'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to set product online visibility.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html')  
+        dashboardMenuAccess(request)
+        with atomic():
+            onlineOder = request.POST.get('onlineOder')
+            minOrder = request.POST.get('minOrder')
+            
+            product = Product.objects.get(Q(id=pk))
+            if onlineOder == 'enable':
+                product.retailAndWholesaleRef.enableOnlineOrder = True
+            else:
+                product.retailAndWholesaleRef.enableOnlineOrder = False
+            product.retailAndWholesaleRef.minimumOrder = minOrder
+            product.retailAndWholesaleRef.save()        
+            activityLogs(request, loginSessions(request, 'user').userID, 'online and mim order', f'Changed online and minimum order of the product: {product.productName} ({product.productCode})') 
+        return HttpResponseRedirect('/sales/salesproductproperties/' + str(product.id))
+
+
+
 
 
     # restock level of the product
@@ -429,10 +471,30 @@ class SetProductProperties(generic.View):
         with atomic():
             product = Product.objects.get(Q(id=pk))
             file = request.FILES['upload']
-            image = ImageUpload(request, 'product')
-            image.upload(file, subjectID=product.productCode)
-            activityLogs(request, loginSessions(request, 'user').userID, 'Product Image', f'You added an image to the product: {product.productName} ({product.productCode})')        
+            image = ImageUpload()
+            #image.upload(file, subjectID=product.productCode)
+            imageRef = image.uploadProductFlyer(request, file, product.productCode)
+            product.productImageRef = imageRef
+            product.save()
+            activityLogs(request, loginSessions(request, 'user').userID, 'Product Image', f'You uploaded an image to the product: {product.productName} ({product.productCode})')        
         return HttpResponseRedirect('/sales/salesproductproperties/' + str(product.id))
+    
+    # upload other images
+    def uploadOtherProductImages(request, pk):
+        if not haveAccess(request, '313'):
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'You do not have access to change product image.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+            return render(request, 'user/state.html')  
+        dashboardMenuAccess(request)
+        with atomic():
+            product = Product.objects.get(Q(id=pk))
+            file = request.FILES['upload']
+            image = ImageUpload()
+            #image.upload(file, subjectID=product.productCode)
+            image.uploadProductImages(request, file, product.productCode)
+            activityLogs(request, loginSessions(request, 'user').userID, 'Product Image', f'You uploaded an image to the product: {product.productName} ({product.productCode})')        
+        return HttpResponseRedirect('/sales/salesproductproperties/' + str(product.id))
+
     
     # set online visibilty 
     def setOnlineVisibility(request, pk):
@@ -640,7 +702,6 @@ class Customers(generic.View):
             details.save()   
 
 
-
 # Supplier management ================================================================================================
 class Suppliers(generic.View):
     def get(self, request):
@@ -680,7 +741,11 @@ class Suppliers(generic.View):
                                       Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & 
                                       Q(disbleRef__productIsDisabled=False))
         suppliesRecords = SupplyQuantityRecords.objects.filter(Q(supplierRef=suppliers)).order_by('-id')
-        return render(request, 'sales/supplierDetails.html', {'supplier': suppliers, 'products': products, 'suppliesRecords': suppliesRecords}) 
+        if request.user_agent.is_mobile:
+            return render(request, 'sales/supplierDetailsMobile.html', {'supplier': suppliers, 'products': products, 'suppliesRecords': suppliesRecords})
+        else:
+            return render(request, 'sales/supplierDetails.html', {'supplier': suppliers, 'products': products, 'suppliesRecords': suppliesRecords}) 
+    
     
     # save supply records
     def supplyRecords(request):  
@@ -809,7 +874,8 @@ class Suppliers(generic.View):
     def suppliesItemsDetails(request, sup, pk):
         supplierRecord = SupplyQuantityRecords.objects.get(Q(id=pk)) 
         inds = IndividualItemsSupplied.objects.filter(Q(supplyRef=supplierRecord))
-        return render(request, 'sales/supplierItems.html', {'individualItems': inds, 'sup': sup, 'supplierRecord': supplierRecord})
+        tempSupplies = TempSupplyQuantity.objects.filter(Q(supplierRef=supplierRecord.supplierRef) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
+        return render(request, 'sales/supplierItems.html', {'individualItems': inds, 'sup': sup, 'supplierRecord': supplierRecord, 'tempSupplies': tempSupplies})
     
     #Disable wrong transaction
     def disableWrongTransaction(request):
@@ -849,7 +915,55 @@ class Suppliers(generic.View):
             messages.error(request, {'message': 'You are see this error message because of one of the following reasons: 1) Wrong transaction ID. 2) The transaction type is not "Supply"', 'title': 'Wrong transaction ID or The transaction type is not Supply'}, extra_tags='wrongTransactionIDOrTransactionTypeIsNotSupply')
             return render(request, 'sales/state.html', {'supplierID': supplier.id})        
 
+    # store temporary supply quantity before saving the supply record
+    def storeTemporarySupply(request):
+        productCode= request.POST.get('productCode')
+        quantity = request.POST.get('qty')
+        cost = request.POST.get('cost')
+        supplierKey = request.POST.get('supplierKey')
+        opt = request.POST.get('opt')
+        supplier = ProductSuppliers.objects.get(Q(id=supplierKey))
+        
 
+        check = TempSupplyQuantity.objects.filter(Q(productRef__productCode=productCode) & Q(supplierRef=supplier) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
+        if opt == 'add':
+            if check.exists():
+                temp = check[0]
+                temp.qty = quantity
+                temp.cost = cost
+                temp.save()
+            else:
+                temp = TempSupplyQuantity()
+                temp.productRef = Product.objects.get(Q(productCode=productCode) & Q(busRef=loginSessions(request, 'business')))
+                temp.supplierRef = supplier
+                temp.branchRef = loginSessions(request, 'branch')
+                temp.userRef = loginSessions(request, 'user')
+                temp.qty = quantity
+                temp.cost = cost
+                temp.save()
+        else:
+            if check.exists():
+                check.delete()
+        return JsonResponse({'quantity': quantity, 'cost': cost})
+    
+    # display temporary supply quantity before saving the supply record
+    def displayTemporarySupply(request):
+        supplierKey = request.GET.get('supplierKey')
+        supplier = ProductSuppliers.objects.get(Q(id=supplierKey))
+        tempSupplies = TempSupplyQuantity.objects.filter(Q(supplierRef=supplier) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
+        data = []
+        for temp in tempSupplies:
+            data.append({
+                'productCode': temp.productRef.productCode,
+                'productName': temp.productRef.productName,
+                'quantity': temp.qty,
+                'cost': temp.cost,
+                'totalCost': float(temp.qty) * float(temp.cost)
+            })
+        return JsonResponse({'tempSupplies': data})   
+
+
+# selling page
 class Selling(generic.View):    
     transactionID = None
     def get(self, request):
@@ -898,7 +1012,10 @@ class Selling(generic.View):
                     dis.save()
                 else:
                     pass
-        return render(request, 'sales/sell.html', {'data': data, 'transactionID': self.transactionID, 'cashOnHand': cash, 'totalTransaction': totalTransaction, 'generalDiscount': generalDiscount})
+        if request.user_agent.is_mobile:
+            return render(request, 'sales/sellMobile.html', {'data': data, 'transactionID': self.transactionID, 'cashOnHand': cash, 'totalTransaction': totalTransaction, 'generalDiscount': generalDiscount})
+        else:
+            return render(request, 'sales/sell.html', {'data': data, 'transactionID': self.transactionID, 'cashOnHand': cash, 'totalTransaction': totalTransaction, 'generalDiscount': generalDiscount})
     
     # add items to cart
     def addToCart(request):
@@ -990,6 +1107,7 @@ class Selling(generic.View):
 
             temPurchase.totalPrice = totalPrice
             temPurchase.amountToPay = totalPrice
+            temPurchase.discount = totalDiscount
             temPurchase.save()
 
             carts = list(AddToCart.objects.values('transactionID', 'productRef__productCode', 'pricePerItem', 'quantity', 'totalPrice', 'productRef__retailAndWholesaleRef__measureRef__stockedUnit', 'productRef__retailAndWholesaleRef__measureRef__soldUnit').filter(Q(branchRef=loginSessions(request, 'branch')) & 
@@ -1170,8 +1288,11 @@ class Payment(generic.View):
                         trans.isSelcted = False            
                     trans.save()
             temp = TemporalPurchaseDetails.objects.get(Q(branchRef=loginSessions(request, 'branch')) & Q(transactionID=transID, ))    
-            customerList = RetailAndWholesaleCustomers.objects.filter(Q(branchRef__busRef=loginSessions(request, 'business')))                         
-            return render(request, 'sales/makePayment.html', {'temp': temp, 'customerList': customerList})
+            customerList = RetailAndWholesaleCustomers.objects.filter(Q(branchRef__busRef=loginSessions(request, 'business')))   
+            if request.user_agent.is_mobile:
+                return render(request, 'sales/makePaymentMobile.html', {'temp': temp, 'customerList': customerList})   
+            else:                   
+                return render(request, 'sales/makePayment.html', {'temp': temp, 'customerList': customerList})
         else:
             messages.set_level(request, messages.INFO)
             messages.error(request, {'message': 'Payment is not possible when no item is added to cart. '
@@ -1201,15 +1322,24 @@ class Payment(generic.View):
                 
         if paymentTerm == 'Part payment (PP)':
             request.session['paymentTermShort'] = 'PP'
-            return render(request, 'sales/paymentAgreement.html', {'payTerm': 'PP', 'transactionID': transactionID})
+            if request.user_agent.is_mobile:
+                return render(request, 'sales/paymentAgreementMobile.html', {'payTerm': 'PP', 'transactionID': transactionID})  
+            else:
+                return render(request, 'sales/paymentAgreement.html', {'payTerm': 'PP', 'transactionID': transactionID})
         
         elif paymentTerm == 'Advance payment (AP)':
-            request.session['paymentTermShort'] = 'AP'            
-            return render(request, 'sales/paymentAgreement.html', {'payTerm': 'AP', 'customer': customers})
+            request.session['paymentTermShort'] = 'AP'    
+            if request.user_agent.is_mobile:
+                return render(request, 'sales/paymentAgreementMobile.html', {'payTerm': 'AP', 'customer': customers})  
+            else:   
+                return render(request, 'sales/paymentAgreement.html', {'payTerm': 'AP', 'customer': customers})
         
         elif paymentTerm == 'Installment agreements (IA)':
             request.session['paymentTermShort'] = 'IA'
-            return render(request, 'sales/paymentAgreement.html', {'payTerm': 'IA', 'customer': customers})        
+            if request.user_agent.is_mobile:
+                return render(request, 'sales/paymentAgreementMobile.html', {'payTerm': 'IA', 'customer': customers})  
+            else:
+                return render(request, 'sales/paymentAgreement.html', {'payTerm': 'IA', 'customer': customers})        
         else:
             if not payAmount:
                 temp = TemporalPurchaseDetails.objects.get(Q(branchRef=loginSessions(request, 'branch')) & Q(transactionID=transactionID)) 
@@ -1568,6 +1698,7 @@ class Payment(generic.View):
                 customerTransactions.totalPrice = sales.totalAmount
                 customerTransactions.discount = sales.discount
                 customerTransactions.amountTopay = sales.amountToPay
+                customerTransactions.currentPayment = cash
                 customerTransactions.amountPaid = sales.amountPaid
                 customerTransactions.amountOwe = sales.amountOwe
                 customerTransactions.oweBalance = totalOwe
@@ -1611,6 +1742,7 @@ class Payment(generic.View):
                 item.pricePerUnit = cart.pricePerItem
                 item.costPerUnit = cart.productRef.retailAndWholesaleRef.currentCostPriceRef.unitCostPrice
                 item.discount = cart.discount
+                item.unitDiscount = round(float(item.discount)/float(item.quantity), 2)
                 item.totalPrice = cart.totalPrice
                 item.save()
 
@@ -1934,7 +2066,10 @@ class PerformanceAnalysis(generic.View):
                    ).filter(Q(oversAndShortagesRef__branchRef__busRef=loginSessions(request, 'business')) & Q(transactionType='Overs') & (Q(date__gte=fromDate) & Q(date__lte=toDate))).order_by('-overs') 
                 totalTarget = result.aggregate(Sum('overs'))['overs__sum']
 
-        return render(request, 'sales/perfomanceAnalysis.html', {'results': result, 'title': title, 'performanceType': performanceType, 'totalTarget': totalTarget})
+        if request.user_agent.is_mobile:
+            return render(request, 'sales/perfomanceAnalysisMobile.html', {'results': result, 'title': title, 'performanceType': performanceType, 'totalTarget': totalTarget})
+        else:
+            return render(request, 'sales/perfomanceAnalysis.html', {'results': result, 'title': title, 'performanceType': performanceType, 'totalTarget': totalTarget})
     
 
     def post(self, request):
@@ -2236,6 +2371,7 @@ class PostPaymentAndCollection(generic.View):
                     customerTransactions.totalPrice = sales.totalAmount
                     customerTransactions.discount = sales.discount
                     customerTransactions.amountTopay = sales.amountToPay
+                    customerTransactions.currentPayment = amount
                     customerTransactions.amountPaid = sales.amountPaid
                     customerTransactions.amountOwe = sales.amountOwe
                     customerTransactions.oweBalance = totalOwe
@@ -2327,7 +2463,6 @@ class PostPaymentAndCollection(generic.View):
                 advanceItemTally.receiverName = ''
                 advanceItemTally.receiverName = ''
                 advanceItemTally.save()
-
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -2337,19 +2472,6 @@ class ReturnProduct(generic.View):
         sales = SalesRecords.objects.get(transactionID=transID)
         product = Product.objects.get(Q(productCode=productCode) & Q(busRef=loginSessions(request, 'business')))
         item = CustomerItemsPurchased.objects.get(Q(transactionID=sales.transactionID) & Q(productCode=product.productCode))
-        import platform
-        import os
-        import uuid
-        from getmac import get_mac_address
-        
-
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-            print(ip)
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-            print(ip)
         return render(request, 'sales/returnProduct.html', {'product': product, 'sales': sales, 'item': item})
     
     def post(self, request, productCode, transID):
@@ -2369,6 +2491,7 @@ class ReturnProduct(generic.View):
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/')) 
 
             item.quantity -= quantity
+            item.quantityReturned += quantity
             item.totalPrice = item.pricePerUnit * item.quantity
             item.save()
 
@@ -2402,7 +2525,7 @@ class ReturnProduct(generic.View):
             tally.save() 
 
             returnRecord = ReturnedProductsRecord()
-            returnRecord.salesRef = SalesRecords.objects.get(transactionID=transID)
+            returnRecord.salesRef = sales
             returnRecord.productRef = product
             returnRecord.quantity = quantity
             returnRecord.pricePerUnit = item.pricePerUnit
@@ -2412,56 +2535,56 @@ class ReturnProduct(generic.View):
             returnRecord.date = dt.datetime.now()
             returnRecord.save()
 
-            amtToReturn = 0
-            
-            rate = 0
-            if sales.discount>0:
-                rate = (((float(item.quantity) * float(item.pricePerUnit)) - float(item.totalPrice)) / (float(item.quantity) * float(item.pricePerUnit))) * 100            
-             
-            discountAmount = (rate / 100) * (float(item.pricePerUnit) * float(quantity))
-            amtToReturn = (float(item.pricePerUnit) * float(quantity)) - discountAmount
+            amtToReturn = 0.00
 
-            # update sales record
-            sales = SalesRecords.objects.get(transactionID=transID)
-            sales.amountReturned += float(amtToReturn)
+            # calculate discount given and subtract it from the amount to be returned  
+            discountAmount = round(float(item.unitDiscount) * float(quantity), 2)
 
-            if sales.amountOwe == sales.amountToPay:
-                sales.amountReturned += float(amtToReturn)
-                sales.amountOwe = float(sales.amountOwe) - float(amtToReturn)
-                sales.amountToPay = float(sales.amountToPay) - float(amtToReturn)                
-                amtToReturn = 0
-            elif sales.amountToPay == sales.amountPaid:
-                sales.amountReturned += float(amtToReturn)
-                sales.amountToPay = float(sales.amountToPay) - float(amtToReturn)   
-                sales.amountPaid = float(sales.amountPaid) - float(amtToReturn)
-                sales.amountOwe = 0                         
-            elif sales.amountOwe <= sales.amountToPay:
-                if float(amtToReturn) >= float(sales.amountOwe):
-                    sales.amountReturned += float(amtToReturn)
-                    amtToReturn = float(amtToReturn) - float(sales.amountOwe)
-                    sales.amountToPay = float(sales.amountToPay) - float(sales.amountOwe)
-                    sales.amountOwe = 0
+            # amount to return to the customer
+            amtToReturn = round((float(item.pricePerUnit) * float(quantity)) - float(discountAmount), 2)
+
+            # total refund amount
+            sales.amountReturned += amtToReturn
+
+            # Case 1: Customer still owes (partial or no payment)
+            if float(sales.amountToPay) > float(sales.amountPaid):
+                # Refund larger than debt
+                if amtToReturn >= float(sales.amountOwe):
+                    sales.amountToPay = round(float(sales.amountToPay) - amtToReturn, 2)
+                    amtToReturn = round(amtToReturn - float(sales.amountOwe), 2)
+                    sales.amountOwe = 0.00
+                    print('Refund covers debt, remainder to customer:', amtToReturn)
                 else:
-                    sales.amountReturned += float(amtToReturn)
-                    amtToReturn = float(sales.amountOwe) - float(amtToReturn)
-                    sales.amountToPay = float(sales.amountToPay) - float(amtToReturn)
-                    sales.amountPaid = float(sales.amountPaid) - float(amtToReturn)
-                    sales.amountOwe = float(sales.amountOwe) - float(amtToReturn)
+                    # Refund only reduces debt
+                    sales.amountToPay = round(float(sales.amountToPay) - amtToReturn, 2)
+                    sales.amountOwe = round(float(sales.amountOwe) - amtToReturn, 2)
+                    amtToReturn = 0.00
+                    print('Refund reduces debt, nothing to customer')
+
+            # Case 2: Full payment made
+            else:
+                # Customer gets full refund
+                sales.amountToPay = round(float(sales.amountToPay) - amtToReturn, 2)
+                sales.amountPaid = round(float(sales.amountPaid) - amtToReturn, 2)
+                sales.amountOwe = 0.00
+                print('Full payment, refund to customer:', amtToReturn)
             sales.save()
-            
+
             # update amount to return 
             checkReturnAmout = ReturnAmountToCustomer.objects.filter(Q(salesRef__transactionID=transID))
             if checkReturnAmout.exists():
                 returnAmount = checkReturnAmout[0]
                 returnAmount.amountToPay += float(amtToReturn)
                 returnAmount.save()
+                print('Executed ========================================================================================')
             else:
                 returnAmount = ReturnAmountToCustomer()
                 returnAmount.salesRef = sales
                 returnAmount.amountToPay = float(amtToReturn)
-                returnAmount.save()        
+                returnAmount.save()    
+                print('Executed ========================================================================================')    
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
+    
 
 # receipts
 class Receipts(generic.View):
@@ -2708,36 +2831,74 @@ class Receipts(generic.View):
 
             # Table Items
             customerItems = AdvancePaymentItemsDetails.objects.filter(Q(advanceItemRef__payAgreemtRef__transactionID=transactionID) & Q(date__date=dt.datetime.now())).order_by('-id')
-            for item in customerItems:
-                Receipts.print_row(str(item.advanceItemRef.productRef.productName), str(item.quantity), str(item.balace), printer)
-            
-            customerItems = customerItems[0]
+            if customerItems.exists():
+                for item in customerItems:
+                    Receipts.print_row(str(item.advanceItemRef.productRef.productName), str(item.quantity), str(item.balace), printer)
+                
+                customerItems = customerItems[0]
 
-            printer.text(f"Trans Date: {customerItems.date} \n")
-            printer.text("-" * 32 + "\n")
+                printer.text(f"Trans Date: {customerItems.date} \n")
+                printer.text("-" * 32 + "\n")
 
-            printer.text("Receiver Name: \n")
-            printer.text(f"{customerItems.receiverName} \n")
-            printer.text("-" * 32 + "\n")
+                printer.text("Receiver Name: \n")
+                printer.text(f"{customerItems.receiverName} \n")
+                printer.text("-" * 32 + "\n")
 
-            printer.text(f"\n By: {loginSessions(request, 'user').userRef.firstName} {loginSessions(request, 'user').userRef.surname} \n")
-            printer.text("-" * 32 + "\n")
-            printer.text("Thanks for doing business with us! \n")
+                printer.text(f"\n By: {loginSessions(request, 'user').userRef.firstName} {loginSessions(request, 'user').userRef.surname} \n")
+                printer.text("-" * 32 + "\n")
+                printer.text("Thanks for doing business with us! \n")
 
-            printer.text("-" * 32 + "\n")
-            printer.text("\n Designed by RN360!\n")
-            printer.text("\n https://www.rn360.net \n")
-            # Cut (optional, visual representation in dummy)
-            printer.cut()
-            # Output the result from the dummy printer
-            print(printer.output.decode('utf-8'))
+                printer.text("-" * 32 + "\n")
+                printer.text("\n Designed by RN360!\n")
+                printer.text("\n https://www.rn360.net \n")
+                # Cut (optional, visual representation in dummy)
+                printer.cut()
+                # Output the result from the dummy printer
+                print(printer.output.decode('utf-8'))
         else:
             pass
 
 
+# Refund 
+class Refund(generic.View):
+    def get(self, request):
+        refunds = ReturnAmountToCustomer.objects.filter(Q(salesRef__branchRef=loginSessions(request, 'branch')) & Q(amountToPay__gt=0)).order_by('-id').order_by('status')
+        return render(request, 'sales/refund.html', {'refunds': refunds})
+    
+    def post(self, request):
+        return HttpResponse()
+    
 
-
-
-
+    # Refund the item returned by the customer
+    def customerRefund(request, pk):
+        refund = ReturnAmountToCustomer.objects.get(Q(id=pk))
+        return render(request, 'sales/refundAmountToCustomer.html', {'refund': refund})
+    
+    def saveCustomerRefund(request, pk):
+        passW = request.POST.get('confirm')
+        with atomic():
+            refund = ReturnAmountToCustomer.objects.get(Q(id=pk))
+            if check_password(password=passW, encoded=loginSessions(request, 'user').password):
+                
+                cash = CashOnhand.objects.filter(Q(userRef=loginSessions(request, 'user')))
+                if cash.exists():
+                    cash = cash[0]
+                    if float(cash.cash) >= float(refund.amountToPay):
+                        refund.status = 'Refunded'
+                        # debit amount from cash on hand
+                        cash.cash -= float(refund.amountToPay)
+                        cash.save()
+                        # debit amount from users account
+                        accountTransactions(request, loginSessions(request, 'user').userID, 'Debit', float(refund.amountToPay), f'Payment of refund with transaction ID: {refund.salesRef.transactionID}')  
+                        refund.save()
+                    else:
+                        messages.set_level(request, messages.WARNING)
+                        messages.warning(request, {'message': 'Cash on hand is less than refund amount.', 'title': 'Transaction Failed'}, extra_tags='cashOnHandIslessThanRefundAmount')
+                        return render(request, 'sales/state.html', {'refund': refund})                
+                return redirect('salesRefund')
+            else:
+                messages.set_level(request, messages.WARNING)
+                messages.warning(request, {'message': 'You have entered wrong password.', 'title': 'Wrong Password'}, extra_tags='passwordNotCorrectForRefund')
+                return render(request, 'sales/state.html', {'refund': refund})
 
 

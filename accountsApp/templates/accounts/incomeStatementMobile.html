@@ -1,0 +1,299 @@
+
+{% extends 'warehouse/warehouse.html' %}
+{% load static %}
+
+{% block warehouseMobile %}
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+
+        </ul>
+        <br/>
+        <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="customers">                
+                <form method="post" class="w-100">
+                {% csrf_token %}
+                <div class="card mb-3 shadow-sm w-100">
+                    <div class="card-body">
+                    <!-- Statement Type -->
+                    <div class="mb-3">
+                        <label for="statementType" class="form-label">Statement Type</label>
+                        <select class="form-control" id="statementType" name="statementType">
+                        <option value='100'>Business Income Statement</option>
+                        <option value='101'>Branch Income Statement</option>
+                        </select>
+                    </div>
+
+                    <!-- Branch -->
+                    <div class="mb-3">
+                        <label for="branch" class="form-label">Branch</label>
+                        <select class="form-control" id="branch" name="branch">
+                        <option></option>
+                        </select>
+                    </div>
+
+                    <!-- Date Range -->
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                        <label for="fromDate" class="form-label">From</label>
+                        <input type="date" class="form-control" name="fromDate" id="fromDate" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                        <label for="toDate" class="form-label">To</label>
+                        <input type="date" class="form-control" name="toDate" id="toDate" required>
+                        </div>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="d-grid">
+                        <button class="btn btn-primary fa fa-search" type="submit"> Search</button>
+                    </div>
+                    </div>
+                </div>
+                </form>
+
+                <!-- Print Button -->
+                <div class="d-grid mt-2">
+                <a class="btn btn-primary w-100 fa fa-print" href="#">Print</a>
+                </div>
+
+                <hr/>
+                <div class="container bg-gradient-light py-5 shadow">
+                {% if statementType == '100' %}
+                <div class="card mb-3 shadow-sm w-100">
+                    <div class="card-body text-center">
+                    <h2 class="mb-2"><b>Income Statement</b></h2>
+                    <h3 class="mb-1"><b>{{business.busName}}</b> ({{business.busID}})</h3>
+                    <h5 class="mb-0">
+                        <b>For the period <u>30th June, 2024</u> to <u>30th August, 2024</u></b>
+                    </h5>
+                    </div>
+                </div>
+                {% elif statementType == '101' %}
+                <div class="card mb-3 shadow-sm w-100">
+                    <div class="card-body text-center">
+                    <h2 class="mb-2"><b>Income Statement</b></h2>
+                    <h4 class="mb-1"><b>{{business.busName}}</b> ({{business.busID}})</h4>
+                    <h5 class="mb-1"><b>{{branch.branchName}}</b> ({{branch.branchID}})</h5>
+                    <h6 class="mb-0">
+                        <b>For the period <u>{{startDate}}</u> to <u>{{endDate}}</u></b>
+                    </h6>
+                    </div>
+                </div>
+                {% endif %}
+
+                    <br/>
+                    <!--Revenue ==========================================================================================-->
+                    <h3 class="mt-3"><u><b>Revenue</b></u></h3>
+                    <div class="card mb-2 shadow-sm w-100">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between">
+                        <span>Sales Revenue:</span>
+                        <span>{{revenue|floatformat:2}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Service Income:</span>
+                        <span>0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span><u>Total Revenue:</u></span>
+                        <span><u>{{revenue|floatformat:2}}</u></span>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Cash Overages -->
+                    <h3 class="mt-3"><u><b>Cash Overages</b></u></h3>
+                    <div class="card mb-2 shadow-sm w-100">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span>Amount:</span>
+                        <span><u>{{overs|floatformat:2}}</u></span>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Cost of Goods Sold -->
+                    <h3 class="mt-3"><u><b>Cost of Goods Sold</b></u></h3>
+                    <div class="card mb-2 shadow-sm w-100">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between">
+                        <span>Sold Goods:</span>
+                        <span>{{goodsSold|floatformat:2}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Damaged Goods:</span>
+                        <span>{{damages|floatformat:2}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Lost Goods:</span>
+                        <span>{{lost|floatformat:2}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Expired Goods:</span>
+                        <span>{{expires|floatformat:2}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span><u>Total Sold Cost:</u></span>
+                        <span><u>{{totalSoldCost|floatformat:2}}</u></span>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Cash Shortages -->
+                    <h3 class="mt-3"><u><b>Cash Shortages</b></u></h3>
+                    <div class="card mb-2 shadow-sm w-100">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span>Amount:</span>
+                        <span><u>{{shortages}}</u></span>
+                        </div>
+                    </div>
+                    </div>
+
+
+                                        <!-- Operating Expenses -->
+                    <h3 class="mt-3"><u><b>Operating Expenses</b></u></h3>
+                    <div class="card mb-2 shadow-sm w-100">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between">
+                        <span>Branch operations:</span>
+                        <span>{{branchOpertion}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Internet:</span>
+                        <span>{{internetFees}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Transportation:</span>
+                        <span>{{transportation}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Fuel:</span>
+                        <span>{{fuel}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Electricity Bill:</span>
+                        <span>{{electricityBill}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Water Bill:</span>
+                        <span>{{waterBill}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Rent:</span>
+                        <span>{{rent}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Salaries and Wages:</span>
+                        <span>{{salariesAndWages}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Tax:</span>
+                        <span>{{tax}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Maintenance and Repairs:</span>
+                        <span>{{maintenance}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Allowance:</span>
+                        <span>{{allowance}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Advertising and Marketing:</span>
+                        <span>{{advertAndmarketing}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Meals and Entertainment:</span>
+                        <span>{{mealsAndEntertainment}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Security:</span>
+                        <span>{{security}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                        <span>Other Expenses:</span>
+                        <span>{{others}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span><u>Total Expenses:</u></span>
+                        <span><u>{{totalExpenses}}</u></span>
+                        </div>
+                    </div>
+                    </div>
+
+
+                    <!-- Net Income -->
+                    <h3 class="mt-3"><u><b>Net Income</b></u></h3>
+                    <div class="card mb-2 shadow-sm w-100">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span>Amount:</span>
+                        <span><u>{{netIncome|floatformat:2}}</u></span>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Gross Income -->
+                    <h3 class="mt-3"><u><b>Gross Income</b></u></h3>
+                    <div class="card mb-2 shadow-sm w-100">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span>Amount:</span>
+                        <span><u>{{groseIncome|floatformat:2}}</u></span>
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>        
+        const performanceType = document.getElementById('statementType');
+        const subject = document.getElementById('branch');
+        var optionsList = [];        
+
+        performanceType.addEventListener('click', function(){
+            subject.options.length = 0;
+            optionsList.length = 0; 
+            $.ajax({
+                url: '/sales/salessearchperformance',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'performanceType': performanceType.value,
+                    'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val(),
+                },
+                success: function (response){                    
+                    for(var i=0; i < response.data.length; i++)
+                    {                        
+                        optionsList.push(response.data[i]);                                      
+                    } 
+                    // we will manipulate the second select here and dates here
+                    if(response.option == '101' || response.option == '104' || response.option == '109' || response.option == '115' || response.option == '116' || response.option == '119' || response.option == '120'){
+                        optionsList.forEach(function(item, index){
+                            var option = document.createElement('option');
+                            option.value = item.branchID;
+                            option.textContent = item.branchName;
+                            subject.appendChild(option);
+                        });
+                        subject.style.display = "inline";
+                    }
+                    else{
+                        subject.style.display = "none";
+                    } 
+                },
+                error: function (error){
+                    alert('error: operation failed!');
+                }
+            });
+        });
+    </script>
+{% endblock warehouseMobile %}
+
+
+
+
+
+

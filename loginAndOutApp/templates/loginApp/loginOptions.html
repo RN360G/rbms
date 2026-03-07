@@ -1,0 +1,38 @@
+{% extends "dashboardApp/rbms.html" %}
+{% load static %}
+{% block rbms %}
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-md-9 col-lg-12 col-xl-10">
+			<div class="card shadow-lg o-hidden border-0 my-5">
+				<div class="card-body p-0">
+					<div class="row">
+						<div class="col-lg-6 col-xl-5 d-none d-lg-flex">
+							<div class="flex-grow-1 bg-login-image" style="background-image: url({% static 'img/rn360_2.jpeg' %});"></div>
+						</div>
+						<div class="col-lg-6">
+							<h1 class="text-center"><b style='color: blue'>RN</b><b style='color: red'>360</b><b style='color: black'>B</b></h1>
+							<h4 class="text-center">Select user type</h4>
+							<div class="p-5">
+								<a href="{% url 'generalMarket' %}" class="btn btn-outline-dark fa fa-arrow-left"></a>
+								<div class="text-center">
+									<h4 class="text-dark mb-4"><span class="fa fa-lock"></span>Sign In as a:</h4>
+								</div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a href="{% url 'customerLogins' %}" class="btn btn-primary d-block btn-user w-100 fa fa-user" style="margin: 2%">Customer</a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="{% url 'login' %}" class="btn btn-primary d-block btn-user w-100 fa fa-building" style="margin: 2%">Business</a>
+
+                                    </div>
+                                </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock rbms  %}

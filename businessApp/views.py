@@ -109,8 +109,8 @@ class AddBusiness(generic.View):
             # session for the new user
             request.session['userID'] = str(nextID) + '001'
             setNewUser(request,nextID,busBranch, fName, sName, dob, '', town, qualification, emial, tel, True)
-        messages.set_level(request, messages.INFO)
-        messages.success(request, {'message': 'You have successfully created new Business Account.',
+            messages.set_level(request, messages.INFO)
+            messages.success(request, {'message': 'You have successfully created new Business Account.',
                               'title': 'New Business Account', 'credential': 'Check your SMS for your tamporal PASSWORD', 
                               'business': [busName, busType, emial, tel, str(bus.busOwner), bus.busID, busBranch.branchID]},
                                extra_tags='New Business')
@@ -158,7 +158,10 @@ class BusinessSettings(generic.View):
                     db.date = dt.datetime.now()
                     db.save()
         dashboardMenuAccess(request)
-        return render(request, 'businessApp/businessSettings.html', {'business': self.business, 'uAccess': access2, 'branches': self.branches, 'user': self.user, 'owner': owner, 'picture': picture})
+        if request.user_agent.is_mobile:
+            return render(request, 'businessApp/businessSettingsMobile.html', {'business': self.business, 'uAccess': access2, 'branches': self.branches, 'user': self.user, 'owner': owner, 'picture': picture})
+        else:
+            return render(request, 'businessApp/businessSettings.html', {'business': self.business, 'uAccess': access2, 'branches': self.branches, 'user': self.user, 'owner': owner, 'picture': picture})
     
     def post(self, request):
         if not haveAccess(request, '201'):

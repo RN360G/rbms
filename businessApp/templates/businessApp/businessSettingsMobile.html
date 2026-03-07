@@ -1,0 +1,374 @@
+{% extends "dashboardApp/index.html" %}
+
+{% block mobile %}
+<div>
+    <ul class="nav nav-tabs" role="tablist">
+        {% if uAccess.2 %}
+            <li class="nav-item" role="presentation"><a class="nav-link active fa fa-plus" role="tab" data-bs-toggle="tab" href="#businessBranches"> Branches</a></li>
+        {% endif %}
+        
+        {% if uAccess.201 %}
+         <li class="nav-item" role="presentation"><a class="nav-link fa fa-plus" role="tab" data-bs-toggle="tab" href="#addBranch"> Add Branch</a></li>
+        {% endif %}
+
+        {% if uAccess.200 %}
+            <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#busDetails"> Business Details</a></li>
+        {% endif %}
+
+        {% if uAccess.206 %}
+            <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#switchBranch"> Switch Branch</a></li>
+        {% endif %}
+
+        {% if uAccess.207 %}
+            <li class="nav-item" role="presentation"><a class="nav-link fa fa-print" role="tab" data-bs-toggle="tab" href="#assingPrinter"> Assign Printer</a></li>
+        {% endif %}
+    </ul>
+    <br/>
+    <div class="tab-content" style="width: 100%;">
+        <div class="tab-pane active" role="tabpanel" id="businessBranches">
+            <div class="container-fluid bg-gradient-light py-5 shadow">
+                <h2>Business Branches</h2>
+
+                <div class="table-responsive mx-0 px-0">
+                <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example" style="width:100%;">
+                    <!-- Hide header on mobile -->
+                    <thead class="d-none d-md-table-header-group">
+                    <tr>
+                        <th>Branches</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for dat in branches %}
+                    <tr>
+                        <td>
+                        <div class="card mb-2 shadow-sm w-100" style="margin-left:0; margin-right:0;">
+                            <div class="card-body p-2">
+                            <!-- Title -->
+                            <h6 class="card-title mb-1">
+                                <b style="font-size: 1.2em; color: black">{{ dat.branchName }}</b>
+                            </h6>
+                            <span class="badge bg-secondary mb-2">Branch ID: {{ dat.branchID }}</span>
+                            <span class="badge bg-info mb-2">Type: {{ dat.branchType }}</span>
+
+                            <!-- Operation Time -->
+                            {% if dat.operateAllTime %}
+                                <p class="mb-1"><strong>Operation Time:</strong> All Time</p>
+                            {% else %}
+                                <p class="mb-1"><strong>Operation Time:</strong> {{ dat.fromTime }} → {{ dat.toTime }}</p>
+                            {% endif %}
+
+                            <!-- Online Visibility -->
+                            {% if dat.onlineVisibility %}
+                                <p class="mb-1"><strong>Status:</strong> <span class="text-primary">Online</span></p>
+                            {% else %}
+                                <p class="mb-1"><strong>Status:</strong> <span class="text-danger">Offline</span></p>
+                            {% endif %}
+
+                            <!-- Actions -->
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                {% if uAccess.202 %}
+                                <a href="#" class="btn btn-outline-dark fa fa-edit flex-fill"> Edit</a>
+                                {% endif %}
+                                {% if uAccess.203 %}
+                                <a href="{% url 'setWorkingHours' dat.branchID 'render' %}" 
+                                    class="btn btn-outline-dark fa fa-clock flex-fill"> Working Hours</a>
+                                {% endif %}
+                                {% if uAccess.205 %}
+                                <a href="{% url 'onlineVisibility' dat.branchID %}" 
+                                    class="btn btn-outline-dark fa fa-globe flex-fill"> Online Visibility</a>
+                                {% endif %}
+                            </div>
+                            </div>
+                        </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="tab-pane" role="tabpanel" id="busDetails">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2>Business Details</h2>
+                <form class="user" method="post" action="{% url 'editBusinessInfo' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="busType">Business ID:</label>
+                            <input class="form-control" type="text" id="busName" name="busName" value="{{business.busID}}" style="color: goldenrod;" disabled required>
+
+                            <label class="form-label" for="busName">Business Name: <b style="color: goldenrod;">{{business.busName}}</b></label>
+                            <input class="form-control" type="text" id="busName" name="busName" value="{{business.busName}}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="busType">Registration Number:</label>
+                            <input class="form-control" type="text" id="busName" name="busName" style="color: goldenrod;" value="{{business.registrationNumber}}" disabled required>
+
+                            <label class="form-label" for="busType">Business Location:</label>
+                            <input class="form-control" type="text" id="busName" name="busName" style="color: goldenrod;" value="{{business.BusinessLocation}}" disabled required>
+                        </div>
+                    </div>       
+
+                    <hr/>
+                    <h3 class="text-center">Business Owner's Details</h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="email">Active Email Address</label>
+                            <input class="form-control" type="email" id="email" name="email" style="color: goldenrod;" value="{{business.busEmail}}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="tel">Active phone number</label>
+                            <input class="form-control" type="tel" id="tel" name="tel" style="color: goldenrod;" value="{{business.busTel}}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="name">Full Name</label>
+                            <input class="form-control" type="text" id="name" name="name" style="color: goldenrod;" value="{{business.busOwner}}" required>
+                        </div>
+                    </div>
+                     <br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>           
+        </div>
+
+        <div class="tab-pane" role="tabpanel" id="addBranch">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2>Add Branch</h2>
+                <form class="user" method="post">
+                    {% csrf_token %} 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="branchName">Branch Name</label>
+                            <input class="form-control" type="text" id="branchName" name="branchName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="fName">Busines Type</label>
+                            <select class="form-select" id="subject" required name="busType">
+                                <option></option>
+                                <option>Retail & Wholesale Business</option>
+                                <option>Farming Business</option>
+                                <option>Manufacturing Business</option>
+                                <option>Hotel Business</option>
+                                <option>Resturant & Bar Business</option>
+                                <option>Transportation Business</option>
+                                <option>Event Management</option>
+                                <option>Real Estate Business</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input class="form-control" type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="tel">Branch Tel</label>
+                            <input class="form-control" type="tel" id="tel" name="tel" required>
+                        </div>
+                    </div><br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Create Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="tab-pane" role="tabpanel" id="switchBranch">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2>Switch Branch</h2>
+                <form class="user" method="post" action="{% url 'switchBranch' %}">
+                    {% csrf_token %} 
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="fName">Select Branch</label>
+                            <select class="form-select" id="branch" required name="branch">
+                                <option></option>
+                                {% for branch in branches%}
+                                    {% if branch.branchID != request.session.branchID %}                                 
+                                        <option value="{{branch.branchID}}">{{branch.branchName}} ({{branch.branchID}})</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fa fa-lock" for="email">Confirm with your Password</label>
+                            <input class="form-control" type="Password" id="Password" name="Password" required>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-outline-primary d-block w-100" type="submit">Switch Branch Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="tab-pane" role="tabpanel" id="assingPrinter">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2><span class="fa fa-print"></span>Assign Printer</h2>
+                <form class="user" method="post" action="{% url 'assignPrinter' %}">
+                    {% csrf_token %}                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="printerType">Select Printer Type</label>
+                            <select class="form-select" id="printerType" required name="printerType">
+                                <option></option>
+                                <option value="USB">USB Printer</option>
+                                <option value="Network">Network Printer</option>
+                                <option value="Serial">Serial Printer</option>
+                                <option value="LP">LP</option>
+                                <option value="Win32Raw">Win32Raw</option>
+                            </select>
+                            <hr/>
+                            <h4>Printer IDs</h4>                              
+                            <label class="form-label fa fa-circle" for="id1" id="id1L">Printer IP Address</label>
+                            <input class="form-control" type="text" id="id1" name="id1">
+                            <hr/>
+                            <label class="form-label fa fa-circle" for="id2"  id="id2L">Port Number</label>
+                            <input class="form-control" type="text" id="id2" name="id2">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fa fa-circle" for="printerLabel">Printer Label</label>
+                            <input class="form-control" type="text" id="printerLabel" name="printerLabel" required>
+                            <p>Label every printer for easy identification</p>
+                            <hr/>
+                            <label class="form-label" for="branchID">Select Branch</label>
+                            <select class="form-select" id="branchID" required name="branchID">
+                                <option></option>
+                                {% for branch in branches%}                               
+                                    <option value="{{branch.branchID}}">{{branch.branchName}} ({{branch.branchID}})</option>
+                                {% endfor %}
+                            </select>
+                            <hr/>
+                            <h4>Printer Description</h4>
+                            <p id="describe"></p>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-outline-primary d-block w-100" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+
+    
+    /*let dob = document.getElementById("ownerDOB").value;
+    var dat1 = new Date(dob);
+    document.getElementById("dob").value=dat1;
+    */
+
+    let id1 = document.getElementById('id1');
+    let id1L = document.getElementById('id1L');
+    let id2 = document.getElementById('id2');
+    let id2L = document.getElementById('id2L');
+    let describe = document.getElementById('describe');
+
+
+    const printerType = document.getElementById('printerType');
+
+    if(printerType.value=='USB'){
+        document.getElementById('id1L').innerHTML = "innerHTML";
+    }
+    else if(printerType.value=='Network'){
+        alert('Network');
+    }
+    else if(printerType.value=='Serial'){
+        alert('Seriel');
+    }
+    else if(printerType.value=='LP'){
+        alert('LP');
+    }
+    else if(printerType.value=='Win32Raw'){
+        alert('Win32Raw');
+    }
+
+    printerType.addEventListener('change', (event) => {
+            if(printerType.value=='USB'){
+                id2.hidden = false;
+                id2L.hidden = false;
+                id1L.innerHTML = "Vendor ID";
+                id2L.innerHTML = "Product ID";
+                id2.setAttribute("required", "true");
+                id1.setAttribute("required", "true");
+                describe.innerHTML = "Before you can connect, you need to find your printer's vendor and product IDs using system tools. lsusb in CMD. Example output: Bus 002 Device 001: ID 04b8:0202 Epson...";
+
+            }
+            else if(printerType.value=='Network'){
+                id2.hidden = false;
+                id2L.hidden = false;
+                id1L.innerHTML = "IP Address";
+                id2L.innerHTML = "Port Number";
+                id2.setAttribute("required", "true");
+                id1.setAttribute("required", "true");
+                describe.innerHTML = "IP Address: Ensure the printer has a static IP address or a reserved DHCP address to prevent disconnection after a restart. If printing fails, verify network connectivity by checking the printer's IP";
+            }
+            else if(printerType.value=='Serial'){
+                id2.hidden = true;
+                id2L.hidden = true;
+                id1L.innerHTML = "Path to serial device and baudrate."
+                id2.setAttribute("required", "false");
+                id1.setAttribute("required", "true");
+                describe.innerHTML = "Initialize the printer object with your specific port and baud rate. For Windows, it might be 'COM3'. For Linux, it might be '/dev/ttyS0' or similar. Ensure the baudrate matches your printer's settings (often configurable via DIP switches)";
+
+            }
+            else if(printerType.value=='LP'){
+                id2.hidden = true;
+                id2L.hidden = true;
+                id1L.innerHTML = "specify the printer name if it's not the default."
+                id2.setAttribute("required", "false");
+                id1.setAttribute("required", "true");
+                describe.innerHTML = "Uses the system default printer by default. You may need to specify the printer name if it's not the default";
+
+            }
+            else if(printerType.value=='Win32Raw'){
+                id2.hidden = true;
+                id2L.hidden = true;
+                id1L.innerHTML = "Exact name of the printer in Windows."
+                id2.setAttribute("required", "false");
+                id1.setAttribute("required", "true");
+                describe.innerHTML = "Enter your printer name with the exact name from Windows settings";
+            }
+    });
+
+    
+
+</script>
+{% endblock mobile %}

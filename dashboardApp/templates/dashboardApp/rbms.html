@@ -5,15 +5,13 @@
 	<!-- start: Meta -->
 	<title>RN360B</title>
 	<meta charset="utf-8">	
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Bootstrap RN360B Dashboard">
 	<meta name="author" content="RN360B">
 	<!-- end: Meta -->
 
-	<!-- start: Mobile Specific -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- end: Mobile Specific -->
-		<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 		<link rel="stylesheet" href="{% static 'fonts/fontawesome-all.min.css' %}">
 		<link rel="stylesheet" href="{% static 'font/font-awesome.min.css' %}" type="text/css"/>
 		<link rel="stylesheet" href="{% static 'css/Banner-Heading-Image-images.css' %}">
@@ -22,15 +20,33 @@
 
 		<link href="{% static 'css/metisMenu.min.css' %}" rel="stylesheet">		
 		<link href="{% static 'css/morris.css' %}" rel="stylesheet">		
-		<link href="{% static "css/jquery.dataTables.min.css" %}" rel="stylesheet">
-		<link href="{% static "css/dataTables.responsive.css" %}" rel="stylesheet">
-		<link href="{% static "css/dataTables.bootstrap.css" %}" rel="stylesheet">
-	    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">			
+		<link href="{% static 'css/jquery.dataTables.min.css' %}" rel="stylesheet">
+		<link href="{% static 'css/dataTables.responsive.css' %}" rel="stylesheet">
+		<link href="{% static 'css/dataTables.bootstrap.css' %}" rel="stylesheet">
+	    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+		
+		<!--install the website as an app-->
+		<link rel="manifest" href="{% static 'manifest.json' %}">
+		<meta name="theme-color" content="#0d6efd">
+		
+		<!-- detect screen size -->
+		<style>
+		/* Default states */
+		.desktop-only { display: block; }
+		.mobile-only { display: none; }
+
+		/* Mobile override */
+		@media (max-width: 768px) {
+			.desktop-only { display: none; }
+			.mobile-only { display: block; }
+		}
+		</style>
+
 </head>
 <body class="bg-gradient-light" id="page-top" style="background-image: url({% static 'img/back5.png' %});">
 	{% block rbms %}
 
-	{% endblock %}
+	{% endblock rbms %}
 	<!-- start: JavaScript-->
 	     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 		 <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -44,6 +60,7 @@
 		 <script src="{% static 'js/rbms.js' %}"></script>
 		 <script src="{% static 'js/chart.js' %}"></script>
 		 <script src="{% static 'js/perfomanceAnalysis.js' %}"></script> 
+		 	 
 	 
 		<script>
 			$(document).ready(function() {
@@ -54,6 +71,15 @@
 				$('#dataTables-example5').DataTable({responsive: true});
 			});
 		</script>
+		<!--for the website installation-->
+		<script>
+			if ("serviceWorker" in navigator) {
+			navigator.serviceWorker.register("{% static 'service-worker.js' %}")
+				.then(reg => console.log("Service Worker registered:", reg))
+				.catch(err => console.error("Service Worker failed:", err));
+			}
+		</script>
+	
 </body>
 </html>
 

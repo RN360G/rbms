@@ -1,259 +1,624 @@
 {% extends 'warehouse/warehouse.html' %}
 
-{% block warehouse %}
-    <div>
-        <ul class="nav nav-tabs" role="tablist">
-            {% if uAccess.5 %}
-                <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#accounts"> Accounts</a></li>
-            {% endif %}
-            
-            {% if uAccess.500 %}
-                <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#fundTransfer"> Transfer Fund</a></li>
-            {% endif %}
 
-            {% if uAccess.5 %}
-                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#shortages"> Overs & Shortages</a></li>
-            {% endif %}
+{% if not request.user_agent.is_mobile %}
+    {% block warehouse %}
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                {% if uAccess.5 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#accounts"> Accounts</a></li>
+                {% endif %}
+                
+                {% if uAccess.500 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#fundTransfer"> Transfer Fund</a></li>
+                {% endif %}
 
-            {% if uAccess.502 %}
-                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#authorizeFundTransfer"> Authorize Transfered Funds</a></li>
-            {% endif %}
-            
-            {% if uAccess.501 %}
-                <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#depositAndWthdrawal"> Deposit & Withdrawal</a></li>
-            {% endif %}
-        </ul>
-        <br/>
-        <div class="tab-content">
-            <!--Accounts==============================================================================================================================-->
-            <div class="tab-pane active" role="tabpanel" id="accounts">
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <h2><span class="fa fa-money"></span> Accounts</h2>
-                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
-                        <thead>
-                            <tr>
-                                <th>Count</th>
-                                <th>Accounts Type</th>
-                                <th>Account Name</th>
-                                <th>Account Number</th>
-                                <th>Branch</th>                                
-                                <th>Account Balance</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for account in accounts %}
-                                <tr class="even gradeA">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ account.accountType}}</td>
-                                    <td>{{ account.accountName}}</td>
-                                    <td>{{ account.accountNumber}}</td>
-                                    <td>{{ account.branchRef.branchName}}</td>                                    
-                                    <td>{{ account.accountBalance|floatformat:2}}</td>
-                                    <td class="center">
-                                        <a href="{% url 'businessAccountTransactions' account.id %}" class="btn btn-outline-dark fa fa-book">Transactions</a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                {% if uAccess.5 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#shortages"> Overs & Shortages</a></li>
+                {% endif %}
 
-            <!--authorize fund tranfer==============================================================================================================================-->
-            <div class="tab-pane" role="tabpanel" id="authorizeFundTransfer">                
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <p style="float:right; text-align: justify; font-size: 18px">Total Fund to be authorized: <i style="color: #c67605">GH&#8373</i> <b>{{totalAmt|floatformat:2}}</b></p>
-                    <h4><span class="fa fa-money"></span> Transfered Funds</h4>
-                    <hr/>
-                    <br/>
-                    <h4><span class="fa fa-list"></span> Transfer List</h4>
-                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example4">
-                        <thead>
-                            <tr>
-                                <th>Count</th>
-                                <th>Date</th>
-                                <th>Transaction ID</th>
-                                <th>Amount</th>
-                                <th>Source Account</th>
-                                <th>Destination Account</th>                                
-                                <th>Narration</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for fund in suspenesAccountFunds %}
-                                <tr class="even gradeA">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ fund.date}}</td>
-                                    <td>{{ fund.transactionID}}</td>
-                                    <td>{{ fund.amount}}</td>
-                                    <td>{{ fund.fromAccountRef.accountName}} <br/> <sup>{{ fund.fromAccountRef.accountNumber}}</sup></td>
-                                    <td>{{ fund.toAccountRef.accountName}} <br/> <sup>{{ fund.toAccountRef.accountNumber}}</sup></td>
-                                    <td>{{ fund.description}}</td>
-                                    <td class="center">
-                                        <a href="{% url 'authorizeFundTransfer' fund.option fund.id 'approve' %}" class="btn btn-outline-dark fa fa-check">Approve</a>
-                                        <a href="{% url 'authorizeFundTransfer' fund.option fund.id 'reject' %}" class="btn btn-outline-danger fa fa-remove"> Reject</a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!--tranfer funds==============================================================================================================================-->
-            <div class="tab-pane" role="tabpanel" id="fundTransfer">                
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <p style="float:right; text-align: justify; font-size: 18px">Business Account Balance: <i style="color: #c67605">GH&#8373</i> <b>{{businessAccountBal|floatformat:2}}</b></p>
-                    <h4><span class="fa fa-money"></span> Transfer Fund</h4>
-                    <form method="post" action="{% url 'transeferToSusoenseAccount' 'businessToBranch' %}">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
-                                <input class="form-control" type="text" id="amount" name="amount" required>
-                                <p style="font-size: large;">Amount to be transfered</p>
-                                <hr/>
-                                <label class="form-label" for="narration">Narration<b style="color: red">*</b></label>
-                                <textarea class="form-control" id="narration" name="narration" rows="4" required></textarea>
-                                <p style="font-size: large;">Brief description of the transfer.</p> 
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="toAccount">To Account<b style="color: red">*</b></label>
-                                <select class="form-select" id="toAccount" required name="toAccount">
-                                    <option value="">--Select Account--</option>
-                                    {% for account in toAccounts %}   
-                                        <option value="{{ account.accountNumber }}">{{ account.accountName}} - {{ account.accountNumber}}</option>
-                                    {% endfor %}                                 
-                                </select>
-                                <p style="font-size: large;">To which account or branch are you transfering the fund.</p>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="row">
-                                <div class="col-md-6 button">
-                                    <button class="btn btn-primary" type="submit">Transfer Fund</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-
-                    <hr/>
-                    <br/>
-                    <h4><span class="fa fa-list"></span> Transfer List</h4>
-                    
-                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example3">
-                        <thead>
-                            <tr>
-                                <th>Count</th>
-                                <th>Date</th>
-                                <th>Transaction ID</th>
-                                <th>Amount</th>
-                                <th>Source Account</th>
-                                <th>Destination Account</th>                                
-                                <th>Narration</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for fund in suspenseInterbranch %}
-                                <tr class="even gradeA">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ fund.date}}</td>
-                                    <td>{{ fund.transactionID}}</td>
-                                    <td>{{ fund.amount}}</td>
-                                    <td>{{ fund.fromAccountRef.accountName}} <br/> <sup>{{ fund.fromAccountRef.accountNumber}}</sup></td>
-                                    <td>{{ fund.toAccountRef.accountName}} <br/> <sup>{{ fund.toAccountRef.accountNumber}}</sup></td>
-                                    <td>{{ fund.description}}</td>
-                                    <td class="center">
-                                        <a href="{% url 'deleteFundTransferFromBusiness' fund.id %}" class="btn btn-outline-danger fa fa-remove">Delete</a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
-
-            <!--Shortage==============================================================================================================================-->
-            <div class="tab-pane" role="tabpanel" id="shortages">
-                    <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
-                    <h2><span class="fa fa-money"></span> Overs & Shortages</h2>
-                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example4">
-                        <thead>
-                            <tr>
-                                <th>Count</th>
-                                <th>Account Name</th>
-                                <th>Account Number</th>
-                                <th>Overs Amount</th>
-                                <th>Shortages Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                {% if uAccess.502 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#authorizeFundTransfer"> Authorize Transfered Funds</a></li>
+                {% endif %}
+                
+                {% if uAccess.501 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#depositAndWthdrawal"> Deposit & Withdrawal</a></li>
+                {% endif %}
+            </ul>
+            <br/>
+            <div class="tab-content">
+                <!--Accounts==============================================================================================================================-->
+                <div class="tab-pane active" role="tabpanel" id="accounts">
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h2><span class="fa fa-money"></span> Accounts</h2>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
                                 <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td style="font-size: 25px">Total: <i style="color: #c67605">GH&#8373</i><b>{{totalOvers|floatformat:2}}</b></td>
-                                    <td style="font-size: 25px">Total: <i style="color: #c67605">GH&#8373</i><b>{{totalShortages|floatformat:2}}</b></td>
+                                    <th>Count</th>
+                                    <th>Accounts Type</th>
+                                    <th>Account Name</th>
+                                    <th>Account Number</th>
+                                    <th>Branch</th>                                
+                                    <th>Account Balance</th>
+                                    <th>Action</th>
                                 </tr>
-                            {% for fund in branchShortages %}
-                                <tr class="even gradeA">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ fund.branchRef__branchName}}</td>
-                                    <td>{{ fund.branchRef__branchID}}</td>
-                                    <td>{{ fund.overSum|floatformat:2}}</td>
-                                    <td style="color:red">{{ fund.shortageSum|floatformat:2}}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>                              
+                            </thead>
+                            <tbody>
+                                {% for account in accounts %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ account.accountType}}</td>
+                                        <td>{{ account.accountName}}</td>
+                                        <td>{{ account.accountNumber}}</td>
+                                        <td>{{ account.branchRef.branchName}}</td>                                    
+                                        <td>{{ account.accountBalance|floatformat:2}}</td>
+                                        <td class="center">
+                                            <a href="{% url 'businessAccountTransactions' account.id %}" class="btn btn-outline-dark fa fa-book">Transactions</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <!--Deposit and Withdrawal==============================================================================================================================-->
-            <div class="tab-pane" role="tabpanel" id="depositAndWthdrawal">                
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <p style="float:right; text-align: justify; font-size: 18px">Business Account Balance: <i style="color: #c67605">GH&#8373</i> <b>{{businessAccountBal|floatformat:2}}</b></p>
-                    <h4><span class="fa fa-money"></span> Deposit Or Withdrawal</h4>
-                    <form method="post" action="{% url 'withdrawalPayments' %}">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
-                                <input class="form-control" type="number" id="amount" name="amount" min="0" max="{{businessAccountBal}}" required>
-                                <p style="font-size: large;">Amount to be transacted</p>
-                                <hr/>
-                                <label class="form-label" for="narration">Narration<b style="color: red">*</b></label>
-                                <textarea class="form-control" id="narration" name="narration" rows="4" required></textarea>
-                                <p style="font-size: large;">Brief description of the transaction.</p> 
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="transactionType">Transaction Type<b style="color: red">*</b></label>
-                                <select class="form-select" id="transactionType" required name="transactionType">
-                                    <option value="">--Select Account--</option>
-                                    <option> Deposit</option>
-                                    <option> Withdrawal</option>
+                <!--authorize fund tranfer==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="authorizeFundTransfer">                
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <p style="float:right; text-align: justify; font-size: 18px">Total Fund to be authorized: <i style="color: #c67605">GH&#8373</i> <b>{{totalAmt|floatformat:2}}</b></p>
+                        <h4><span class="fa fa-money"></span> Transfered Funds</h4>
+                        <hr/>
+                        <br/>
+                        <h4><span class="fa fa-list"></span> Transfer List</h4>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example4">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date</th>
+                                    <th>Transaction ID</th>
+                                    <th>Amount</th>
+                                    <th>Source Account</th>
+                                    <th>Destination Account</th>                                
+                                    <th>Narration</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fund in suspenesAccountFunds %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ fund.date}}</td>
+                                        <td>{{ fund.transactionID}}</td>
+                                        <td>{{ fund.amount}}</td>
+                                        <td>{{ fund.fromAccountRef.accountName}} <br/> <sup>{{ fund.fromAccountRef.accountNumber}}</sup></td>
+                                        <td>{{ fund.toAccountRef.accountName}} <br/> <sup>{{ fund.toAccountRef.accountNumber}}</sup></td>
+                                        <td>{{ fund.description}}</td>
+                                        <td class="center">
+                                            <a href="{% url 'authorizeFundTransfer' fund.option fund.id 'approve' %}" class="btn btn-outline-dark fa fa-check">Approve</a>
+                                            <a href="{% url 'authorizeFundTransfer' fund.option fund.id 'reject' %}" class="btn btn-outline-danger fa fa-remove"> Reject</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                                </select>
-                                <p style="font-size: large;">The kind of transaction to be performed (Deposit/Withdrawal)</p>
-                            </div>
-                        </div>
-                        <div class="mb-3">
+                <!--tranfer funds==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="fundTransfer">                
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <p style="float:right; text-align: justify; font-size: 18px">Business Account Balance: <i style="color: #c67605">GH&#8373</i> <b>{{businessAccountBal|floatformat:2}}</b></p>
+                        <h4><span class="fa fa-money"></span> Transfer Fund</h4>
+                        <form method="post" action="{% url 'transeferToSusoenseAccount' 'businessToBranch' %}">
+                            {% csrf_token %}
                             <div class="row">
-                                <div class="col-md-6 button">
-                                    <button class="btn btn-primary" type="submit">Save Transaction</button>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="amount" name="amount" required>
+                                    <p style="font-size: large;">Amount to be transfered</p>
+                                    <hr/>
+                                    <label class="form-label" for="narration">Narration<b style="color: red">*</b></label>
+                                    <textarea class="form-control" id="narration" name="narration" rows="4" required></textarea>
+                                    <p style="font-size: large;">Brief description of the transfer.</p> 
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="toAccount">To Account<b style="color: red">*</b></label>
+                                    <select class="form-select" id="toAccount" required name="toAccount">
+                                        <option value="">--Select Account--</option>
+                                        {% for account in toAccounts %}   
+                                            <option value="{{ account.accountNumber }}">{{ account.accountName}} - {{ account.accountNumber}}</option>
+                                        {% endfor %}                                 
+                                    </select>
+                                    <p style="font-size: large;">To which account or branch are you transfering the fund.</p>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Transfer Fund</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <hr/>
+                        <br/>
+                        <h4><span class="fa fa-list"></span> Transfer List</h4>
+                        
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example3">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Date</th>
+                                    <th>Transaction ID</th>
+                                    <th>Amount</th>
+                                    <th>Source Account</th>
+                                    <th>Destination Account</th>                                
+                                    <th>Narration</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fund in suspenseInterbranch %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ fund.date}}</td>
+                                        <td>{{ fund.transactionID}}</td>
+                                        <td>{{ fund.amount}}</td>
+                                        <td>{{ fund.fromAccountRef.accountName}} <br/> <sup>{{ fund.fromAccountRef.accountNumber}}</sup></td>
+                                        <td>{{ fund.toAccountRef.accountName}} <br/> <sup>{{ fund.toAccountRef.accountNumber}}</sup></td>
+                                        <td>{{ fund.description}}</td>
+                                        <td class="center">
+                                            <a href="{% url 'deleteFundTransferFromBusiness' fund.id %}" class="btn btn-outline-danger fa fa-remove">Delete</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                <!--Shortage==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="shortages">
+                        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+                        <h2><span class="fa fa-money"></span> Overs & Shortages</h2>
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example4">
+                            <thead>
+                                <tr>
+                                    <th>Count</th>
+                                    <th>Account Name</th>
+                                    <th>Account Number</th>
+                                    <th>Overs Amount</th>
+                                    <th>Shortages Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="font-size: 25px">Total: <i style="color: #c67605">GH&#8373</i><b>{{totalOvers|floatformat:2}}</b></td>
+                                        <td style="font-size: 25px">Total: <i style="color: #c67605">GH&#8373</i><b>{{totalShortages|floatformat:2}}</b></td>
+                                    </tr>
+                                {% for fund in branchShortages %}
+                                    <tr class="even gradeA">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ fund.branchRef__branchName}}</td>
+                                        <td>{{ fund.branchRef__branchID}}</td>
+                                        <td>{{ fund.overSum|floatformat:2}}</td>
+                                        <td style="color:red">{{ fund.shortageSum|floatformat:2}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                              
+                    </div>
+                </div>
+
+                <!--Deposit and Withdrawal==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="depositAndWthdrawal">                
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <p style="float:right; text-align: justify; font-size: 18px">Business Account Balance: <i style="color: #c67605">GH&#8373</i> <b>{{businessAccountBal|floatformat:2}}</b></p>
+                        <h4><span class="fa fa-money"></span> Deposit Or Withdrawal</h4>
+                        <form method="post" action="{% url 'withdrawalPayments' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="amount" name="amount" min="0" max="{{businessAccountBal}}" required>
+                                    <p style="font-size: large;">Amount to be transacted</p>
+                                    <hr/>
+                                    <label class="form-label" for="narration">Narration<b style="color: red">*</b></label>
+                                    <textarea class="form-control" id="narration" name="narration" rows="4" required></textarea>
+                                    <p style="font-size: large;">Brief description of the transaction.</p> 
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="transactionType">Transaction Type<b style="color: red">*</b></label>
+                                    <select class="form-select" id="transactionType" required name="transactionType">
+                                        <option value="">--Select Account--</option>
+                                        <option> Deposit</option>
+                                        <option> Withdrawal</option>
+
+                                    </select>
+                                    <p style="font-size: large;">The kind of transaction to be performed (Deposit/Withdrawal)</p>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Save Transaction</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-{% endblock warehouse %}
+    {% endblock warehouse %}
+
+
+
+    <!--Mobile ========================================================================================================-->
+    {% else %}
+        {% block warehouseMobile %}
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                {% if uAccess.5 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#accounts"> Accounts</a></li>
+                {% endif %}
+                
+                {% if uAccess.500 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#fundTransfer"> Transfer Fund</a></li>
+                {% endif %}
+
+                {% if uAccess.5 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#shortages"> Overs & Shortages</a></li>
+                {% endif %}
+
+                {% if uAccess.502 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#authorizeFundTransfer"> Authorize Transfered Funds</a></li>
+                {% endif %}
+                
+                {% if uAccess.501 %}
+                    <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#depositAndWthdrawal"> Deposit & Withdrawal</a></li>
+                {% endif %}
+            </ul>
+            <br/>
+            <div class="tab-content">
+                <!--Accounts==============================================================================================================================-->
+                <div class="tab-pane active" role="tabpanel" id="accounts">
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h2><span class="fa fa-money"></span> Accounts</h2>
+                        <div class="table-responsive mx-0 px-0">
+                        <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example">
+                            <!-- Hide header on mobile, show on md+ -->
+                            <thead class="d-none d-md-table-header-group">
+                            <tr>
+                                <th>Accounts</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for account in accounts %}
+                            <tr>
+                                <td>
+                                <div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
+                                    <div class="card-body p-2">
+                                    <!-- Title -->
+                                    <h6 class="card-title mb-1">
+                                       <b style="color: black;">{{ account.accountName }}</b>
+                                    </h6>
+                                    <span class="badge bg-secondary mb-2">{{ account.accountType }}</span>
+
+                                    <p class="mb-1"><strong>Acc Number:</strong> {{ account.accountNumber }}</p>
+                                    <p class="mb-1"><strong>Branch:</strong> {{ account.branchRef.branchName }}</p>
+                                    <p class="mb-1"><strong>Balance:</strong> {{ account.accountBalance|floatformat:2 }}</p>
+                                    <!-- Action -->
+                                    <a href="{% url 'businessAccountTransactions' account.id %}" 
+                                        class="btn btn-outline-dark fa fa-book w-100 mt-2">
+                                        Transactions
+                                    </a>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--authorize fund tranfer==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="authorizeFundTransfer">                
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <p style="float:right; text-align: justify;">
+                        Total Fund to be authorized: 
+                        <i style="color: #c67605">GH&#8373</i> 
+                        <b>{{ totalAmt|floatformat:2 }}</b>
+                        </p>
+                        <h4><span class="fa fa-money"></span> Transfered Funds</h4>
+                        <hr/>
+                        <br/>
+                        <h4><span class="fa fa-list"></span> Transfer List</h4>
+
+                        <div class="table-responsive mx-0 px-0">
+                        <table class="table table-bordered table-hover w-100 mb-0" 
+                                id="dataTables-example4" style="width:100%;">
+                            <!-- Hide header on mobile -->
+                            <thead class="d-none d-md-table-header-group">
+                            <tr>
+                                <th>Transfers</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for fund in suspenesAccountFunds %}
+                            <tr>
+                                <td>
+                                <div class="card mb-2 shadow-sm w-100" style="margin-left:0; margin-right:0;">
+                                    <div class="card-body p-2">
+                                    <!-- Title -->
+                                    <h6 class="card-title mb-1">
+                                        #{{ forloop.counter }} — Transaction ID: {{ fund.transactionID }}
+                                    </h6>
+                                    <span class="badge bg-primary mb-2">Date: {{ fund.date }}</span>
+
+                                    <!-- Details -->
+                                    <p class="mb-1"><strong>Amount:</strong> 
+                                        <span class="badge bg-secondary">{{ fund.amount }}</span>
+                                    </p>
+                                    <p class="mb-1"><strong>Source:</strong> 
+                                        {{ fund.fromAccountRef.accountName }} 
+                                        <br><sup>{{ fund.fromAccountRef.accountNumber }}</sup>
+                                    </p>
+                                    <p class="mb-1"><strong>Destination:</strong> 
+                                        {{ fund.toAccountRef.accountName }} 
+                                        <br><sup>{{ fund.toAccountRef.accountNumber }}</sup>
+                                    </p>
+                                    <p class="mb-1"><strong>Narration:</strong> {{ fund.description }}</p>
+
+                                    <!-- Actions -->
+                                    <div class="d-flex gap-2 mt-2">
+                                        <a href="{% url 'authorizeFundTransfer' fund.option fund.id 'approve' %}" 
+                                        class="btn btn-outline-dark fa fa-check flex-fill">
+                                        Approve
+                                        </a>
+                                        <a href="{% url 'authorizeFundTransfer' fund.option fund.id 'reject' %}" 
+                                        class="btn btn-outline-danger fa fa-remove flex-fill">
+                                        Reject
+                                        </a>
+                                    </div>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--tranfer funds==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="fundTransfer">                
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <p style="float:right; text-align: justify; font-size: 18px">Business Account Balance: <i style="color: #c67605">GH&#8373</i> <b>{{businessAccountBal|floatformat:2}}</b></p>
+                        <h4><span class="fa fa-money"></span> Transfer Fund</h4>
+                        <form method="post" action="{% url 'transeferToSusoenseAccount' 'businessToBranch' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="amount" name="amount" required>
+                                    <p style="font-size: large;">Amount to be transfered</p>
+                                    <hr/>
+                                    <label class="form-label" for="narration">Narration<b style="color: red">*</b></label>
+                                    <textarea class="form-control" id="narration" name="narration" rows="4" required></textarea>
+                                    <p style="font-size: large;">Brief description of the transfer.</p> 
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="toAccount">To Account<b style="color: red">*</b></label>
+                                    <select class="form-select" id="toAccount" required name="toAccount">
+                                        <option value="">--Select Account--</option>
+                                        {% for account in toAccounts %}   
+                                            <option value="{{ account.accountNumber }}">{{ account.accountName}} - {{ account.accountNumber}}</option>
+                                        {% endfor %}                                 
+                                    </select>
+                                    <p style="font-size: large;">To which account or branch are you transfering the fund.</p>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Transfer Fund</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <hr/>
+                        <br/>
+                        <h4><span class="fa fa-list"></span> Transfer List</h4>
+                        
+                        <div class="table-responsive mx-0 px-0">
+                            <table class="table table-bordered table-hover w-100 mb-0" 
+                                    id="dataTables-example3" style="width:100%;">
+                                <!-- Hide header on mobile, show on md+ -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr>
+                                    <th>Transfers</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for fund in suspenseInterbranch %}
+                                
+                                    <div class="card mb-2 shadow-sm w-100" style="margin-left:0; margin-right:0;">
+                                        <div class="card-body p-2">
+                                        <!-- Title -->
+                                        <h6 class="card-title mb-1">
+                                            #{{ forloop.counter }} — Transaction ID: {{ fund.transactionID }}
+                                        </h6>
+                                        <span class="badge bg-primary mb-2">Date: {{ fund.date }}</span>
+
+                                        <!-- Details -->
+                                        <p class="mb-1"><strong>Amount:</strong> 
+                                            <span class="badge bg-secondary">{{ fund.amount }}</span>
+                                        </p>
+                                        <p class="mb-1"><strong>Source:</strong> 
+                                            {{ fund.fromAccountRef.accountName }} 
+                                            <br><sup>{{ fund.fromAccountRef.accountNumber }}</sup>
+                                        </p>
+                                        <p class="mb-1"><strong>Destination:</strong> 
+                                            {{ fund.toAccountRef.accountName }} 
+                                            <br><sup>{{ fund.toAccountRef.accountNumber }}</sup>
+                                        </p>
+                                        <p class="mb-1"><strong>Narration:</strong> {{ fund.description }}</p>
+
+                                        <!-- Action -->
+                                        <div class="mt-2">
+                                            <a href="{% url 'deleteFundTransferFromBusiness' fund.id %}" 
+                                            class="btn btn-outline-danger fa fa-remove w-100">
+                                            Delete
+                                            </a>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--Shortage==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="shortages">
+                    <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+                        <h2><span class="fa fa-money"></span> Overs & Shortages</h2>
+
+                        <!-- Search bar -->
+                        <div class="mb-3">
+                        <input type="text" id="searchExample4" 
+                                class="form-control" 
+                                placeholder="Search Overs & Shortages...">
+                        </div>
+
+                        <div class="table-responsive mx-0 px-0">
+                        <table class="table table-bordered table-hover w-100 mb-0" 
+                                id="dataTables-example30" style="width:100%;">
+                            <!-- Hide header on mobile -->
+                            <thead class="d-none d-md-table-header-group">
+                            <tr>
+                                <th>Overs & Shortages</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Totals Row -->
+                            <tr>
+                                <td>
+                                <div class="card mb-2 shadow-sm w-100" style="margin-left:0; margin-right:0;">
+                                    <div class="card-body p-2">
+                                    <h6 class="card-title mb-2">Totals</h6>
+                                    <p class="mb-1" style="font-size: 18px">
+                                        <strong>Overs:</strong> 
+                                        <i style="color: #c67605">GH&#8373</i> 
+                                        <b>{{ totalOvers|floatformat:2 }}</b>
+                                    </p>
+                                    <p class="mb-1" style="font-size: 18px">
+                                        <strong>Shortages:</strong> 
+                                        <i style="color: #c67605">GH&#8373</i> 
+                                        <b>{{ totalShortages|floatformat:2 }}</b>
+                                    </p>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+
+                            <!-- Branch Rows -->
+                            {% for fund in branchShortages %}
+                            <tr>
+                                <td>
+                                <div class="card mb-2 shadow-sm w-100" style="margin-left:0; margin-right:0;">
+                                    <div class="card-body p-2">
+                                    <h6 class="card-title mb-1">
+                                        #{{ forloop.counter }} — {{ fund.branchRef__branchName }}
+                                    </h6>
+                                    <p class="mb-1"><strong>Account Number:</strong> {{ fund.branchRef__branchID }}</p>
+                                    <p class="mb-1"><strong>Overs:</strong> 
+                                        <span class="badge bg-success">{{ fund.overSum|floatformat:2 }}</span>
+                                    </p>
+                                    <p class="mb-1"><strong>Shortages:</strong> 
+                                        <span class="badge bg-danger">{{ fund.shortageSum|floatformat:2 }}</span>
+                                    </p>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                    <script>
+                        document.getElementById("searchExample4").addEventListener("keyup", function() {
+                        var value = this.value.toLowerCase();
+                        document.querySelectorAll("#dataTables-example30 tbody tr").forEach(function(row) {
+                            row.style.display = row.textContent.toLowerCase().includes(value) ? "" : "none";
+                        });
+                        });
+                    </script>
+                </div>
+                
+
+                <!--Deposit and Withdrawal==============================================================================================================================-->
+                <div class="tab-pane" role="tabpanel" id="depositAndWthdrawal">                
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <p style="float:right; text-align: justify; font-size: 18px">Business Account Balance: <i style="color: #c67605">GH&#8373</i> <b>{{businessAccountBal|floatformat:2}}</b></p>
+                        <h4><span class="fa fa-money"></span> Deposit Or Withdrawal</h4>
+                        <form method="post" action="{% url 'withdrawalPayments' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="amount" name="amount" min="0" max="{{businessAccountBal}}" required>
+                                    <p style="font-size: large;">Amount to be transacted</p>
+                                    <hr/>
+                                    <label class="form-label" for="narration">Narration<b style="color: red">*</b></label>
+                                    <textarea class="form-control" id="narration" name="narration" rows="4" required></textarea>
+                                    <p style="font-size: large;">Brief description of the transaction.</p> 
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="transactionType">Transaction Type<b style="color: red">*</b></label>
+                                    <select class="form-select" id="transactionType" required name="transactionType">
+                                        <option value="">--Select Account--</option>
+                                        <option> Deposit</option>
+                                        <option> Withdrawal</option>
+
+                                    </select>
+                                    <p style="font-size: large;">The kind of transaction to be performed (Deposit/Withdrawal)</p>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Save Transaction</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock warehouseMobile %}    
+{% endif %}
+    
+
+
 
 
 

@@ -833,7 +833,10 @@ class IncomeStatementView(generic.View):
         endDate = request.session['incomeStatementEndDate']
 
         if startDate == '' or endDate == '' or statementType == '':
-            return render(request, 'accounts/incomeStatement.html')
+            if request.user_agent.is_mobile:
+                return render(request, 'accounts/incomeStatementMobile.html')
+            else:
+                return render(request, 'accounts/incomeStatement.html')
         
         title = ''
         goods = None
@@ -1006,7 +1009,11 @@ class IncomeStatementView(generic.View):
             'endDate': endDate,
             'statementType': statementType,
         }
-        return render(request, 'accounts/incomeStatement.html', data)
+        if request.user_agent.is_mobile:
+            return render(request, 'accounts/incomeStatementMobile.html', data)
+        else:
+            return render(request, 'accounts/incomeStatement.html', data)
+    
     
     def post(self, request):
         startDate = request.POST.get('fromDate')

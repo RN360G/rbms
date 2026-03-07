@@ -4,7 +4,10 @@ from loginAndOutApp import views as loginViews
 
 urlpatterns = [
     path('',loginViews.RichNetLogin.as_view(), name='richnetLogin'),
-    path('richnetdasshboard', views.Richnet360.as_view(), name='richnetDashboard'),
-    path('logoutrn360admin', loginViews.logoutRN360Admin, name='logoutRN360Admin'),
+    path('richnetdasshboard/', views.Richnet360.as_view(), name='richnetDashboard'),
+    path('logoutrn360admin/', loginViews.logoutRN360Admin, name='logoutRN360Admin'),
+    path('addcharges/', views.Richnet360.addCharges, name='addCharges'),
+    path('confirmregistrationnumber/', views.Richnet360.registrationNumber, name='registrationNumber'),
+    path('changebusinessstatus/', views.Richnet360.changeStatus, name='changeBusStatus')
 ]
 

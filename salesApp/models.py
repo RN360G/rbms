@@ -10,7 +10,9 @@ class RetailAndWholesale(models.Model):
     quantityInStock = models.FloatField(default=0.0) # in pieces, kg, litres, etc
     reorderLevel = models.FloatField(default=0.0) # in pieces, kg, litres, etc. when stock reaches this level, reorder is needed
     partCanBeSold = models.BooleanField(default=True) # whether product can be sold in parts or not
-    isVisibleOnline = models.BooleanField(default=True)     
+    isVisibleOnline = models.BooleanField(default=True)
+    enableOnlineOrder = models.BooleanField(default=False)
+    minimumOrder = models.FloatField(default=1)     
     currentCostPriceRef = models.ForeignKey('CurrentCostAndPrice', on_delete=models.DO_NOTHING)
     measureRef = models.ForeignKey('MeasuringUnits', on_delete=models.DO_NOTHING, null=True)
     quantityRef = models.ForeignKey('Quantities', on_delete=models.DO_NOTHING, null=True)
@@ -125,6 +127,19 @@ class IndividualItemsSupplied(models.Model):
     totalCost = models.FloatField(default=0.00)
 
 
+# record temparily the quantity supplied 
+class TempSupplyQuantity(models.Model):
+    branchRef = models.ForeignKey(BusinessBranch, on_delete=models.CASCADE)
+    supplierRef = models.ForeignKey(ProductSuppliers, on_delete=models.CASCADE)
+    userRef = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING)  
+    productRef = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    qty = models.FloatField(default=0)
+    amountPaid = models.FloatField(default=0.00)
+    amountOwe = models.FloatField(default=0.00)
+    unityCost = models.FloatField(default=0.00)
+    totalCost = models.FloatField(default=0.00)
+
+
 # current cost and price of retail and wholesale products
 class CurrentCostAndPrice(models.Model):
     costPrice = models.FloatField(default=0.00)
@@ -181,9 +196,11 @@ class CustomerItemsPurchased(models.Model):
     productCode = models.CharField(max_length=15)
     measureUnit = models.CharField(max_length=15) # in pieces, kg, litres, etc
     quantity = models.FloatField()
+    quantityReturned = models.FloatField(default=0) # what the customer has returned
     pricePerUnit = models.FloatField(default=0.0) 
     costPerUnit = models.FloatField(default=0.0) 
     promotionRate = models.FloatField(default=0.00)
+    unitDiscount = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)
     totalPrice = models.FloatField(default=0.0)
     date = models.DateField(null=True, auto_now_add=True) 
@@ -204,6 +221,7 @@ class ReturnedProductsRecord(models.Model):
 class ReturnAmountToCustomer(models.Model):
     salesRef = models.ForeignKey('SalesRecords', on_delete=models.CASCADE)
     amountToPay = models.FloatField(default=0.00)
+    status = models.CharField(max_length=20, default='Pending') #Pending, Refunded
 
 
 # store all transactions made by a customer
@@ -216,6 +234,7 @@ class AllCustomerTransactions(models.Model):
     transactionBy = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING)
     totalPrice = models.FloatField(default=0.0) 
     discount = models.FloatField(default=0.0)
+    currentPayment = models.FloatField(default=0.0)
     amountTopay = models.FloatField(default=0.0)
     amountPaid = models.FloatField(default=0.0)
     amountOwe = models.FloatField(default=0.0)

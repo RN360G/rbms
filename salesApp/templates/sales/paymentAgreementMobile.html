@@ -1,0 +1,166 @@
+{% extends 'warehouse/warehouse.html' %}
+{% load static %}
+
+{% block warehouseMobile %}
+    <a href="{% url 'salesMakePayment' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
+
+    <div>
+        <div class="tab-content">
+            {% if payTerm == 'IA'%}
+            <!--Installment Agreement ==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+
+                    <h4><span class="fa fa-money"></span> Installment Agreement</h4>                    
+                    <form method="post" action="{% url 'salesConfirmAgreementCode' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="period">Payment Period<b style="color: red">*</b></label>
+                                <select class="form-select" id="period" required name="period">
+                                    <option></option>
+                                    <option>Daily</option>
+                                    <option>Weekly</option>
+                                    <option>Monthly</option> 
+                                    <option>Yealy</option>                                      
+                                </select> 
+                            </div>                            
+                            <div class="col-md-6">
+                                <p style="font-size: large; color: black;"><b>NOTE: </b> Payment is made base on the selected period. <br/> Daily means, the customer must make payment everyday, weekly means every weak, etc.</p>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="numberOfPeriod">Number of Days/Weeks/Months/Years<b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="numberOfPeriod" name="numberOfPeriod" required>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="font-size: large; color: black;"><b>NOTE: </b> Number of Days or weeks, or months or years given to the customer to finish all the payments. 
+                                </p>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Exclude the following days</h6>
+                                <label style="margin-left: 1%">Monday: <input type="checkbox" name="days" value="Monday" /></label>
+                                <label style="margin-left: 1%">Tuesday: <input type="checkbox" name="days" value="Tuesday" /></label>
+                                <label style="margin-left: 1%">Wednesday: <input type="checkbox" name="days" value="Wednesday" /></label>
+                                <label style="margin-left: 1%">Thursday: <input type="checkbox" name="days" value="Thursday" /></label>
+                                <label style="margin-left: 1%">Friday: <input type="checkbox" name="days" value="Friday" /></label>
+                                <label style="margin-left: 1%">Saturday: <input type="checkbox" name="days" value="Saturday" /></label>
+                                <label style="margin-left: 1%">Sunday: <input type="checkbox" name="days" value="Sunday" /></label>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="font-size: large; color: black;"><b>NOTE: </b>Penalty is exempted when the payment day falls under any of the selected days.
+                                </p>
+                            </div>
+                        </div>
+                        <hr/>
+                        <!--
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="amountPerPeriod">Amount Per Period<b style="color: red">*</b></label>
+                                <input class="form-control" type="text" id="amountPerPeriod" name="amountPerPeriod" required>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="font-size: large; color: black;"><b>NOTE: </b> The amount entered should be paid based on the period selected; for example, if the period is weekly, then the amount should be paid every week until the total amount has been paid.
+                                </p>
+                            </div>
+                        </div>
+                        <hr/>-->
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="panelty">Penalty Charges (In percentage)<b style="color: red">*</b></label>
+                                <input class="form-control" type="text" id="panelty" name="panelty" required>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="font-size: large; color: black;"><b>NOTE: </b> A penalty shall be paid for breach of the payment contract. <br/> <b>NOTE: </b> This is in percentage.
+                                </p>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary" type="submit">Save Agreement</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% elif payTerm == 'AP' %}
+            <!--Advance Payment ==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <h4><span class="fa fa-money"></span> Payment In Advance</h4>                    
+                    <form method="post" action="{% url 'salesConfirmAgreementCode' %}">
+                        {% csrf_token %}
+                        <h4><b>NOTE: </b>  Collection Code. The customer can only collect items using this code. Please Confirm the code to save the agreement.</h4>
+
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary" type="submit">Send Code</button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr/>
+                    </form>
+                </div>
+            </div>
+
+            {% elif payTerm == 'PP' %}
+            <!--Part Payment ==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="customers">
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+
+                    <h4><span class="fa fa-book"></span> Part Payment Agreement <sup>({{transactionID}})</sup></h4>   
+
+                    <form method="post" action="{% url 'salesConfirmAgreementCode' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="numberOfDays">Number of days<b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="numberOfDays" name="numberOfDays" required>
+                                <p style="color: black;"><b>NOTE: </b> Number of days given the customer to complete the payment of full amount!</p>
+                            </div>
+                            <div class="col-md-6">
+                                <!--
+                                <label class="form-label" for="numberOfDays">Number of days before next Payment<b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="numberOfDaysForNextPayment" name="numberOfDaysForNextPayment" required>
+                                <p style="color: black;"><b>NOTE: </b> Number of days before next payment is transacted</p>
+                                -->
+                            
+                                <label class="form-label" for="panelty">Panelty Charges Rate<b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="panelty" name="panelty" step="any" required>                            
+                           
+                                <p style="color: black;"><b>NOTE: </b> Please remember, this is in percentage. What percentage of the total amount to be paid is paid as panelty when the contract is breached.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary" type="submit">Save Agreement</button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr/>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock warehouseMobile %}
+
+
+
+
+
+

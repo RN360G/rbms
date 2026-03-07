@@ -1,0 +1,689 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% block warehouseMobile %}
+    <div>
+        <ul class="nav nav-tabs" role="tablist">            
+            <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#products"> Products</a></li>                      
+            {% if uAccess.300 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-plus" role="tab" data-bs-toggle="tab" href="#addProduct"> Add Product</a></li>
+            {% endif %}
+
+            {% if uAccess.314 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#customeMeasureUnit"> Add Custome Measuring Unit</a></li>
+            {% endif %}
+
+            {% if uAccess.307 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-remove" role="tab" data-bs-toggle="tab" href="#disableProduct"> Disable Product</a></li>
+            {% endif %}
+
+            {% if uAccess.308 %}
+                <li class="nav-item" role="presentation"><a class="nav-link fa fa-remove" role="tab" data-bs-toggle="tab" href="#discount"> General Discount</a></li>
+            {% endif %}
+            <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#restockAlert"> Restock Alert</a></li>
+        </ul>
+        <br/>
+        <div class="tab-content">
+            <!--Products==============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="products">
+                <div class="container-fluid bg-gradient-light py-5 shadow px-0">
+                    <h4 class="text-center"><span class="fa fa-book"></span> Products</h4>
+
+                    <div class="table-responsive mx-0 px-0">
+                        <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example">
+                            <thead class="d-none d-md-table-header-group">
+                                <tr>
+                                    <th>Products</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                    <tr>
+                                        <td>
+                                            <div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
+                                                <div class="card-body p-2">
+                                                    <h6 class="card-title mb-1">#{{ forloop.counter }}</h6>
+                                                    <h3><b>{{ product.productName }}</b></h3>
+                                                    <p class="mb-1"><small>Product Code: {{ product.productCode }}</small></p>
+
+                                                    {% if product.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or product.retailAndWholesaleRef.measureRef.stockedUnit == product.retailAndWholesaleRef.measureRef.soldUnit %}
+                                                        <p class="mb-1"><strong>Stock:</strong> {{ product.retailAndWholesaleRef.quantityRef.packQty }} <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup></p>
+                                                        <p class="mb-1"><strong>Restock Level:</strong> {{ product.retailAndWholesaleRef.reorderLevel }} <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup></p>
+                                                        <p class="mb-1"><strong>Cost Price:</strong> {{ product.retailAndWholesaleRef.currentCostPriceRef.costPrice }} <sup style="color:brown"> per {{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup></p>
+                                                        <p class="mb-1"><strong>Selling Price:</strong> {{ product.retailAndWholesaleRef.currentCostPriceRef.sellingPrice }} <sup style="color:brown"> per {{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup></p>
+                                                    {% else %}
+                                                        <p class="mb-1"><strong>Stock:</strong> {{ product.retailAndWholesaleRef.quantityRef.packQty }} <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup> 
+                                                            <b> | </b> {{ product.retailAndWholesaleRef.quantityRef.uintQty }} <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.soldUnit }}</sup></p>
+                                                        <p class="mb-1"><strong>Restock Level:</strong> {{ product.retailAndWholesaleRef.reorderLevel }} <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup></p>
+                                                        <p class="mb-1"><strong>Cost Price:</strong> {{ product.retailAndWholesaleRef.currentCostPriceRef.costPrice }} <sup style="color:brown"> per {{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup> 
+                                                            <b> | </b> {{ product.retailAndWholesaleRef.currentCostPriceRef.unitCostPrice }} <sup style="color:brown"> per {{ product.retailAndWholesaleRef.measureRef.soldUnit }}</sup></p>
+                                                        <p class="mb-1"><strong>Selling Price:</strong> {{ product.retailAndWholesaleRef.currentCostPriceRef.sellingPrice }} <sup style="color:brown"> per {{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup> 
+                                                            <b> | </b> {{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice }} <sup style="color:brown"> per {{ product.retailAndWholesaleRef.measureRef.soldUnit }}</sup></p>
+                                                    {% endif %}
+
+                                                    {% if uAccess.3 %}
+                                                        <a href="{% url 'salesProductProperties' product.id %}" 
+                                                        class="btn btn-outline-dark fa fa-book w-100 mt-2">
+                                                        Tally, Price, Stock and Other Properties
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--disable Products==============================================================================================================================-->
+            <div class="tab-pane" role="tabpanel" id="disableProduct">                
+                <div class="container-fluid bg-gradient-light py-5 shadow px-0">
+                    <h4 class="text-center"><span class="fa fa-remove"></span> Disabled Products</h4>
+
+                    <form method="post" action="{% url 'salesProductDisable' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="productCode">Product Code <b style="color: red">*</b></label>
+                                <input class="form-control" type="text" id="productCode" name="productCode" required>
+                                <p style="font-size: large;">Code of the product to be disabled</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="font-size: large; color: black;">
+                                    <b>NOTE:</b> Disabled product will not be visible on the products page and it will also not be available for sales.
+                                    <br/><i>Enter the code of the product you want to disable.</i>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-danger d-block w-100" type="submit">Disable Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr/>
+                    <h4><span class="fa fa-list"></span> List of Disabled Products</h4>
+
+                    <div class="table-responsive mx-0 px-0">
+                        <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example3">
+                            <thead class="d-none d-md-table-header-group">
+                                <tr>
+                                    <th>Disabled Products</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in disabledProducts %}
+                                    <tr>
+                                        <td>
+                                            <div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
+                                                <div class="card-body p-2">
+                                                    <h6 class="card-title mb-1">#{{ forloop.counter }} — {{ product.productName }}</h6>
+                                                    <p class="mb-1"><small>Code: {{ product.productCode }} <sup>{{ dat.busRef.branchID }}</sup></small></p>
+                                                    <p class="mb-1"><strong>Quantity Available:</strong> {{ product.retailAndWholesaleRef.quantityRef.packQty}} {{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</p>
+                                                    <p class="mb-1"><strong>Disabled By:</strong> {{ product.disbleRef.operationBy.userRef.firstName }} {{ product.disbleRef.operationBy.userRef.surname }} <br/> <small>{{ product.disbleRef.operationBy.userID }}</small></p>
+                                                    <p class="mb-1"><strong>Date:</strong> {{ product.disbleRef.date }}</p>
+                                                    <a href="{% url 'salesProductEnable' product.id %}" 
+                                                    class="btn btn-outline-dark fa fa-book w-100 mt-2">Enable</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!--discount==============================================================================================================================-->
+            <div class="tab-pane" role="tabpanel" id="discount">                
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <h2><span class="fa fa-percent"></span> Discount</h2>
+                    <h4>Current discount: <b>{{discount}}</b> %</h4>
+                    <form method="post" action="{% url 'salesGeneralDiscount' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="discount">Discount Rate <b style="color: red">*</b></label>
+                                <input class="form-control" type="text" id="discount" name="discount" required>
+                                <p style="font-size: large;">Enter discount rate here</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="font-size: large; color: black;"><b>NOTE: </b> Any number entered will be divided by 100.</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary d-block w-100" type="submit">Give Discount</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!--custome Measure Unit====================================================================================================================-->
+            <div class="tab-pane" role="tabpanel" id="customeMeasureUnit">                
+                <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <h2><span class="fa fa-circle"></span> Add Custome Measure Unit</h2>
+                    <form method="post" action="{% url 'salesAddUnit' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="unitName">Measure Unit<b style="color: red">*</b></label>
+                                <input class="form-control" type="text" id="unitName" name="unitName" required>
+                                <p style="font-size: large;">The unit name should be unit</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="unitCategory">Uses of this unit<b style="color: red">*</b></label>
+                                <select class="form-select" id="unitCategory" required name="unitCategory">
+                                    <option></option>
+                                    <option>For Stock Keeping</option>
+                                    <option>For Selling</option>
+                                    <option>Both</option>
+                                </select>
+                                   <p style="font-size: large; color: black;"><b>NOTE: </b> This determines whether the unit wll be used for selling, for keeping stock or both.</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary d-block w-100" type="submit">Add Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr/>
+                    <br/>
+                    <h4><span class="fa fa-list"></span> Unit List</h4>
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example4">
+                        <thead>
+                            <tr>
+                                <th>Unit</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for measureUnit in measureUnits %}
+                                <tr class="even gradeA">
+                                    <td>{{ measureUnit.unit}}</td>
+                                    <td>{{ measureUnit.unityType}}</td>
+                                    <td class="center">
+                                        <a href="{% url 'salesDeleteUnit' measureUnit.id %}" class="btn btn-outline-danger fa fa-circle">Delete</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!--Restock alert====================================================================================================================-->
+            <div class="tab-pane" role="tabpanel" id="restockAlert">                
+                <div class="container-fluid bg-gradient-light py-5 shadow px-0">
+                    <h4 class="text-center"><span class="fa fa-circle"></span> Products Alert for Restock</h4>
+                    <div class="table-responsive mx-0 px-0">
+                        <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example5">
+                            <thead class="d-none d-md-table-header-group">
+                                <tr>
+                                    <th>Restock Alerts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in restockAlerts %}
+                                    <tr>
+                                        <td>
+                                            <div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
+                                                <div class="card-body p-2">
+                                                    <h6 class="card-title mb-1">
+                                                        #{{ forloop.counter }} — {{ product.productName }}
+                                                    </h6>
+                                                    <p class="mb-1"><small>Code: {{ product.productCode }}</small></p>
+                                                    <p class="mb-1"><strong>Quantity Available:</strong> {{ product.retailAndWholesaleRef.quantityRef.packQty }}</p>
+                                                    <p class="mb-1"><strong>Restock Level:</strong> {{ product.retailAndWholesaleRef.reorderLevel }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--Register Products==============================================================================================================================-->
+            <div class="tab-pane" role="tabpanel" id="addProduct">
+                    <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+                        <h2><span class="fa fa-plus"></span> New Product</h2>
+                        <form class="user" method="post" action="{% url 'addSalesProduct' %}">
+                            {% csrf_token %}        
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="productName">Product Name <b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="productName" name="productName" required>
+                                    <p style="font-size: large;">Product Name should be unique.</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="category">Product Category <b style="color: red">*</b></label>
+                                    <select class="form-select" id="category" required name="category">
+                                        <option>Others</option>
+                                        <option>Agro Product</option>
+                                        <option>Beverages</option>
+                                        <option>Clothing</option>
+                                        <option>Drinks</option>
+                                        <option>Electronicts</option>
+                                        <option>Fashion</option>
+                                        <option>Food</option>
+                                        <option>Footwear</option> 
+                                        <option>Pharmaceutical Product</option>                                       
+                                        <option>Vehicle</option> 
+                                    </select>
+                                </div>
+                            </div><hr/>
+                            <h3>Stocked Units and Sold Units</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="measureUnitStocked">Stocked Units<b style="color: red">*</b></label>
+                                    <select class="form-select" id="measureUnitStocked" required name="measureUnitStocked">
+                                        <option selected>Piece</option>                                        
+                                        {% for measureUnit in measureUnits %}
+                                           {% if measureUnit.unityType == 'Both' or measureUnit.unityType == 'For Stock Keeping' %}
+                                              <option selected>{{measureUnit.unit}}</option> 
+                                           {% endif %}                                                                                       
+                                        {% endfor %}                                          
+                                    </select>
+                                    <p style="font-size: large;">The basic unit you keep in inventory</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="measureUnitSold" id="measureUnitSoldLabel">Sold Units <b style="color: red">*</b></label>
+                                    <h6 id="defaultSoldUnit">Sold Unit: <b>Pieces</b></h6>
+                                    <select class="form-select" id="measureUnitSold" required name="measureUnitSold">
+                                        <option selected>Piece</option>                                        
+                                        {% for measureUnit in measureUnits %}
+                                           {% if measureUnit.unityType == 'Both' or measureUnit.unityType == 'For Selling' %}
+                                              <option selected>{{measureUnit.unit}}</option> 
+                                           {% endif %}                                                                                       
+                                        {% endfor %}  
+                                    </select>
+                                    <p style="font-size: large;" id="measureUnitSoldP">The unit in which you sell the product to the customer. This can be the same as the stocked unit or different.</p>
+                                </div>
+                            </div><hr/>                           
+                            
+                            <h3>Number/Quanity of this Product</h3>
+                            <div class="row">                                
+                                <div class="col-md-6">
+                                    <label class="form-label" for="quantity">Quantity (<b id="qtyPack1">Box</b>)<b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="quantity" name="quantity" step="any" min="0" required>
+                                    <p style="font-size: large;">Quantity/Number of this product Available (<b id="qtyPack2">Box</b>)</p>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="quantityPerPack" id="quantityPerPackLabel"><b id="qtyInPack1"></b> Per/ in each <b id="qtyPerPack1"></b> <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="quantityPerPack" name="quantityPerPack" step="any" min="0" required>
+                                    <p style="font-size: large;" id="quantityPerPackP"><b id="qtyInPack2"></b> of this products in each <b id="qtyPerPack2"></b></p>
+
+                                    <hr id="hr3"/>
+
+                                    <label class="form-label" for="qtyLeftLessThanPack" id="qtyLeftLessThanPackLabel">Quantity not up to a/an <b id="notUpToPack1"></b> <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="qtyLeftLessThanPack" name="qtyLeftLessThanPack" value="0" min="0" step="any" required>
+                                    <p style="font-size: large;" id="qtyLeftLessThanPackP">Quantity of this product left less than a/an <b id="notUpToPack2"></b></p>
+
+
+                                </div>
+                            </div><hr/>
+
+                            <h3>Cost price and Selling Price</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="costPricePack">Cost price per <b id="packCost"></b> <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="costPricePack" name="costPricePack" step="any" min="0" required>
+                                    <p style="font-size: large;">Current cost price of this product. <br/> <b>Amount paid to your supplier for each of this product</b>.</p>
+                                    <hr id="hr2"/>
+
+                                    <label class="form-label" for="costPriceUnit" id="costPriceUnitLabel">Cost price per <b id="unitCost">Unit/Single</b> <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="costPriceUnit" name="costPriceUnit" step="any" min="0" required>
+                                    <p style="font-size: large;" id="costPriceUnitP">Current cost price of this product. <br/> <b>Amount paid to your supplier for each of this product</b>.</p>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="sellingPricePack">Selling Price per <b id="packSell">Pieces</b> <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="sellingPricePack" name="sellingPricePack" step="any" min="0" required>
+                                    <p style="font-size: large;">Current selling price of this product.  <br/> <b>Amount to be paid by the customer for each of this product</b>.</p>
+                                    <hr id="hr1"/>
+
+                                    <label class="form-label" for="sellingPriceUnit" id="sellingPriceUnitLabel">Selling Price per <b id="unitSell">Unit/Single</b> <b style="color: red">*</b></label>
+                                    <input class="form-control" type="number" id="sellingPriceUnit" name="sellingPriceUnit" step="any" min="0" required>
+                                    <p style="font-size: large;" id="sellingPriceUnitP">Current selling price of this product per unit.  <br/> <b>Amount to be paid by the customer for each of this product</b>.</p>
+                                </div>
+                            </div><hr/> 
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="dob">Product Descripts</label>
+                                    <textarea name="description" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    
+                                </div>
+                            </div><hr/>
+
+                            <br/>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary d-block w-100" type="submit">Add Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>        
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let measureUnitStocked = document.getElementById('measureUnitStocked');        
+        let measureUnitSold = document.getElementById('measureUnitSold');
+        let measureUnitSoldLabel = document.getElementById('measureUnitSoldLabel');
+        let measureUnitSoldP= document.getElementById('measureUnitSoldP');
+        let defaultSoldUnit = document.getElementById('defaultSoldUnit');
+
+        // cost price
+        let costPriceUnit = document.getElementById('costPriceUnit');
+        let costPriceUnitLabel = document.getElementById('costPriceUnitLabel');
+        let costPriceUnitP = document.getElementById('costPriceUnitP');        
+        let unitCost = document.getElementById('unitCost');
+        let packCost = document.getElementById('packCost');
+
+        // sell price
+        let sellingPriceUnit = document.getElementById('sellingPriceUnit');
+        let sellingPriceUnitLabel = document.getElementById('sellingPriceUnitLabel');
+        let sellingPriceUnitP = document.getElementById('sellingPriceUnitP');        
+        let unitSell = document.getElementById('unitSell');
+        let packSell = document.getElementById('packSell');
+
+        // Quantity
+        let quantityPerPack = document.getElementById('quantityPerPack');
+        let quantityPerPackLabel = document.getElementById('quantityPerPackLabel');
+        let quantityPerPackP = document.getElementById('quantityPerPackP');
+
+        let qtyLeftLessThanPack = document.getElementById('qtyLeftLessThanPack')
+        let qtyLeftLessThanPackLabel = document.getElementById('qtyLeftLessThanPackLabel')
+        let qtyLeftLessThanPackP = document.getElementById('qtyLeftLessThanPackP')
+
+        let notUpToPack1 = document.getElementById('notUpToPack1');
+        let notUpToPack2 = document.getElementById('notUpToPack2');
+        
+
+        let qtyPack1 = document.getElementById('qtyPack1');
+        let qtyPack2 = document.getElementById('qtyPack2');
+
+        // quanty per pack
+        let qtyPerPack1 = document.getElementById('qtyPerPack1');
+        let qtyPerPack2 = document.getElementById('qtyPerPack2')
+
+        let qtyInPack1 = document.getElementById('qtyInPack1');
+        let qtyInPack2 = document.getElementById('qtyInPack2');
+
+        // line
+        let hr3 = document.getElementById('hr3');
+        let hr2 = document.getElementById('hr2');
+        let hr1 = document.getElementById('hr1');
+
+
+        if(measureUnitStocked.value == 'Piece'){            
+
+           qtyPack1.textContent = measureUnitStocked.value;  
+           qtyPack2.textContent = measureUnitStocked.value;  
+
+           notUpToPack1.textContent = measureUnitStocked.value; 
+           notUpToPack2.textContent = measureUnitStocked.value; 
+
+           packCost.textContent = measureUnitStocked.value;
+           packSell.textContent = measureUnitStocked.value;  
+
+           measureUnitSold.hidden = true;
+           measureUnitSold.value = 'Piece';
+           measureUnitSoldLabel.hidden = true;
+           measureUnitSoldP.hidden = true;
+           defaultSoldUnit.hidden = false;
+
+           costPriceUnit.hidden = true;
+           costPriceUnitLabel.hidden = true;
+           costPriceUnitP.hidden = true;
+
+           sellingPriceUnit.hidden = true;
+           sellingPriceUnitLabel.hidden = true;
+           sellingPriceUnitP.hidden = true;
+
+           quantityPerPack.hidden = true;
+           quantityPerPackLabel.hidden = true;
+           quantityPerPackP.hidden = true;
+
+           qtyLeftLessThanPack.hidden = true;
+           qtyLeftLessThanPackLabel.hidden = true;
+           qtyLeftLessThanPackP.hidden = true;
+
+           hr1.hidden = true;
+           hr2.hidden = true;
+           hr3.hidden = true;           
+        }
+
+
+        measureUnitStocked.addEventListener('click', function(){
+            if(measureUnitStocked.value == 'Piece')
+            {    
+                costPriceUnit.value = 0;
+                sellingPriceUnit.value = 0;
+                quantityPerPack.value = 1;
+
+                qtyPack1.textContent = measureUnitStocked.value;  
+                qtyPack2.textContent = measureUnitStocked.value;  
+                
+                packCost.textContent = measureUnitStocked.value;
+                packSell.textContent = measureUnitStocked.value;   
+
+                measureUnitSold.hidden = true;
+                measureUnitSoldLabel.hidden = true;
+                measureUnitSoldP.hidden = true;
+                defaultSoldUnit.hidden = false;
+
+                costPriceUnit.hidden = true;
+                costPriceUnitLabel.hidden = true;
+                costPriceUnitP.hidden = true;
+
+                sellingPriceUnit.hidden = true;
+                sellingPriceUnitLabel.hidden = true;
+                sellingPriceUnitP.hidden = true;
+
+                quantityPerPack.hidden = true;
+                quantityPerPackLabel.hidden = true;
+                quantityPerPackP.hidden = true;
+
+                qtyLeftLessThanPack.hidden = true;
+                qtyLeftLessThanPackLabel.hidden = true;
+                qtyLeftLessThanPackP.hidden = true;
+
+                hr1.hidden = true;
+                hr2.hidden = true;
+                hr3.hidden = true;
+
+                if(measureUnitStocked.value == measureUnitSold.value){              
+                    quantityPerPack.value = 1;
+                    quantityPerPack.hidden = true;
+                    quantityPerPackLabel.hidden = true;
+                    quantityPerPackP.hidden = true;
+
+                    sellingPriceUnit.value = 0;
+                    sellingPriceUnit.hidden = true;
+                    sellingPriceUnitLabel.hidden = true;
+                    sellingPriceUnitP.hidden = true;
+
+                    costPriceUnit.value = 0;
+                    costPriceUnit.hidden = true;
+                    costPriceUnitLabel.hidden = true;
+                    costPriceUnitP.hidden = true;
+
+                    qtyLeftLessThanPack.hidden = true;
+                    qtyLeftLessThanPackLabel.hidden = true;
+                    qtyLeftLessThanPackP.hidden = true;
+                    hr1.hidden = true;
+                    hr2.hidden = true;
+                    hr3.hidden = true;
+                }
+
+            }
+            else{ 
+                costPriceUnit.value = '';
+                sellingPriceUnit.value = '';
+                quantityPerPack.value = '';
+
+                qtyPack1.textContent = measureUnitStocked.value;  
+                qtyPack2.textContent = measureUnitStocked.value; 
+
+                qtyPerPack1.textContent = measureUnitStocked.value;
+                qtyPerPack2.textContent = measureUnitStocked.value;
+
+                qtyInPack1.textContent = measureUnitSold.value;
+                qtyInPack2.textContent = measureUnitSold.value;
+                
+                packCost.textContent = measureUnitStocked.value;
+                packSell.textContent = measureUnitStocked.value; 
+                
+                unitSell.textContent = measureUnitSold.value;
+                unitCost.textContent = measureUnitSold.value;
+
+                notUpToPack1.textContent = measureUnitStocked.value; 
+                notUpToPack2.textContent = measureUnitStocked.value; 
+
+                measureUnitSold.hidden = false;
+                measureUnitSoldLabel.hidden = false;
+                measureUnitSoldP.hidden = false;
+                defaultSoldUnit.hidden = true;
+
+                costPriceUnit.hidden = false;
+                costPriceUnitLabel.hidden = false;
+                costPriceUnitP.hidden = false;
+
+                sellingPriceUnit.hidden = false;
+                sellingPriceUnitLabel.hidden = false;
+                sellingPriceUnitP.hidden = false;
+
+                quantityPerPack.hidden = false;
+                quantityPerPackLabel.hidden = false;
+                quantityPerPackP.hidden = false;
+
+                qtyLeftLessThanPack.hidden = false;
+                qtyLeftLessThanPackLabel.hidden = false;
+                qtyLeftLessThanPackP.hidden = false;
+
+                hr1.hidden = false;
+                hr2.hidden = false;
+                hr3.hidden = false;
+
+                if(measureUnitStocked.value == measureUnitSold.value){              
+                    quantityPerPack.value = 1;
+                    quantityPerPack.hidden = true;
+                    quantityPerPackLabel.hidden = true;
+                    quantityPerPackP.hidden = true;
+
+                    sellingPriceUnit.value = 0;
+                    sellingPriceUnit.hidden = true;
+                    sellingPriceUnitLabel.hidden = true;
+                    sellingPriceUnitP.hidden = true;
+
+                    costPriceUnit.value = 0;
+                    costPriceUnit.hidden = true;
+                    costPriceUnitLabel.hidden = true;
+                    costPriceUnitP.hidden = true;
+
+                    qtyLeftLessThanPack.hidden = true;
+                    qtyLeftLessThanPackLabel.hidden = true;
+                    qtyLeftLessThanPackP.hidden = true;
+
+                    hr1.hidden = true;
+                    hr2.hidden = true;
+                    hr3.hidden = true;
+                }
+            }
+        });
+
+
+        measureUnitSold.addEventListener('click', function(){
+            //qtyPerPack1.textContent = measureUnitSold.value;
+            //qtyPerPack2.textContent = measureUnitSold.value;
+            qtyPerPack1.textContent = measureUnitStocked.value;
+            qtyPerPack2.textContent = measureUnitStocked.value;
+
+            qtyInPack1.textContent = measureUnitSold.value;
+            qtyInPack2.textContent = measureUnitSold.value;
+
+            unitSell.textContent = measureUnitSold.value;
+            unitCost.textContent = measureUnitSold.value;
+
+           if(measureUnitStocked.value == measureUnitSold.value){              
+                quantityPerPack.value = 1;
+                quantityPerPack.hidden = true;
+                quantityPerPackLabel.hidden = true;
+                quantityPerPackP.hidden = true;
+
+                sellingPriceUnit.value = 0;
+                sellingPriceUnit.hidden = true;
+                sellingPriceUnitLabel.hidden = true;
+                sellingPriceUnitP.hidden = true;
+
+                costPriceUnit.value = 0;
+                costPriceUnit.hidden = true;
+                costPriceUnitLabel.hidden = true;
+                costPriceUnitP.hidden = true;
+                hr1.hidden = true;
+                hr2.hidden = true;
+                hr3.hidden = true;
+           }
+           else{
+                quantityPerPack.value = '';
+                quantityPerPack.hidden = false;
+                quantityPerPackLabel.hidden = false;
+                quantityPerPackP.hidden = false;
+
+                sellingPriceUnit.value = '';
+                sellingPriceUnit.hidden = false;
+                sellingPriceUnitLabel.hidden = false;
+                sellingPriceUnitP.hidden = false;
+
+                costPriceUnit.value = '';
+                costPriceUnit.hidden = false;
+                costPriceUnitLabel.hidden = false;
+                costPriceUnitP.hidden = false;
+
+                qtyLeftLessThanPack.value = '0'
+                qtyLeftLessThanPack.hidden = false;
+                qtyLeftLessThanPackLabel.hidden = false;
+                qtyLeftLessThanPackP.hidden = false;
+
+                hr1.hidden = false;
+                hr2.hidden = false;
+                hr3.hidden = false;
+           }
+        });
+    </script>
+{% endblock warehouseMobile %}
+
+
+
+
+
+

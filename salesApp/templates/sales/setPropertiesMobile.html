@@ -1,0 +1,612 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% block warehouseMobile %}  
+<a href="{% url 'salesProduct' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>  
+<hr/>
+<div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
+    <div class="card-body p-2">
+        <!-- Product Name & Code -->
+        <h6 class="card-title mb-1">
+            <b style="color:black">{{ product.productName }}</b>
+            <span class="text-muted">{{ product.productCode }}</span>
+        </h6>
+
+        <!-- Stock Available -->
+        <p class="mb-1">
+            <strong>Stock Available:</strong>
+            {% if product.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or product.retailAndWholesaleRef.measureRef.stockedUnit == product.retailAndWholesaleRef.measureRef.soldUnit %}
+                <b style="color:black">{{ product.retailAndWholesaleRef.quantityRef.packQty }}</b>
+                <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup>
+            {% else %}
+                <b style="color:black">{{ product.retailAndWholesaleRef.quantityRef.packQty }}</b>
+                <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup>
+                <b style="color:black">{{ product.retailAndWholesaleRef.quantityRef.uintQty }}</b>
+                <sup style="color:brown">{{ product.retailAndWholesaleRef.measureRef.soldUnit }}</sup>
+                <br/>
+                <small>
+                    {{ product.retailAndWholesaleRef.quantityRef.qtyPerPack }}
+                    <sup>{{ product.retailAndWholesaleRef.measureRef.soldUnit }}</sup> = 1
+                    <sup>{{ product.retailAndWholesaleRef.measureRef.stockedUnit }}</sup>
+                </small>
+            {% endif %}
+        </p>
+
+        <!-- Online/Offline & Discount -->
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="badge bg-light text-dark">
+                <i class="fa fa-globe"></i>
+                {% if product.retailAndWholesaleRef.isVisibleOnline %}
+                    Online
+                {% else %}
+                    Offline
+                {% endif %}
+            </span>
+            <span class="text-muted">
+                Discount: <b>{{ discount.discount|floatformat:2 }}</b> <i class="fa fa-percent"></i>
+            </span>
+        </div>
+    </div>
+</div>
+
+<hr/>
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation"><a class="nav-link active fa fa-list" role="tab" data-bs-toggle="tab" href="#tally"> Tally</a></li>
+    
+    {% if uAccess.301 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-plus" role="tab" data-bs-toggle="tab" href="#addStock"> Add Stock</a></li>
+    {% endif %}
+
+    {% if uAccess.303 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#changePrice"> Change Price</a></li>
+    {% endif %}
+
+    {% if uAccess.313 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-image" role="tab" data-bs-toggle="tab" href="#image"> Image</a></li>
+    {% endif %}
+
+    {% if uAccess.312 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#retockLevel"> Restock Level</a></li>
+    {% endif %}
+
+    {% if uAccess.311 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-edit" role="tab" data-bs-toggle="tab" href="#adjustment"> Stock Adjustment</a></li>
+    {% endif %}
+
+    {% if uAccess.315 %}
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-globe" role="tab" data-bs-toggle="tab" href="#visibility"> Online Visibility</a></li>
+    {% endif %}
+
+    {% if uAccess.309 %}  
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-percent" role="tab" data-bs-toggle="tab" href="#discount"> Discount</a></li>
+    {% endif %}
+    
+    {% if uAccess.316 %}  
+        <li class="nav-item" role="presentation"><a class="nav-link fa fa-circle" role="tab" data-bs-toggle="tab" href="#returnPeriod"> Return Period</a></li>
+    {% endif %}
+
+    {% if uAccess.315 %}
+       <li class="nav-item" role="presentation"><a class="nav-link fa fa-cart-plus" role="tab" data-bs-toggle="tab" href="#onlineOder"> Online Order & Min Order</a></li>
+    {% endif %}
+
+</ul>
+<br/>
+
+<div class="tab-content">
+    <!--Add new stock =============================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="addStock">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-plus"></span>Add to Stock</h2>
+            <form class="user" method="post" action="{% url 'salesProductaddStock' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if product.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or product.retailAndWholesaleRef.measureRef.stockedUnit == product.retailAndWholesaleRef.measureRef.soldUnit %}                         
+                            <label class="form-label" for="quantity">Quantity (in <b>{{product.retailAndWholesaleRef.measureRef.soldUnit}}</b>) <b style="color: red">*</b></label>
+                            <input class="form-control" type="number" id="quantity" name="quantity" required step="any" min='0'>                                                    
+                        {% else %}
+                            <label class="form-label" for="productCategory">Quantity (in <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b>)<b style="color: red">*</b></label>
+                            <input class="form-control" type="number" id="quantity" name="quantity" required step="any" min='0'>                             
+                            <hr/>
+                            <label class="form-label" for="additionalQuantity">Additional quantity less than  <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b><b style="color: red">*</b></label>
+                            <input class="form-control" type="number" id="additionalQuantity" name="additionalQuantity" value="0" required step="any" min='0'> 
+                            <p>Additional <b>{{product.retailAndWholesaleRef.measureRef.soldUnit}}</b> left which is not up to a/an <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b></p>
+                                                  
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p style="font-size: large; color: black;">
+                            <b>NOTE: </b>Quantity to add to the current stock                                
+                        </p>
+                    </div>
+                </div>
+                <hr/>
+                <br/>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if product.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or product.retailAndWholesaleRef.measureRef.stockedUnit == product.retailAndWholesaleRef.measureRef.soldUnit %}                       
+                            <label class="form-label" for="costPrice">Cost Price Per <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b><b style="color: red">*</b></label>
+                            <input class="form-control" type="number" id="costPrice" name="costPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.costPrice}}" required step="any" min='0'>                   
+                        {% else %}
+                            <label class="form-label" for="costPrice">Cost Price Per <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b> <b style="color: red">*</b></label>
+                            <input class="form-control" type="number" id="costPrice" name="costPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.costPrice}}" required step="any" min='0'>
+                            <hr/>
+                            <label class="form-label" for="unitCostPrice">Cost Price Per <b>{{product.retailAndWholesaleRef.measureRef.soldUnit}}</b> <b style="color: red">*</b></label>
+                            <input class="form-control" type="number" id="unitCostPrice" name="unitCostPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.unitCostPrice}}" required step="any" min='0'>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p style="font-size: large; color: black;">
+                            <b>NOTE: </b>What is the cost price of each item in the stock<br/> 
+                            <b>leave it as it is if the price still remains the same</b>                               
+                        </p>
+                    </div>
+                </div><hr/>
+                <br/>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-md-6 button">
+                            <button class="btn btn-primary" type="submit">Add Stock</button>
+                        </div>
+                    </div>
+                </div>
+            </form> 
+        </div>
+    </div> 
+
+    <!--Change price =============================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="changePrice">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-money"></span> Set Current Selling Price and Cost Price</h2>
+            <form class="user" method="post" action="{% url 'salesProductChangePrice' product.id %}">
+                {% csrf_token %}
+                <h4>Current Selling Price</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if product.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or product.retailAndWholesaleRef.measureRef.stockedUnit == product.retailAndWholesaleRef.measureRef.soldUnit %}   
+
+                        <label class="form-label" for="sellingPrice">Selling Price Per <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b><b style="color: red">*</b></label>
+                        <input class="form-control" type="number" id="sellingPrice" name="sellingPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.sellingPrice}}" required step="any" min='0'>
+                        {% else %}
+
+                        <label class="form-label" for="sellingPrice">Selling Price Per <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b><b style="color: red">*</b></label>
+                        <input class="form-control" type="number" id="sellingPrice" name="sellingPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.sellingPrice}}" required step="any" min='0'>
+                        <hr/>
+                        <label class="form-label" for="unitSellingPrice">Selling Price per <b>{{product.retailAndWholesaleRef.measureRef.soldUnit}}</b> <b style="color: red">*</b></label>
+                        <input class="form-control" type="number" id="unitSellingPrice" name="unitSellingPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice}}" required step="any" min='0'>
+
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                    <p style="font-size: large; color: black;">
+                        <b>NOTE: </b>Change the selling price from the current price to a new Price  <br/><b>Customer items prices will be calculated base on this price </b>   
+                        <br/><b>leave it as it is if the selling price still remains the same</b>                               
+                    </p>
+                    </div>
+                    </div><hr/>
+                    <h4>Current Cost Price</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if product.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or product.retailAndWholesaleRef.measureRef.stockedUnit == product.retailAndWholesaleRef.measureRef.soldUnit %} 
+                                <label class="form-label" for="costPrice">Current Cost Price<b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="costPrice" name="costPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.costPrice}}" required step="any" min='0'>
+                            {% else %}
+                                <label class="form-label" for="costPrice">Current Cost Price per <b>{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</b><b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="costPrice" name="costPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.costPrice}}" required step="any" min='0'>
+
+                                <hr/>
+                                <label class="form-label" for="unitCostPrice">Cost Price per <b>{{product.retailAndWholesaleRef.measureRef.soldUnit}}</b><b style="color: red">*</b></label>
+                                <input class="form-control" type="number" id="unitCostPrice" name="unitCostPrice" value="{{product.retailAndWholesaleRef.currentCostPriceRef.unitCostPrice}}" required step="any" min='0'>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <p style="font-size: large; color: black;">
+                                <b>NOTE: </b>Change the cost price from the current price to a new Price <br/> 
+                                <b>leave it as it is if the cost price still remains the same</b>                               
+                            </p>
+                        </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary" type="submit">Set Price</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+
+    <!--Item tally =============================================================================================================================-->
+    <div class="tab-pane active" role="tabpanel" id="tally">
+        <div class="container-fluid bg-gradient-light py-5 shadow px-0">
+            <h2><span class="fa fa-list"></span> Tally Card</h2>
+            <table width="100%" class="table table-striped table-bordered table-hover w-100 mb-0" id="dataTables-example">
+                <thead>
+                    <tr>
+                        <th>Date</th> 
+                        <th>Qty</th>   
+                        <th>Bal</th>                    
+                        <th>Narration</th>
+                        <th>Transaction Type</th>
+                        <th>By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tal in tally %}
+                        <tr class="even gradeA">
+                            <td>{{ tal.date}}</td>
+                            {% if tal.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and tal.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or tal.retailAndWholesaleRef.measureRef.stockedUnit == tal.retailAndWholesaleRef.measureRef.soldUnit %}
+
+                                <td>{{ tal.quantity}} <sup>{{tal.retailAndWholesaleRef.measureRef.stockedUnit}}</sup></td>
+                                <td>{{ tal.balance}} <sup>{{tal.retailAndWholesaleRef.measureRef.stockedUnit}}</sup></td>
+                            {% else %}
+                                <td>
+                                    {{ tal.unitQuantity}} <sup style="color: brown">{{tal.retailAndWholesaleRef.measureRef.soldUnit}}</sup> <br/>
+                                    {{ tal.quantity}}  <sup style="color: brown">{{tal.retailAndWholesaleRef.measureRef.stockedUnit}}</sup>
+                                    
+                                </td>
+                                <td>
+                                    {{ tal.uintBalance}} <sup style="color: brown">{{tal.retailAndWholesaleRef.measureRef.soldUnit}}</sup><br/> 
+                                    {{ tal.balance}} <sup style="color: brown">{{tal.retailAndWholesaleRef.measureRef.stockedUnit}}</sup>                                     
+                                </td>
+                            {% endif %}
+                            <td><sup>{{ tal.narration}}</sup></td>
+                            <td>{{ tal.transactionType}}</td>
+                            <td>{{ tal.transactionBy.userRef.firstName}} {{ tal.transactionBy.userRef.firstName}} <br/> {{ tal.transactionBy.userID}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!--upload image =============================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="image">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-image"></span> Upload Product Flyer</h2>
+            <form class="user" method="post" action="{% url 'salesUploadImage' product.id %}"  enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="sellingPrice">Select Image <b style="color: red">*</b></label>
+                        <input type="file" class="form-control" name="upload" id="electImage" onchange="loadImage(event)" accept="image/*" required>
+                        <button class="btn btn-primary" type="submit">Upload</button>                        
+                        <div class="card shadow-sm">
+                            <img src="{{ image.image.url }}" class="card-img-top img-fluid" id="electImageOutput" alt="Product Image" height="300" width="300">
+                            <div class="card-body p-2">
+                                <p class="mb-0"><small>Uploaded on {{ image.date|date:"Y-m-d H:i" }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                </div>
+            </form>           
+            
+            {% if image  %}
+                <h2><span class="fa fa-image"></span> Upload Other Images</h2>
+                <form class="user" method="post" action="{% url 'salesUploadOtherProductImages' product.id %}"  enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="sellingPrice">Select Image <b style="color: red">*</b></label>
+                            <input type="file" class="form-control" name="upload" id="electImage" accept="image/*" required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary" type="submit">Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="container my-4">
+                    <h4><span class="fa fa-image"></span> Product Images</h4>
+                    <div class="row">
+                        {% for img in otherImages %}
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <div class="card shadow-sm">
+                                <img src="{{ img.image.url }}" class="card-img-top img-fluid" alt="Product Image">
+                                <div class="card-body p-2">
+                                    <p class="mb-0"><small>Uploaded on {{ img.date|date:"Y-m-d H:i" }}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No images uploaded for this product yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>                
+            {% endif %}
+        </div>
+    </div>
+
+    <!--Restock Level =============================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="retockLevel">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-circle"></span> Set Restock Level</h2>
+            <form class="user" method="post" action="{% url 'salesRestockLevel' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="restock">Set Level <b style="color: red">*</b></label>
+                        <input class="form-control" type="number" id="restock" name="restock" value="{{product.retailAndWholesaleRef.reorderLevel}}" required step="any" min='0'>
+                    </div>
+                    <div class="col-md-6">
+                    <p style="font-size: large; color: black;">
+                        <b>NOTE: </b>This is the level at which you restock this product 
+                        <br/><b>It will alert you when the stock available is equal or below theis level.</b>                               
+                    </p>
+                    </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary" type="submit">Set Level</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+
+    <!--Return Period =============================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="returnPeriod">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-circle"></span> Set Return Period</h2>
+            <form class="user" method="post" action="{% url 'salesReturnPeriod' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="returnPeriod">Set Return Period <b style="color: red">*</b></label>
+                        <input class="form-control" type="number" id="returnPeriod" name="returnPeriod" value="{{product.retailAndWholesaleRef.returnPeriod}}" required min='0'>
+                    </div>
+                    <div class="col-md-6">
+                    <p style="font-size: large; color: black;">
+                        <b>NOTE: </b>This is the period (in days) a customer can return this product after purchase.                              
+                    </p>
+                    </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+
+    <!--Stock Adjustment =============================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="adjustment" style="width:100%;">
+        <div class="container-fluid bg-gradient-light py-5 shadow px-0" style="color: black;">
+            <h2><span class="fa fa-edit"></span> Stock Adjustment</h2>
+            <form class="user" method="post" action="{% url 'salesAdjustment' product.id %}">
+                {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select name="adjustmentType" class="form-control" required>
+                                <option></option>
+                                <option>Wrong Entry (Add Stock)</option>
+                                <option>Wrong Entry (Remove Stock)</option>
+                                <option>Expired Products</option>
+                                <option>Damaged Products</option>
+                                <option>Lost Products</option>
+                                <option>Found Lost Products</option>
+                            </select>
+                            <p style="font-size: large; color: green;">
+                                <b>This is very important. It determines whether to add or remove from the stock.</b>                              
+                           </p> 
+                        </div>
+                        <div class="col-md-6">
+                            <p style="font-size: large; color: black;">
+                                <b>NOTE: </b>This will determine whether the <b>Quantity To Adjust</b> will be added or removed from the stock.
+                                <br/><b>The options <u style="color: brown">Wrong Entry (Add Stock)</u> and <u style="color: brown">Found Lost Product</u> will add <i style="color: brown">Quantity To Adjust</i> to the stock. The rest of the options will remove from the stock.</b>                               
+                           </p>                            
+                        </div>
+                    </div>
+                    <hr/>                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if tal.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and tal.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or tal.retailAndWholesaleRef.measureRef.stockedUnit == tal.retailAndWholesaleRef.measureRef.soldUnit %}
+                                <label class="form-label" for="quantity">Quantity To Adjust (in <i style="color:red">{{product.retailAndWholesaleRef.measureRef.soldUnit}}</i>)<b style="color: red">*</b></label>
+                            {% else %}
+                                <label class="form-label" for="quantity">Quantity To Adjust (in <i style="color:red">{{product.retailAndWholesaleRef.measureRef.stockedUnit}})</i> <b style="color: red">*</b></label>
+                            {% endif %}
+                            <input class="form-control" type="number" id="restock" name="quantity" required step="any" min='0'>
+                        </div>
+                        <div class="col-md-6">
+                            <p style="font-size: large; color: black;">
+                                <b>NOTE: </b>This is the Quantity to be Added to or Removed from the Stock.  
+                                {% if tal.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and tal.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or tal.retailAndWholesaleRef.measureRef.stockedUnit == tal.retailAndWholesaleRef.measureRef.soldUnit %}
+                                    <br/><b>Please ensure the quantity/number to adjust is in <i style="color:brown">{{product.retailAndWholesaleRef.measureRef.soldUnit}}</i></b>                               
+                                {% else %}
+                                    <br/><b>Please ensure the quantity/number to adjust is in <i style="color:brown">{{product.retailAndWholesaleRef.measureRef.stockedUnit}}</i></b>                               
+                                {% endif %}                        
+                           </p>                            
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Narration <b style="color: red">*</b></label>
+                            <textarea name="narration" placeholder="Reason for this Adjustment" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <p style="font-size: large; color: black;">
+                                <b>NOTE: </b>Give the reason for this adjustment.                            
+                           </p>                            
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Adjust Now</button>
+                            </div>
+                        </div>
+                    </div>
+            </form> 
+            <br/>
+            <hr/>
+            <h4><span class="fa fa-list"></span> Adjustment Cards</h4>
+            <div class="table-responsive px-0 mx-0">
+                <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example2">
+                    <thead>
+                        <tr>
+                            <th>Adjustments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tal in adjustments %}
+                            <tr>
+                                <td>
+                                    <div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1" style="color: black;"><b>{{ tal.adjustmentType }} — {{ tal.transactionType }}</b></h6>
+                                            <p class="mb-1"><strong>Date:</strong> {{ tal.date }}</p>
+                                            <p class="mb-1"><strong>Narration:</strong> {{ tal.narration }}</p>
+                                            <p class="mb-1"><strong>Adjustment Type:</strong> {{ tal.adjustmentType }}</p>
+                                            <p class="mb-1"><strong>In/Out:</strong> {{ tal.transactionType }}</p>
+
+                                            {% if tal.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and tal.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or tal.retailAndWholesaleRef.measureRef.stockedUnit == tal.retailAndWholesaleRef.measureRef.soldUnit %}
+                                                <p class="mb-1"><strong>Old Stock:</strong> {{ tal.oldStock }} <sup>{{ tal.retailAndWholesaleRef.measureRef.stockedUnit }}</sup></p>
+                                                <p class="mb-1"><strong>Adjusted Quantity:</strong> {{ tal.quantity }} <sup style="color:brown">{{ tal.retailAndWholesaleRef.measureRef.soldUnit }}</sup></p>
+                                                <p class="mb-1"><strong>New Stock:</strong> {{ tal.newStock }} <sup>{{ tal.retailAndWholesaleRef.measureRef.stockedUnit }}</sup></p>
+                                            {% else %}
+                                                <p class="mb-1"><strong>Old Stock:</strong> {{ tal.oldStock }} <sup style="color:brown">{{ tal.retailAndWholesaleRef.measureRef.stockedUnit }}</sup> 
+                                                    <br/> {{ tal.oldStockUnit }} <sup style="color:brown">{{ tal.retailAndWholesaleRef.measureRef.soldUnit }}</sup></p>
+                                                <p class="mb-1"><strong>Adjusted Quantity:</strong> {{ tal.quantity }} <sup style="color:brown">{{ tal.retailAndWholesaleRef.measureRef.soldUnit }}</sup></p>
+                                                <p class="mb-1"><strong>New Stock:</strong> {{ tal.newStock }} <sup style="color:brown">{{ tal.retailAndWholesaleRef.measureRef.stockedUnit }}</sup> 
+                                                    <br/> {{ tal.newStockUnit }} <sup style="color:brown">{{ tal.retailAndWholesaleRef.measureRef.soldUnit }}</sup></p>
+                                            {% endif %}
+
+                                            <p class="mb-1"><strong>Adjusted By:</strong> {{ tal.transactionBy.userRef.firstName }} {{ tal.transactionBy.userRef.surname }} 
+                                                <br/> <small>{{ tal.transactionBy.userID }}</small></p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+           
+        </div>
+    </div>
+
+    <!--Set online Visibility =================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="visibility">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-globe"></span> Online Visibility</h2>
+            <form class="user" method="post" action="{% url 'salesOnloneVisibility' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <select name="visibility" class="form-control" required>                                
+                            <option {% if product.retailAndWholesaleRef.isVisibleOnline %} selected {% endif %}>Online</option>
+                            <option {% if not product.retailAndWholesaleRef.isVisibleOnline %} selected {% endif %}>Offline</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                    <p style="font-size: large; color: black;">
+                        <b>NOTE: </b>Everybody online will see this product. Your customers can view the details of this product.                             
+                    </p>
+                    </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Set Visibility now</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+
+    <!--individual discount =================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="discount">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-percent"></span> Put discount on this product</h2>
+            <form class="user" method="post" action="{% url 'salesIndividualDiscount' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Enter dicount <b style="color: red">*</b> <b>{{discount.discountSwaper}} <i class="fa fa-percent"></i></b></label>
+                        <input type="number" class="form-control" name="discount" value="{{discount.discountSwaper}}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <p style="font-size: large; color: black;">
+                            <b>NOTE: </b> Any number entered will be divided by 100.                            
+                        </p>
+                    </div>
+                </div>
+
+                <hr/>
+                <h4>Dicount Period</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Start From <b style="color: red">*</b> <b>{{discount.startFrom}}</b></label>
+                        <input type="datetime-local" class="form-control" name="fromDate" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label>End At <b style="color: red">*</b> <b>{{discount.endAt}}</b></label>
+                        <input type="datetime-local" class="form-control" name="endAt" required>
+                    </div>
+                </div>
+                <hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Set Discount</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+
+    <!--Set online oder and minimum order =================================================================================================================-->
+    <div class="tab-pane" role="tabpanel" id="onlineOder">
+        <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+            <h2><span class="fa fa-cart-plus"></span> Online Order & Minimum Order</h2>
+            <form class="user" method="post" action="{% url 'salesMinimumAndOnlineOrder' product.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Enable or disable online order <b></b></label>
+                        <select name="onlineOder" class="form-control" required>                                
+                            <option value="enable" {% if product.retailAndWholesaleRef.enableOnlineOrder %} selected {% endif %}>Enabled</option>
+                            <option value="disable" {% if not product.retailAndWholesaleRef.enableOnlineOrder %} selected {% endif %}>Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Minimum Order in <b></b></label>
+                        <input type="number" class="form-control" value="{{product.retailAndWholesaleRef.minimumOrder}}" name="minOrder" required>
+                    </div>
+                    </div><hr/>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 button">
+                                <button class="btn btn-primary d-block w-100" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </div>
+            </form>                   
+        </div>
+    </div>
+</div>
+
+<script>
+    var loadImage = function (event){
+        var image = document.getElementById('electImageOutput');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    }
+</script>
+{% endblock warehouseMobile %}
+
+
+

@@ -1,0 +1,79 @@
+{% extends 'warehouse/warehouse.html' %}
+
+{% if not request.user_agent.is_mobile %}
+    {% block warehouse %}  
+    <a href="{% url 'salesRefund' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+    <div class="tab-content">
+        <!--Return Period =============================================================================================================================-->
+        <div class="tab-pane active" role="tabpanel" id="returnPeriod">
+            <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+                <h2><span class="fa fa-money"></span> Refund</h2>
+                <h3>Transaction ID: <b>{{ refund.salesRef.transactionID}}</b></h3>
+                <h4>Amount: <b>{{refund.amountToPay|floatformat:2}}</b></h4>
+                <h5>Customer: <b>{{refund.salesRef.customerName}} ({{refund.salesRef.customerTel}})</b></h5>
+
+                <form class="user" method="post" action="{% url 'salesSaveRefund' refund.id %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="text-danger">You are about to refund the above amount</h3>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="quantity">Enter Your Password to confirm<b style="color: red">*</b></label>
+                            <input class="form-control" type="password" name="confirm" required>
+                        </div>
+                        </div><hr/>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6 button">
+                                    <button class="btn btn-primary" type="submit">Refund Now</button>
+                                </div>
+                            </div>
+                        </div>
+                </form>                   
+            </div>
+        </div>
+    </div>
+    {% endblock warehouse %}
+
+    <!--Mobile===============================================================================================================================-->
+    {% block warehouseMobile %}
+        <a href="{% url 'salesRefund' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+        <div class="tab-content">
+            <!--Return Period =============================================================================================================================-->
+            <div class="tab-pane active" role="tabpanel" id="returnPeriod">
+                <div class="container-fluid bg-gradient-light py-5 shadow" style="color: black;">
+                    <h2><span class="fa fa-money"></span> Refund</h2>
+                    <h3>Transaction ID: <b>{{ refund.salesRef.transactionID}}</b></h3>
+                    <h4>Amount: <b>{{refund.amountToPay|floatformat:2}}</b></h4>
+                    <h5>Customer: <b>{{refund.salesRef.customerName}} ({{refund.salesRef.customerTel}})</b></h5>
+
+                    <form class="user" method="post" action="{% url 'salesSaveRefund' refund.id %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="text-danger">You are about to refund the above amount</h3>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="quantity">Enter Your Password to confirm<b style="color: red">*</b></label>
+                                <input class="form-control" type="password" name="confirm" required>
+                            </div>
+                            </div><hr/>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Refund Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                    </form>                   
+                </div>
+            </div>
+        </div>    
+    {% endblock warehouseMobile %}
+{% endif %}
+
+
+
+
+

@@ -1,40 +1,83 @@
 {% extends 'warehouse/warehouse.html' %}
 {% load static %}
 
-{% block warehouse %}
-    <a href="{% url 'salesMakePayment' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
-    <div>
-        <div class="tab-content">
-            <div class="tab-pane active" role="tabpanel" id="customers">
-                <a href="{% url 'deleteCurrentAgreementCode' %}" class="fa fa-arrow-remove btn btn-outline-danger" style="color:black; float: right">Delete Old code and generate new one</a> 
-                <div class="container-fluid bg-gradient-light py-5 shadow">
-                    <h2><span class="fa fa-money"></span> Confirm Agreement Code</h2>                    
-                    <form method="post" action="{% url 'salesExecuteSavePayment' opt %}">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="agreeCode">Confirm <b>Collection Code</b> (CC)<b style="color: red">*</b></label>
-                                <input class="form-control" type="text" id="agreeCode" name="agreeCode" required>
-                            </div>
-                            <div class="col-md-6">
-                                <p style="font-size: large; color: black;"><b>NOTE: </b> This is the agreement code.
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mb-3">
+
+{% if not request.user_agent.is_mobile %}
+    {% block warehouse %}
+        <a href="{% url 'salesMakePayment' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
+        <div>
+            <div class="tab-content">
+                <div class="tab-pane active" role="tabpanel" id="customers">
+                    <a href="{% url 'deleteCurrentAgreementCode' %}" class="fa fa-arrow-remove btn btn-outline-danger" style="color:black; float: right">Delete Old code and generate new one</a> 
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h2><span class="fa fa-money"></span> Confirm Agreement Code</h2>                    
+                        <form method="post" action="{% url 'salesExecuteSavePayment' opt %}">
+                            {% csrf_token %}
                             <div class="row">
-                                <div class="col-md-6 button">
-                                    <button class="btn btn-primary" type="submit">Confirm Now</button>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="agreeCode">Confirm <b>Collection Code</b> (CC)<b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="agreeCode" name="agreeCode" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p style="font-size: large; color: black;"><b>NOTE: </b> This is the agreement code.
+                                    </p>
                                 </div>
                             </div>
-                        </div>
-                        <hr/>
-                    </form>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Confirm Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-{% endblock warehouse %}
+    {% endblock warehouse %}
+
+    {% else %}
+        {% block warehouseMobile %}
+        <a href="{% url 'salesMakePayment' %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a> 
+        <hr/>
+        <div>
+            <div class="tab-content">
+                <div class="tab-pane active" role="tabpanel" id="customers">
+                    <a href="{% url 'deleteCurrentAgreementCode' %}" class="fa fa-arrow-remove btn btn-outline-danger" style="color:black; float: right">Delete Old code and generate new one</a> 
+                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                        <h4><span class="fa fa-money"></span> Confirm Agreement Code</h4>                    
+                        <form method="post" action="{% url 'salesExecuteSavePayment' opt %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="agreeCode">Confirm <b>Collection Code</b> (CC)<b style="color: red">*</b></label>
+                                    <input class="form-control" type="text" id="agreeCode" name="agreeCode" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p style="font-size: large; color: black;"><b>NOTE: </b> This is the agreement code.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 button">
+                                        <button class="btn btn-primary" type="submit">Confirm Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock warehouseMobile %}
+    
+{% endif %}
+    
+
 
 
 

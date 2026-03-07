@@ -1,130 +1,348 @@
 {% extends 'warehouse/warehouse.html' %}
 
-{% block warehouse %}
-    <div>
-        <!--<ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" role="presentation"><a class="nav-link active fa fa-book" role="tab" data-bs-toggle="tab" href="#accounts"> Denominations</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-book" role="tab" data-bs-toggle="tab" href="#"> Add Denomination</a></li>
-            <li class="nav-item" role="presentation"><a class="nav-link fa fa-money" role="tab" data-bs-toggle="tab" href="#"> Shortages & Overs</a></li>
-        </ul>
-        <br/>-->
-        <div class="tab-content">
-            <!--Products==============================================================================================================================-->
-            <div class="tab-pane active" role="tabpanel" id="accounts">
-                <div class="container bg-gradient-light py-5 shadow">
-                    <a class="btn btn-primary" href="{% url 'transeferToSusoenseAccount' 'cashOnHand' %}">Transfer Fund</a>
-                    <div style="float: right;">
-                        <p>{{status}}</p>
-                    </div>
-                    <h2><span class="fa fa-money"></span> Cash Analysis</h2>
-                    <span>Physical cash: <i style="color: #c67605">GH&#8373</i> <b>{{cashAnalysis.totalCash|floatformat:2}}</b></span>
-                    |
-                    <span>System cash: <i style="color: #c67605">GH&#8373</i> <b>{{cashAnalysis.CashOnhandRef.cash|floatformat:2}}</b></span>
-                    {% if cashAnalysis.totalCash > cashAnalysis.CashOnhandRef.cash %}
-                       <span style="float: right">Overs: <i style="color: #c67605">GH&#8373</i> <b>{{cashStatus|floatformat:2}}</b></span>
-                    {% elif cashAnalysis.totalCash < cashAnalysis.CashOnhandRef.cash %}
-                       <span style="float: right; color: red">Shortages: <i style="color: #c67605">GH&#8373</i> <b>{{cashStatus|floatformat:2}}</b></span>
-                    {% else %}
-                       <span style="float: right; color: green">Balanced</span>
-                    {% endif %}
 
-                    
-                    <form method="post" action="{% url 'cashAnalysis' %}">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <button class="btn btn-primary" type="submit" style="float:right">Count Cash</button>      
+{% if not request.user_agent.is_mobile %}
+    {% block warehouse %}
+        <div>
+            <div class="tab-content">
+                <!--Products==============================================================================================================================-->
+                <div class="tab-pane active" role="tabpanel" id="accounts">
+                    <div class="container bg-gradient-light py-5 shadow">
+                        <a class="btn btn-primary" href="{% url 'transeferToSusoenseAccount' 'cashOnHand' %}">Transfer Fund</a>
+                        <div style="float: right;">
+                            <p>{{status}}</p>
                         </div>
-                    
-                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-exampleh">
-                            <thead>
-                                <tr>
-                                    <th>Denominations</th>
-                                    <th>Quantity</th>
-                                    <th>Total Amount</th> 
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="even gradeA">
-                                    <td>200 Cedis</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash200}}" min="0" name="cash200" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash200Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>100 Cedis</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash100}}" min="0" name="cash100" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash100Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>50 Cedis</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash50}}" min="0" name="cash50" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash50Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>20 Cedis</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash20}}" min="0" name="cash20" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash20Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>10 Cedis</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash10}}" min="0" name="cash10" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash10Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>5 Cedis</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash5}}" min="0" name="cash5" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash5Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>2 Cedis</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash2}}" min="0" name="cash2" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash2Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>1 Cedi</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.cash1}}" min="0" name="cash1" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash1Total}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>50 Pesewas</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.coins50pesewas}}" min="0" name="cash50P" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins50pesewasTotal}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>20 Pesewas</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.coins20pesewas}}" min="0" name="cash20P" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins20pesewasTotal}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td>10 Pesewas</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.coins10pesewas}}" min="0" name="cash10P" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins10pesewasTotal}}</td>
-                                </tr>  
-                                <tr class="even gradeA">
-                                    <td>5 Pesewas</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.coins5pesewas}}" min="0" name="cash5P" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins5pesewasTotal}}</td>
-                                </tr>  
-                                <tr class="even gradeA">
-                                    <td>1 Pesewas</td>
-                                    <td><input type="number" class="form-control" value="{{cashAnalysis.coins1pesewa}}" min="0" name="cash1P" required/></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins1pesewaTotal}}</td>
-                                </tr>
-                                <tr class="even gradeA">
-                                    <td></td>
-                                    <td></td>
-                                    <td><i style="color: #c67605">GH&#8373</i> <b>{{cashAnalysis.totalCash|floatformat:2}}</b></td>
-                                </tr>      
-                            </tbody>
-                        </table>
-                        <div class="mb-3">
-                            <button class="btn btn-primary" type="submit" style="float:right">Count Cash</button>      
-                        </div>
-                    </form>
+                        <h2><span class="fa fa-money"></span> Cash Analysis</h2>
+                        <span>Physical cash: <i style="color: #c67605">GH&#8373</i> <b>{{cashAnalysis.totalCash|floatformat:2}}</b></span>
+                        |
+                        <span>System cash: <i style="color: #c67605">GH&#8373</i> <b>{{cashAnalysis.CashOnhandRef.cash|floatformat:2}}</b></span>
+                        {% if cashAnalysis.totalCash > cashAnalysis.CashOnhandRef.cash %}
+                        <span style="float: right">Overs: <i style="color: #c67605">GH&#8373</i> <b>{{cashStatus|floatformat:2}}</b></span>
+                        {% elif cashAnalysis.totalCash < cashAnalysis.CashOnhandRef.cash %}
+                        <span style="float: right; color: red">Shortages: <i style="color: #c67605">GH&#8373</i> <b>{{cashStatus|floatformat:2}}</b></span>
+                        {% else %}
+                        <span style="float: right; color: green">Balanced</span>
+                        {% endif %}
+
+                        
+                        <form method="post" action="{% url 'cashAnalysis' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <button class="btn btn-primary" type="submit" style="float:right">Count Cash</button>      
+                            </div>
+                        
+                            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-exampleh">
+                                <thead>
+                                    <tr>
+                                        <th>Denominations</th>
+                                        <th>Quantity</th>
+                                        <th>Total Amount</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="even gradeA">
+                                        <td>200 Cedis</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash200}}" min="0" name="cash200" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash200Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>100 Cedis</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash100}}" min="0" name="cash100" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash100Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>50 Cedis</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash50}}" min="0" name="cash50" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash50Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>20 Cedis</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash20}}" min="0" name="cash20" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash20Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>10 Cedis</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash10}}" min="0" name="cash10" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash10Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>5 Cedis</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash5}}" min="0" name="cash5" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash5Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>2 Cedis</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash2}}" min="0" name="cash2" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash2Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>1 Cedi</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.cash1}}" min="0" name="cash1" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.cash1Total}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>50 Pesewas</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.coins50pesewas}}" min="0" name="cash50P" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins50pesewasTotal}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>20 Pesewas</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.coins20pesewas}}" min="0" name="cash20P" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins20pesewasTotal}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td>10 Pesewas</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.coins10pesewas}}" min="0" name="cash10P" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins10pesewasTotal}}</td>
+                                    </tr>  
+                                    <tr class="even gradeA">
+                                        <td>5 Pesewas</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.coins5pesewas}}" min="0" name="cash5P" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins5pesewasTotal}}</td>
+                                    </tr>  
+                                    <tr class="even gradeA">
+                                        <td>1 Pesewas</td>
+                                        <td><input type="number" class="form-control" value="{{cashAnalysis.coins1pesewa}}" min="0" name="cash1P" required/></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> {{cashAnalysis.coins1pesewaTotal}}</td>
+                                    </tr>
+                                    <tr class="even gradeA">
+                                        <td></td>
+                                        <td></td>
+                                        <td><i style="color: #c67605">GH&#8373</i> <b>{{cashAnalysis.totalCash|floatformat:2}}</b></td>
+                                    </tr>      
+                                </tbody>
+                            </table>
+                            <div class="mb-3">
+                                <button class="btn btn-primary" type="submit" style="float:right">Count Cash</button>      
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+    {% endblock warehouse %}
+
+    <!--Mobile===============================================================================================================================-->
+    {% else %}
+        {% block warehouseMobile %}
+<div>
+  <div class="tab-content">
+    <!-- Cash Analysis -->
+    <div class="tab-pane active" role="tabpanel" id="accounts">
+      <div class="container bg-gradient-light py-5 shadow">
+        <a class="btn btn-primary" href="{% url 'transeferToSusoenseAccount' 'cashOnHand' %}">Transfer Fund</a>
+        <div>
+          <p>{{ status }}</p>
+        </div>
+        <h2><span class="fa fa-money"></span> Cash Analysis</h2>
+        <span>Physical cash: <i style="color: #c67605">GH&#8373</i> <b>{{ cashAnalysis.totalCash|floatformat:2 }}</b></span>
+        |
+        <span>System cash: <i style="color: #c67605">GH&#8373</i> <b>{{ cashAnalysis.CashOnhandRef.cash|floatformat:2 }}</b></span>
+        {% if cashAnalysis.totalCash > cashAnalysis.CashOnhandRef.cash %}
+          <span>Overs: <i style="color: #c67605">GH&#8373</i> <b>{{ cashStatus|floatformat:2 }}</b></span>
+        {% elif cashAnalysis.totalCash < cashAnalysis.CashOnhandRef.cash %}
+          <span style="color: red">Shortages: <i style="color: #c67605">GH&#8373</i> <b>{{ cashStatus|floatformat:2 }}</b></span>
+        {% else %}
+          <span style="color: green">Balanced</span>
+        {% endif %}
+
+        <form method="post" action="{% url 'cashAnalysis' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Count Cash</button>      
+          </div>
+
+            <div class="table-responsive mx-0 px-0">
+            <table class="table table-bordered table-hover w-100 mb-0" 
+                    id="dataTables-exampleh" style="width:100%;">
+                <!-- Hide header on mobile -->
+                <thead class="d-none d-md-table-header-group">
+                <tr>
+                    <th>Cash Denominations</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 200 Cedis -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">200 Cedis</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash200 }}" min="0" name="cash200" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash200Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 100 Cedis -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">100 Cedis</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash100 }}" min="0" name="cash100" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash100Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 50 Cedis -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">50 Cedis</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash50 }}" min="0" name="cash50" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash50Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 20 Cedis -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">20 Cedis</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash20 }}" min="0" name="cash20" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash20Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 10 Cedis -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">10 Cedis</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash10 }}" min="0" name="cash10" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash10Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 5 Cedis -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">5 Cedis</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash5 }}" min="0" name="cash5" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash5Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 2 Cedis -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">2 Cedis</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash2 }}" min="0" name="cash2" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash2Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 1 Cedi -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">1 Cedi</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.cash1 }}" min="0" name="cash1" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.cash1Total }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 50 Pesewas -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">50 Pesewas</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.coins50pesewas }}" min="0" name="cash50P" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.coins50pesewasTotal }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 20 Pesewas -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">20 Pesewas</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.coins20pesewas }}" min="0" name="cash20P" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.coins20pesewasTotal }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 10 Pesewas -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">10 Pesewas</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.coins10pesewas }}" min="0" name="cash10P" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.coins10pesewasTotal }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 5 Pesewas -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">5 Pesewas</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.coins5pesewas }}" min="0" name="cash5P" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.coins5pesewasTotal }}</p>
+                    </div></div>
+                </td></tr>
+
+                <!-- 1 Pesewa -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">1 Pesewa</h6>
+                    <p><strong>Quantity:</strong> 
+                        <input type="number" class="form-control d-inline-block w-50"
+                            value="{{ cashAnalysis.coins1pesewa }}" min="0" name="cash1P" required/>
+                    </p>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373</i> {{ cashAnalysis.coins1pesewaTotal }}</p>
+                    </div></div>
+                </td>
+                </tr>
+                <!-- Total Cash -->
+                <tr><td>
+                    <div class="card mb-2 shadow-sm w-100"><div class="card-body p-2">
+                    <h6 class="card-title mb-1">Total Cash</h6>
+                    <p><strong>Total:</strong> <i style="color:#c67605">GH&#8373;</i> <b>{{ cashAnalysis.totalCash|floatformat:2 }}</b></p>
+                    </div></div>
+                </td></tr>
+                </tbody>
+            </table>
+          </div>    
+
+          <div class="mb-3">
+            <button class="btn btn-primary" type="submit" style="float:right">Count Cash</button>      
+          </div>
+        </form>
+      </div>
     </div>
-{% endblock warehouse %}
+  </div>
+</div>
+
+    {% endblock warehouseMobile %}
+    
+{% endif %}
+    
+
 
 
 

@@ -56,4 +56,5 @@ busAccess = {
     '13':['Operational Expenses', 'This will allow the user have access to expenses page', '6'],
     '14':['Awaiting Collection', 'This will allow the user have access to items awaiting collection page', '6'],
     '15':['Repayments', 'This will allow the user have access to repayments page', '6'],
+    '16':['Refund', 'This will allow the user refund amount of the returned items', '6'],
     }

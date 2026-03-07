@@ -1,181 +1,181 @@
 {% extends 'warehouse/warehouse.html' %}
 {% load static %}
 
-{% block warehouse %}
-    <div>
-        <div class="tab-content">
-            <div class="tab-pane active" role="tabpanel" id="customers">
-					<div class="row">
-                        <div class="col-md-6 col-xl-3 mb-4">
-                            <div class="card shadow border-left-primary py-2">
-                                <div class="card-body">
-                                    <div class="row g-0 align-items-center">
-                                        <div class="col me-2">
-                                            <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Cash On Hand</span></div>
-                                            <div class="text-dark fw-bold h5 mb-0"><span><i style="color: #c67605">GH&#8373</i> <b>{{cashOnHand}}</b></span></div>
+    {% block warehouse %}
+        <div class="desktop-only">
+            <div class="tab-content">
+                <div class="tab-pane active" role="tabpanel" id="customers">
+                        <div class="row">
+                            <div class="col-md-6 col-xl-3 mb-4">
+                                <div class="card shadow border-left-primary py-2">
+                                    <div class="card-body">
+                                        <div class="row g-0 align-items-center">
+                                            <div class="col me-2">
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Cash On Hand</span></div>
+                                                <div class="text-dark fw-bold h5 mb-0"><span><i style="color: #c67605">GH&#8373</i> <b>{{cashOnHand|floatformat:2}}</b></span></div>
+                                            </div>
+                                            <div class="col">
+                                                <span>Total Trans: <b id="totalPromotion">{{totalTransaction}}</b></span>
+                                            </div>
+                                            <div class="col-auto"><i class="fas fa-money fa-2x text-gray-300"></i></div>
                                         </div>
-                                        <div class="col">
-                                            <span>Total Trans: <b id="totalPromotion">{{totalTransaction}}</b></span>
-                                        </div>
-                                        <div class="col-auto"><i class="fas fa-money fa-2x text-gray-300"></i></div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-3 mb-4">
-                            <div class="card shadow border-left-info py-2">
-                                <div class="card-body">
-                                    <div class="row g-0 align-items-center">
-                                        <div class="col me-2">
-                                            <div class="text-uppercase text-info fw-bold text-xs mb-1"><span>Amount To Pay</span></div>
-                                            <div class="row g-0 align-items-center">                                                
-                                                <div class="col-auto">
-                                                    <div class="text-dark fw-bold h5 mb-0 me-3"><span><i style="color: #c67605">GH&#8373</i> <b id="amtToPay">0.00</b></span></div>
-                                                </div>
-                                                <div class="col">
-                                                    <span>Total Amt: <i style="color: #c67605">GH&#8373</i><b id="totalAmount">0.00</b></span>
+                            <div class="col-md-6 col-xl-3 mb-4">
+                                <div class="card shadow border-left-info py-2">
+                                    <div class="card-body">
+                                        <div class="row g-0 align-items-center">
+                                            <div class="col me-2">
+                                                <div class="text-uppercase text-info fw-bold text-xs mb-1"><span>Amount To Pay</span></div>
+                                                <div class="row g-0 align-items-center">                                                
+                                                    <div class="col-auto">
+                                                        <div class="text-dark fw-bold h5 mb-0 me-3"><span><i style="color: #c67605">GH&#8373</i> <b id="amtToPay">0.00</b></span></div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span>Total Amt: <i style="color: #c67605">GH&#8373</i><b id="totalAmount">0.00</b></span>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="col-auto"><i class="fas fa-money fa-2x text-gray-300"></i></div>
                                         </div>
-                                        <div class="col-auto"><i class="fas fa-money fa-2x text-gray-300"></i></div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>                        
-                        <div class="col-md-6 col-xl-3 mb-4">
-                            <div class="card shadow border-left-warning py-2">
-                                <div class="card-body">
-                                    <div class="row g-0 align-items-center">
-                                        <div class="col me-2">
-                                            <div class="text-uppercase text-info fw-bold text-xs mb-1"><span>Current Transaction ID</span></div>
-                                            <div class="text-dark fw-bold h5 mb-0"><span><b>{{transactionID}}</b></span></div>
-                                        </div>
-                                        <div class="col-auto"><i class="fas fa-id-badge fa-2x text-gray-300"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-xl-3 mb-4">  
-                            <form action="{% url 'salesMakePayment' %}">
-                                {% csrf_token %}
-                                <div  class="box-content">
-                                <div style="width: auto; float: right">
-                                    <div class="form-group">   
-                                        <input type='hidden' name='transID' value="{{transactionID}}"/>                    
-                                        <button type="submit" class="form-control btn btn-primary text-lg-center fa fa-money" style="width: 150px; margin-left: 2%; margin-bottom: 10px; height: 50px; float: right"> Make Payment</button>                                                         
-                                    </div>
-                                </div>
-                                </div>
-                            </form>
-                        </div>                        
-                    </div>
-                <div>
-
-                <form method='post' action="{% url 'salesSaveTransactionID' %}" style="float: left">
-                    {% csrf_token %}
-                    <input type="hidden" id="salesTransactionID" name="transactionID" value="{{ transactionID }}"> 
-                    <button type="submit" class="btn btn-outline-dark fa fa-circle">Put On Hold</button>
-                </form> 
-                <a href="{% url 'transactionOnHold' %}" class="btn btn-outline-dark fa fa-circle">Select Transaction</a>
-
-                <a style="font-size: small; margin-left: 10px; color: bisque; font-size: 100%;" href="{% url 'salesPrintCollectedItems' 'current' 'currentTransaction' %}" class="btn btn-primary fa fa-print"></a>  
-                <a href="{% url 'salesCurrentItemToCart' transactionID %}" class="btn btn-primary fa fa-cart-arrow-down" style="margin-left: 2%" id="cartBut"> </a> 
-                <span style="float: right">Discount On all Products: <b>{{generalDiscount}}</b>%</span>
-            </div>
-
-            <div class="container-fluid bg-gradient-light py-5 shadow">            
-                <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example2">
-                    <thead>
-                        <tr> 
-                            <th>Product</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for dat in data %}
-                        <tr>
-                            <td class="center" style="padding: 2%; font-size: 20px; background-color: whitesmoke;">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        {% if not dat.productImageRef.image %}
-                                            <img src="{% static 'img/rn360.jpeg' %}" class="rounded card-img-top img-fluid" style="width: 100%; height: 250px; padding: 0%" alt="...">
-                                        {% else %}
-                                            <img src="{{dat.productImageRef.image.url}}" class="rounded card-img-top img-fluid" style="width: 100%; height: 250px; padding: 0%" alt="...">
-                                        
-                                        {% endif %}
-                                        
-                                        <sup style="color: brown; font-size: small">{{ dat.productCode }}</sup><br/><b style="font-size: large;">{{ dat.productName }}</b> <br/><i style="font-size: small">{{dat.productCategory}}</i> 
-                                        {% if dat.totalDiscaount > 0 %}
-                                            <div style="color: black; font-size: small; float: right; border: ridge"> 
-                                                <i style="color: #c67605">GH&#8373</i><b><s>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</s></b> 
-                                                <br/>  
-                                                <i style="color: #c67605">GH&#8373</i><b>{{dat.priceAfterDiscount|floatformat:2}}</b> <br/>                                         
-                                                Discount: <b>{{dat.totalDiscaount|floatformat:2}}</b> %                                            
+                            </div>                        
+                            <div class="col-md-6 col-xl-3 mb-4">
+                                <div class="card shadow border-left-warning py-2">
+                                    <div class="card-body">
+                                        <div class="row g-0 align-items-center">
+                                            <div class="col me-2">
+                                                <div class="text-uppercase text-info fw-bold text-xs mb-1"><span>Current Transaction ID</span></div>
+                                                <div class="text-dark fw-bold h5 mb-0"><span><b>{{transactionID}}</b></span></div>
                                             </div>
-                                        {% else %}
-                                            <div style="color: black; font-size: small; float: right; border: ridge"> 
-                                                <i style="color: #c67605">GH&#8373</i><b>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</b>                                        
-                                            </div>                                        
-                                        {% endif %}
-
-
+                                            <div class="col-auto"><i class="fas fa-id-badge fa-2x text-gray-300"></i></div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4" style="border-left: solid; border-right: solid; padding-left: 2%; padding-right: 2%" >
-                                        <b>Qty/number Available & Price</b>
-                                        <p style="font-size: large; width: 50%">
-                                            <i style="font-size: 15px">Quatity Available: <b>{{ dat.retailAndWholesaleRef.quantityRef.uintQty }}</b> {{dat.retailAndWholesaleRef.measureRef.soldUnit}}</i> <br/> 
-                                            {% if dat.retailAndWholesaleRef.measureRef.stockedUnit != dat.retailAndWholesaleRef.measureRef.soldUnit %}
-                                              <b>{{dat.retailAndWholesaleRef.quantityRef.qtyPerPack}}</b>  <b>{{ dat.retailAndWholesaleRef.measureRef.soldUnit }}</b> per <b>{{ dat.retailAndWholesaleRef.measureRef.stockedUnit }}</b>                                      
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-3 mb-4">  
+                                <form action="{% url 'salesMakePayment' %}">
+                                    {% csrf_token %}
+                                    <div  class="box-content">
+                                    <div style="width: auto; float: right">
+                                        <div class="form-group">   
+                                            <input type='hidden' name='transID' value="{{transactionID}}"/>                    
+                                            <button type="submit" class="form-control btn btn-primary text-lg-center fa fa-money" style="width: 150px; margin-left: 2%; margin-bottom: 10px; height: 50px; float: right"> Make Payment</button>                                                         
+                                        </div>
+                                    </div>
+                                    </div>
+                                </form>
+                            </div>                        
+                        </div>
+                    <div>
+
+                    <form method='post' action="{% url 'salesSaveTransactionID' %}" style="float: left">
+                        {% csrf_token %}
+                        <input type="hidden" id="salesTransactionID" name="transactionID" value="{{ transactionID }}"> 
+                        <button type="submit" class="btn btn-outline-dark fa fa-circle">Put On Hold</button>
+                    </form> 
+                    <a href="{% url 'transactionOnHold' %}" class="btn btn-outline-dark fa fa-circle">Select Transaction</a>
+
+                    <a style="font-size: small; margin-left: 10px; color: bisque; font-size: 100%;" href="{% url 'salesPrintCollectedItems' 'current' 'currentTransaction' %}" class="btn btn-primary fa fa-print"></a>  
+                    <a href="{% url 'salesCurrentItemToCart' transactionID %}" class="btn btn-primary fa fa-cart-arrow-down" style="margin-left: 2%" id="cartBut"> </a> 
+                    <span style="float: right">Discount On all Products: <b>{{generalDiscount}}</b>%</span>
+                </div>
+
+                <div class="container-fluid bg-gradient-light py-5 shadow">            
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example2">
+                        <thead>
+                            <tr> 
+                                <th>Product</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dat in data %}
+                            <tr>
+                                <td class="center" style="padding: 2%; font-size: 20px; background-color: whitesmoke;">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            {% if not dat.productImageRef.image %}
+                                                <img src="{% static 'img/rn360.jpeg' %}" class="rounded card-img-top img-fluid" style="width: 100%; height: 250px; padding: 0%" alt="...">
+                                            {% else %}
+                                                <img src="{{dat.productImageRef.image.url}}" class="rounded card-img-top img-fluid" style="width: 100%; height: 250px; padding: 0%" alt="...">
+                                            
+                                            {% endif %}
+                                            
+                                            <sup style="color: brown; font-size: small">{{ dat.productCode }}</sup><br/><b style="font-size: large;">{{ dat.productName }}</b> <br/><i style="font-size: small">{{dat.productCategory}}</i> 
+                                            {% if dat.totalDiscaount > 0 %}
+                                                <div style="color: black; font-size: small; float: right; border: ridge"> 
+                                                    <i style="color: #c67605">GH&#8373</i><b><s>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</s></b> 
+                                                    <br/>  
+                                                    <i style="color: #c67605">GH&#8373</i><b>{{dat.priceAfterDiscount|floatformat:2}}</b> <br/>                                         
+                                                    Discount: <b>{{dat.totalDiscaount|floatformat:2}}</b> %                                            
+                                                </div>
+                                            {% else %}
+                                                <div style="color: black; font-size: small; float: right; border: ridge"> 
+                                                    <i style="color: #c67605">GH&#8373</i><b>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</b>                                        
+                                                </div>                                        
+                                            {% endif %}
+
+
+                                        </div>
+                                        <div class="col-md-4" style="border-left: solid; border-right: solid; padding-left: 2%; padding-right: 2%" >
+                                            <b>Qty/number Available & Price</b>
+                                            <p style="font-size: large; width: 50%">
+                                                <i style="font-size: 15px">Quatity Available: <b>{{ dat.retailAndWholesaleRef.quantityRef.uintQty }}</b> {{dat.retailAndWholesaleRef.measureRef.soldUnit}}</i> <br/> 
+                                                {% if dat.retailAndWholesaleRef.measureRef.stockedUnit != dat.retailAndWholesaleRef.measureRef.soldUnit %}
+                                                <b>{{dat.retailAndWholesaleRef.quantityRef.qtyPerPack}}</b>  <b>{{ dat.retailAndWholesaleRef.measureRef.soldUnit }}</b> per <b>{{ dat.retailAndWholesaleRef.measureRef.stockedUnit }}</b>                                      
+                                                {% endif %}
+                                                <hr/>
+                                                Price per <b>{{dat.retailAndWholesaleRef.measureRef.soldUnit}}</b>: <i style="color: #c67605">GH&#8373</i><b>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</b>
+                                            </p>
+                                            {% if dat.retailAndWholesaleRef.discountRef.isActive %}
+                                                <p style="color: brown; font-size: small"> 
+                                                    <b>{{dat.retailAndWholesaleRef.discountRef.startFrom}}</b> To <b>{{dat.retailAndWholesaleRef.discountRef.endAt}}</b> <br/>
+                                                    Discount of <b>{{dat.retailAndWholesaleRef.discountRef.discount}}</b> %                                            
+                                                </p>
                                             {% endif %}
                                             <hr/>
-                                            Price per <b>{{dat.retailAndWholesaleRef.measureRef.soldUnit}}</b>: <i style="color: #c67605">GH&#8373</i><b>{{ dat.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</b>
-                                        </p>
-                                        {% if dat.retailAndWholesaleRef.discountRef.isActive %}
-                                            <p style="color: brown; font-size: small"> 
-                                                <b>{{dat.retailAndWholesaleRef.discountRef.startFrom}}</b> To <b>{{dat.retailAndWholesaleRef.discountRef.endAt}}</b> <br/>
-                                                Discount of <b>{{dat.retailAndWholesaleRef.discountRef.discount}}</b> %                                            
+                                            <b>Product Description</b>
+                                            <p style="font-size: 15px"><i>{{dat.productDescription}}</i></p>
+                                        </div>
+                                        <div class="col-md-4">                                       
+                                            
+                                            <p style="font-size: small; width: 50%" id="cartPage{{dat.productCode}}" hidden>
+                                                <b><u>Added</u></b><br/>
+                                                Qty: <b id="addQty{{dat.productCode}}"></b>  |  Price: <i style="color: #c67605">GH&#8373</i><b id="price{{dat.productCode}}"></b> <br/>
+                                                Total Price: <i style="color: #c67605">GH&#8373</i><b id="priceTotal{{dat.productCode}}"></b>
                                             </p>
-                                        {% endif %}
-                                        <hr/>
-                                        <b>Product Description</b>
-                                        <p style="font-size: 15px"><i>{{dat.productDescription}}</i></p>
-                                    </div>
-                                    <div class="col-md-4">                                       
-                                        
-                                        <p style="font-size: small; width: 50%" id="cartPage{{dat.productCode}}" hidden>
-                                            <b><u>Added</u></b><br/>
-                                            Qty: <b id="addQty{{dat.productCode}}"></b>  |  Price: <i style="color: #c67605">GH&#8373</i><b id="price{{dat.productCode}}"></b> <br/>
-                                            Total Price: <i style="color: #c67605">GH&#8373</i><b id="priceTotal{{dat.productCode}}"></b>
-                                        </p>
 
-                                        <div>
-                                            <b>Add to cart <span class="fa fa-cart-plus"></span></b><br/>
-                                            {% csrf_token %}
-                                            <input type="hidden" name='productCode' value="{{ dat.productCode }}">
-                                            <!--<label style="float: right; font-size: 20px; border-style: ridge"><span class="fa fa-spin">0</span></label>-->
-                                            <br/>
-                                            <div style="width: 100%;">                                                
-                                                <input type="number" step="any" name="qtyToCart" min="0" value="0" class="form-control" style="width: 90%; height: 50px; font-size: larger; float: left" id="qty{{ dat.productCode }}" required>
+                                            <div>
+                                                <b>Add to cart <span class="fa fa-cart-plus"></span></b><br/>
+                                                {% csrf_token %}
+                                                <input type="hidden" name='productCode' value="{{ dat.productCode }}">
+                                                <!--<label style="float: right; font-size: 20px; border-style: ridge"><span class="fa fa-spin">0</span></label>-->
                                                 <br/>
-                                                <button class="btn btn-outline-primary fa fa-cart-plus" style="width: 45%; height: 50px; font-size: larger; float: left;" id="{{ dat.productCode }}cartBut" onclick="addToCart('add', {{dat.productCode}})"></button>
-                                                <button class="btn btn-outline-danger fa fa-remove" style="width: 45%; height: 50px; font-size: larger; float: left;" onclick="addToCart('remove', {{dat.productCode}})"></button>
+                                                <div style="width: 100%;">                                                
+                                                    <input type="number" step="any" name="qtyToCart" min="0" value="0" class="form-control" style="width: 90%; height: 50px; font-size: larger; float: left" id="qty{{ dat.productCode }}" required>
+                                                    <br/>
+                                                    <button class="btn btn-outline-primary fa fa-cart-plus" style="width: 45%; height: 50px; font-size: larger; float: left;" id="{{ dat.productCode }}cartBut" onclick="addToCart('add', {{dat.productCode}})"></button>
+                                                    <button class="btn btn-outline-danger fa fa-remove" style="width: 45%; height: 50px; font-size: larger; float: left;" onclick="addToCart('remove', {{dat.productCode}})"></button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <br/>
-                            </td>
-                        </tr>
-                       {% endfor %}
-                    </tbody>
-                </table>
+                                    <br/>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <script src="{% static 'js/sell.js' %}"></script>
+        </div>    
+        <script src="{% static 'js/sell.js' %}"></script>
 {% endblock warehouse %}
 
-
+   
 
 
 

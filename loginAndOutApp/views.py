@@ -8,6 +8,7 @@ from businessApp.models import BusinessBranch, Business
 from django.db.models import Sum, Q
 from django.contrib import messages
 from usersApp.views import setStatus, UserAccess
+from imageApp.models import Images
 
 
 # Create your views here.
@@ -24,21 +25,37 @@ class LogIn(generic.View):
         if user.exists():
             if user[0].status != 'Disabled':
                 if check_password(password=passW, encoded=user[0].password) or (user[0].password == passW and not user[0].passwordIsSet):
-                    request.session['busName'] = str(user[0].busRef.busRef.busName)
-                    request.session['busID'] = str(user[0].busRef.busRef.busID)
-                    request.session['userID'] = str(user[0].userID)
-                    request.session['userNames'] = str(user[0].userRef.firstName) + ' ' + str(user[0].userRef.surname)
-                    request.session['branchID'] = str(user[0].busRef.branchID)
-                    request.session['branchType'] = str(user[0].busRef.branchType)
-                    request.session['branchName'] = str(user[0].busRef.branchName)
-                    #check user access and set session variables
-                    dashboardMenuAccess(request)
-                    setStatus(request, str(user[0].userID), 'Online')
-                    if not user[0].passwordIsSet:
+                    # check if business status is active
+                    if user[0].busRef.busRef.status == 'Active':
+                        request.session['busName'] = str(user[0].busRef.busRef.busName)
+                        request.session['busID'] = str(user[0].busRef.busRef.busID)
                         request.session['userID'] = str(user[0].userID)
-                        return redirect(to='createPassword') 
+                        request.session['userNames'] = str(user[0].userRef.firstName) + ' ' + str(user[0].userRef.surname)
+                        request.session['branchID'] = str(user[0].busRef.branchID)
+                        request.session['branchType'] = str(user[0].busRef.branchType)
+                        request.session['branchName'] = str(user[0].busRef.branchName)
+                        image = Images.objects.filter(Q(userRef=user[0]))
+                        if image.exists():
+                            image = image[0]
+                            request.session['profileImage'] = image.image.url
+                        #check user access and set session variables
+                        dashboardMenuAccess(request)
+                        setStatus(request, str(user[0].userID), 'Online')
+                        if not user[0].passwordIsSet:
+                            request.session['userID'] = str(user[0].userID)
+                            return redirect(to='createPassword')
+                        return redirect(to='dashboard')
+                    elif user[0].busRef.busRef.status == 'Inactive':
+                        messages.set_level(request, messages.WARNING)
+                        messages.warning(request, {'message': 'This business account is inactive. please contact system administrator for help.', 'title': 'Business Account is blocked!'},
+                                extra_tags='businessAccountIsClodeOrInactive')
+                        return render(request, 'loginApp/state.html')
+                    else:
+                        messages.set_level(request, messages.WARNING)
+                        messages.warning(request, {'message': 'This business account is closed by RN360B. Please contact system administarator for help.', 'title': 'Business is closed!'},
+                                extra_tags='businessAccountIsClodeOrInactive')
+                        return render(request, 'loginApp/state.html')
 
-                    return redirect(to='dashboard')
                 else:
                     messages.set_level(request, messages.ERROR)
                     messages.error(request, {'message': 'Wrong User ID or Password.', 'title': 'Wrong User Credentials'},
@@ -54,6 +71,9 @@ class LogIn(generic.View):
               messages.error(request, {'message': 'Wrong User ID or Password.', 'title': 'Wrong User Credentials'},
                                extra_tags='loginCredentialsNotFound')
               return render(request, 'loginApp/state.html')
+        
+    def loginOptions(request):
+        return render(request, 'loginApp/loginOptions.html')
         
 
 class RichNetLogin(generic.View):
@@ -75,6 +95,34 @@ class RichNetLogin(generic.View):
             messages.set_level(request, messages.ERROR)
             messages.error(request, {'message': 'Wrong User ID or Password.', 'title': 'Wrong User Credentials'}, extra_tags='richnetLoginCredentialsNotFound')
             return render(request, 'loginApp/state.html')
+
+
+# customer login
+class CustomerLogins(generic.View):
+    def get(self, request):
+        return render(request, 'loginApp/customerLogin.html')
+    
+    def post(self, request):
+        return HttpResponse('')
+    
+
+# create customer account
+class CreateCustomerAccount(generic.View):
+    def get(self, request):
+        return render(request, 'loginApp/createCustomerAcc.html')
+    
+    def post(self, request):
+        
+        return HttpResponse()
+    
+
+# generate new pin: use when the customer forget his pin
+class GenerateNewPin(generic.View):
+    def get(self, request):
+        return render(request, 'loginApp/generateNewPin.html')
+    
+    def post(self, request):
+        return HttpResponse()
 
 
 class CreatePassword(generic.View):
@@ -165,6 +213,7 @@ def dashboardMenuAccess(request):
     request.session['operationalExpenses'] = False
     request.session['awaitingCollection'] = False
     request.session['repayments'] = False
+    request.session['refund'] = False
     userAccess = UserAccess.objects.filter(Q(userRef=user))
 
     if user.userIsAdmin:
@@ -183,6 +232,7 @@ def dashboardMenuAccess(request):
         request.session['operationalExpenses'] = True
         request.session['awaitingCollection'] = True
         request.session['repayments'] = True
+        request.session['refund'] = True
     else:
         for uA in userAccess:
             if uA.accessRef.accessCode == '1':
@@ -215,6 +265,9 @@ def dashboardMenuAccess(request):
                 request.session['awaitingCollection'] = True
             if uA.accessRef.accessCode == '15':
                 request.session['repayments'] = True
+            if uA.accessRef.accessCode == '16':
+                request.session['refund'] = True
         
+
 
 

@@ -1,7 +1,18 @@
 {% extends "dashboardApp/index.html" %}
 
-{% block index %}
-    {% block warehouse %} 
 
-    {% endblock warehouse %}
-{% endblock index %}
+{% if not request.user_agent.is_mobile %}
+    {% block index %}
+        {% block warehouse %} 
+
+        {% endblock warehouse %}
+    {% endblock index %}
+
+{% else %}
+     {% block mobile %}
+        {% block warehouseMobile %} 
+
+        {% endblock warehouseMobile %}        
+    {% endblock mobile %}
+
+{% endif %}
