@@ -3,158 +3,190 @@
 
 {% block rbmsM %}
 <header class="bg-dark shadow">
-    <div class="carousel slide shadow" data-bs-ride="carousel" id="carousel-1">
-        <div class="carousel-inner">
-            <div class="carousel-item active"><img class="w-100 d-block img-thumbnail" src="{% static 'imgM/team/safe.png' %}" alt="Slide Image"></div>
-            <div class="carousel-item"><img class="w-100 d-block img-thumbnail" src="{% static 'imgM/team/safe.png' %}" alt="Slide Image"></div>
-            <div class="carousel-item"><img class="w-100 d-block img-thumbnail" src="{% static 'imgM/team/safe.png' %}" alt="Slide Image"></div>
-        </div>
-        <div><a class="carousel-control-prev" href="#carousel-1" role="button" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span><span class="visually-hidden">Previous</span></a><a class="carousel-control-next" href="#carousel-1" role="button" data-bs-slide="next"><span class="carousel-control-next-icon"></span><span class="visually-hidden">Next</span></a></div>
-        <div class="carousel-indicators"><button type="button" data-bs-target="#carousel-1" data-bs-slide-to="0" class="active"></button> <button type="button" data-bs-target="#carousel-1" data-bs-slide-to="1"></button> <button type="button" data-bs-target="#carousel-1" data-bs-slide-to="2"></button></div>
+  <div id="carouselEcommerce" class="carousel slide" data-bs-ride="carousel">
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselEcommerce" data-bs-slide-to="0" class="active"></button>
+      <button type="button" data-bs-target="#carouselEcommerce" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#carouselEcommerce" data-bs-slide-to="2"></button>
     </div>
+    
+    <!-- Carousel inner -->
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="{% static 'imgM/team/safe.png' %}" class="d-block w-100 img-fluid" alt="Featured Product"
+             style="max-height:400px; object-fit:cover;">
+        <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
+          <h5 class="fw-bold">New Arrivals</h5>
+          <p>Discover the latest products in our store.</p>
+          <a href="#" class="btn btn-primary btn-sm">Shop Now</a>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <img src="{% static 'imgM/team/safe.png' %}" class="d-block w-100 img-fluid" alt="Discount Offer"
+             style="max-height:400px; object-fit:cover;">
+        <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
+          <h5 class="fw-bold">Exclusive Discounts</h5>
+          <p>Save big on selected items today.</p>
+          <a href="#" class="btn btn-success btn-sm">View Deals</a>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <img src="{% static 'imgM/team/safe.png' %}" class="d-block w-100 img-fluid" alt="Best Sellers"
+             style="max-height:400px; object-fit:cover;">
+        <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
+          <h5 class="fw-bold">Best Sellers</h5>
+          <p>Shop the most popular items loved by customers.</p>
+          <a href="#" class="btn btn-warning btn-sm">Browse</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselEcommerce" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselEcommerce" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
 </header>
 
+
 <section id="portfolio" class="portfolio">
-    <div class="container-fluid shadow" style="height: 1000px; overflow-y: hidden; overflow-y: scroll;">
-      
+    <div class="container-fluid shadow" style="height: 1000px; overflow-y: hidden; overflow-y: scroll;">      
         <!--all====================================================================================================================-->
         <div class="row" style="margin: 1%;" id='all'>            
             {% for product in combinedResult %}           
                 {% if product.obj == 1 %}
-                    <div class="col-md-6 col-lg-4 card shadow" style="margin-bottom: 2%;">
-                        <!-- image/modal trigger -->
-                        <a class="d-block mx-auto" href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" style="position:relative;">
-                            <div class="d-flex portfolio-item-caption position-absolute h-100 w-100">
-                                <div class="text-center text-white my-auto portfolio-item-caption-content w-100"></div>
-                            </div>
-                            <img class="img-thumbnail img-fluid shadow" src="{% static 'img/default.jpeg' %}">
-                        </a>
-                        <!-- card body moved outside the anchor so buttons are clickable -->
-                        <div class="card-body px-4 py-5 px-md-5" style="margin-top: -45px;">
-                        <h5 class="fw-bold card-title" style="width: 100%; height: 25px; overflow-x: hidden; overflow-y: hidden;">
-                            <!-- Verified check icon before the name -->                            
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow h-100 border-0">
+                            <!-- Product image -->
+                            <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="position-relative">
+                            <img class="card-img-top img-fluid rounded" src="{% static 'img/default.jpeg' %}" alt="{{product.busRef.busName}}">
                             {% if product.busRef.registrationNumber != null %}
-                                <i class="fa fa-check-circle" style="color:lightblue; margin-right:5px;" title="Verified"></i>                                
-                            {% endif %}                   
-                            
-                            <b class="badge badge-warning" style="font-size: 12px;">{{product.busRef.busName}}</b>
-                            <i style="margin-left: 2%; font-size: 12px;">{{product.branchName}}</i>
-                        </h5>
+                                <span class="badge bg-info position-absolute top-0 start-0 m-2">
+                                <i class="fa fa-check-circle"></i> Verified
+                                </span>
+                            {% endif %}
+                            </a>
 
-                            <!-- buttons on the right, description on the left -->
-                            <div class="d-flex align-items-start gap-3">
-                                <p class="text-muted card-text mb-0 clamped-text flex-grow-1" style="height: 50px; overflow: hidden; font-size: 12px;">
-                                    <sup>
-                                        {% if product.operateAllTime == True %}
-                                            Business Hours: <b>24/7</b>
-                                        {% else %}                                           
-                                            Business Hours: <b>{{product.fromTime}}</b> to <b>{{product.toTime}}</b>                             
-                                        {% endif %}
-                                    </sup>
-                                    <br/>
-                                    {% if product.branchAddress %}
-                                        {{product.branchAddress}}
-                                    {% endif %}
-                                    
-                                </p>
-                                <div class="d-flex flex-column gap-2 ms-2 buttons-right" style="min-width:48px;">
-                                    <!-- Share + Call row -->
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="button" class="btn btn-sm btn-outline-primary share-btn p-1" aria-label="Share" data-title="Business Name" data-id="2344">
-                                            <i class="fa fa-share-alt" aria-hidden="true"></i>
-                                        </button>
-                                        <!-- Call button -->
-                                        <a href="tel:{{product.branchTel}}" class="btn btn-sm btn-outline-success p-1" aria-label="Call" title="Call">
-                                            <i class="fa fa-phone" aria-hidden="true"></i>
-                                        </a>
-                                    </div>
+                            <!-- Card body -->
+                            <div class="card-body">
+                            <h5 class="card-title fw-bold mb-2">
+                                {{product.busRef.busName}}
+                                <small class="text-muted d-block">{{product.branchName}}</small>
+                            </h5>
 
-                                    <!-- Copy + WhatsApp row -->
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn p-1" aria-label="Copy link" data-id="2344">
-                                            <i class="fa fa-copy" aria-hidden="true"></i>
-                                        </button>
-                                        <!-- WhatsApp button -->
-                                        <a href="https://wa.me/{{product.branchTel}}" target="_blank" class="btn btn-sm btn-outline-success p-1" aria-label="WhatsApp" title="Chat on WhatsApp">
-                                            <i class="fa fa-whatsapp" aria-hidden="true"></i>
-                                        </a>
-                                    </div>
+                            <p class="card-text text-muted mb-3" style="font-size: 13px; min-height: 50px;">
+                                {% if product.operateAllTime %}
+                                Business Hours: <b>24/7</b>
+                                {% else %}
+                                Business Hours: <b>{{product.fromTime}}</b> – <b>{{product.toTime}}</b>
+                                {% endif %}
+                                <br>
+                                {% if product.branchAddress %}
+                                {{product.branchAddress}}
+                                {% endif %}
+                            </p>
+
+                            <!-- Action buttons -->
+                            <div class="d-flex justify-content-between">
+                                <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" title="Share">
+                                    <i class="fa fa-share-alt"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy link">
+                                    <i class="fa fa-copy"></i>
+                                </button>
+                                </div>
+                                <div class="btn-group" role="group">
+                                <a href="tel:{{product.branchTel}}" class="btn btn-sm btn-outline-success" title="Call">
+                                    <i class="fa fa-phone"></i>
+                                </a>
+                                <a href="https://wa.me/{{product.branchTel}}" target="_blank" class="btn btn-sm btn-outline-success" title="WhatsApp">
+                                    <i class="fa fa-whatsapp"></i>
+                                </a>
                                 </div>
                             </div>
-                            <div class="ellipsis-indicator" aria-hidden="true">…</div>
+                            </div>
                         </div>
                     </div>
+
                 {% elif product.obj == 2 %}
                         {% if product.belongsToModel == 'Retail & Wholesale Business' %}
-                            <div class="col-md-6 col-lg-4 card shadow" style="margin-bottom: 2%;">
-                                <a class="d-block mx-auto portfolio-item" href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" style="position:relative;" id='product{{product.retailAndWholesaleRef.branchRef.branchID}}{{product.productCode}}' onclick="productDetails('{{product.productName}}', '{{product.productCode}}', '{{product.discountRate}}', '{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice}}', '{{product.productDescription}}', '{{product.retailAndWholesaleRef.branchRef.branchID}}', '{{product.retailAndWholesaleRef.branchRef.branchName}}', '{{product.retailAndWholesaleRef.branchRef.branchTel}}', '{{product.retailAndWholesaleRef.branchRef.branchEmail}}', '{{product.productImageRef.image.url}}')">
-                                    <div class="d-flex portfolio-item-caption position-absolute h-100 w-100">
-                                        <div class="text-center text-white my-auto portfolio-item-caption-content w-100"></div>
-                                    </div>
-                                    <!-- overlay icons placed inside the image (top-right) -->
-                                    <div class="overlay-actions" style="position:absolute;top:8px;right:8px;z-index:50;display:flex;gap:6px;">
-                                    </div>
-                                    {% if not product.productImageRef.image %}
-                                        <img class="img-thumbnail img-fluid shadow" src="{% static 'img/default.jpeg' %}">
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card shadow h-100 border-0">
+                                    <!-- Product image with overlay -->
+                                    <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}"
+                                    id="product{{product.retailAndWholesaleRef.branchRef.branchID}}{{product.productCode}}"
+                                    onclick="productDetails('{{product.productName}}','{{product.productCode}}','{{product.discountRate}}','{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice}}','{{product.productDescription}}','{{product.retailAndWholesaleRef.branchRef.branchID}}','{{product.retailAndWholesaleRef.branchRef.branchName}}','{{product.retailAndWholesaleRef.branchRef.branchTel}}','{{product.retailAndWholesaleRef.branchRef.branchEmail}}','{{product.productImageRef.image.url}}')"
+                                    class="position-relative d-block">
+                                    
+                                    {% if product.productImageRef.image %}
+                                        <img class="card-img-top img-fluid rounded shadow" src="{{product.productImageRef.image.url}}" alt="{{product.productName}}">
                                     {% else %}
-                                        <img class="img-thumbnail img-fluid shadow" src="{{product.productImageRef.image.url}}">                            
-                                    {% endif %}                            
-                                </a>
-                                
-                                <div class="card-body px-4 py-4 px-md-5" style="margin-top: 5px;">
-                                    <!-- product title / supplier -->
-                                    <div class="fw-bold card-title d-flex justify-content-between align-items-start" style="height: auto; gap:8px; margin-bottom:8px;">
-                                        <div style="flex-grow:1; overflow: hidden;">
-                                            <span class="product-name d-block" style="font-size: 12px;" title="{{ product.productName }}">{{ product.productName|default:"Product Name" }}</span>
-                                            <div class="small text-muted">
-                                                <i>Supplier:</i> <b class="supplier-name" style="font-size: 12px;">{{ product.busRef.busName|default:"Non" }}</b><br/>
-                                                <sup style="font-size: 12px;">{{ product.retailAndWholesaleRef.branchRef.branchName|default:"Supplier" }}</sup>
-                                            </div>
+                                        <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default.jpeg' %}" alt="Default image">
+                                    {% endif %}
+
+                                    <!-- Overlay actions -->
+                                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                                        <button type="button" class="btn btn-sm btn-light share-btn" title="Share">
+                                        <i class="fa fa-share-alt"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light copy-btn" title="Copy link">
+                                        <i class="fa fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    </a>
+
+                                    <!-- Card body -->
+                                    <div class="card-body">
+                                    <!-- Product title and supplier -->
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                        <h6 class="card-title fw-bold mb-1" style="font-size:14px;">
+                                            {{ product.productName|default:"Product Name" }}
+                                        </h6>
+                                        <p class="text-muted mb-0" style="font-size:12px;">
+                                            Supplier: <b>{{ product.busRef.busName|default:"Non" }}</b><br>
+                                            <small>{{ product.retailAndWholesaleRef.branchRef.branchName|default:"Supplier" }}</small>
+                                        </p>
                                         </div>
-                                        <!-- pricing row: aligned to the right -->
-                                        <div class="mb-2 d-flex flex-column align-items-end gap-1" style="border: ridge 1px silver; background-color: black; padding: 5px">
-                                            {% if product.discountRate == 0 and product.retailAndWholesaleRef.discountRef.discount == 0 %}
-                                                <span  style='color:white'><i>&#8373</i><b class="product-price">{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</b></span>
-                                            {% else %}
-                                                <span class="fw-bold product-price" style='color:brown'><s><i>&#8373</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2|default:"0.00" }}</s></span>
-                                                <span class="fw-bold product-price" style='color:white'><i>&#8373</i><b>{{ product.priceAfterDiscount|floatformat:2 |default:"0.00" }}</b></span>
-                                            {% endif %}
+
+                                        <!-- Pricing aligned right -->
+                                        <div class="text-end">
+                                        {% if product.discountRate == 0 and product.retailAndWholesaleRef.discountRef.discount == 0 %}
+                                            <span class="fw-bold text-primary" style="font-size:16px;">
+                                            <i>&#8373;</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted d-block" style="font-size:13px;">
+                                            <s><i>&#8373;</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</s>
+                                            </span>
+                                            <span class="fw-bold text-success" style="font-size:16px;">
+                                            <i>&#8373;</i>{{ product.priceAfterDiscount|floatformat:2 }}
+                                            </span>
+                                        {% endif %}
                                         </div>
                                     </div>
-                                    <!-- description + action buttons on right -->
-                                    <div class="d-flex align-items-start gap-3">
-                                        <p class="text-muted card-text mb-0 clamped-text flex-grow-1" style="height: 50px; overflow: hidden; font-size: 12px;">
-                                            {{ product.productDescription|default:"" }}
-                                        </p>
-                                        <!-- Container with flex-grow pushes icons to bottom -->
-                                        <div class="d-flex flex-column" style="height:100%;">
-                                            <div class="mt-auto d-flex gap-3 ms-2 buttons-right align-items-end" style="min-width:48px;">                                                
-                                                <!-- Share + Call -->
-                                                <div class="d-flex flex-column align-items-center gap-1">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary share-btn p-1" aria-label="Share" data-title="{{ product.name }}" data-id="{{ product.id }}" title="Share">
-                                                        <i class="fa fa-share-alt" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </button>
-                                                    <a href="tel:{{product.retailAndWholesaleRef.branchRef.branchTel}}" class="btn btn-sm btn-outline-success p-1" aria-label="Call" title="Call">
-                                                        <i class="fa fa-phone" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </a>
-                                                </div>
-                                                <!-- Copy + WhatsApp -->
-                                                <div class="d-flex flex-column align-items-center gap-1">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary copy-btn p-1" aria-label="Copy link" data-id="{{ product.id }}" title="Copy link">
-                                                        <i class="fa fa-copy" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </button>
-                                                    <a href="https://wa.me/{{product.retailAndWholesaleRef.branchRef.branchTel}}?text=Interested:%20{{ product.productName }}%20({{ product.productCode }})" 
-                                                    target="_blank" 
-                                                    class="btn btn-sm btn-outline-success p-1" 
-                                                    aria-label="WhatsApp" 
-                                                    title="Chat on WhatsApp">
-                                                        <i class="fa fa-whatsapp" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </a>
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>                                    
+                                    <!-- Description -->
+                                    <p class="card-text text-muted mb-3" style="font-size:12px; height:50px; overflow:hidden;">
+                                        {{ product.productDescription|default:"No description available" }}
+                                    </p>
+
+                                    <!-- Action buttons -->
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-primary" title="Add to Cart">
+                                            <i class="fa fa-shopping-cart"></i> Add
+                                        </a>
+                                    </div>
+                                    </div>
                                 </div>
                             </div>
                     {% elif product.belongsToModel == 'Hotel'  %}
@@ -169,67 +201,57 @@
         <div class="row" style="margin: 1%;" id='businesses'>            
             {% for product in combinedResult %}           
                 {% if product.obj == 1 %}
-                    <div class="col-md-6 col-lg-4 card shadow" style="margin-bottom: 2%;">
-                        <!-- image/modal trigger -->
-                        <a class="d-block mx-auto" href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" style="position:relative;">
-                            <div class="d-flex portfolio-item-caption position-absolute h-100 w-100">
-                                <div class="text-center text-white my-auto portfolio-item-caption-content w-100"></div>
-                            </div>
-                            <img class="img-thumbnail img-fluid shadow" src="{% static 'img/default.jpeg' %}">
-                        </a>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow h-100 border-0">
+                            <!-- Product image -->
+                            <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="position-relative">
+                            <img class="card-img-top img-fluid rounded" src="{% static 'img/default.jpeg' %}" alt="{{product.busRef.busName}}">
+                            {% if product.busRef.registrationNumber != null %}
+                                <span class="badge bg-info position-absolute top-0 start-0 m-2">
+                                <i class="fa fa-check-circle"></i> Verified
+                                </span>
+                            {% endif %}
+                            </a>
 
-                        <!-- card body moved outside the anchor so buttons are clickable -->
-                        <div class="card-body px-4 py-5 px-md-5" style="margin-top: -45px;">
-                            <h5 class="fw-bold card-title" style="width: 100%; height: 25px; overflow-x: hidden; overflow-y: hidden;">
-                                <!-- Verified check icon before the name -->                          
-                                {% if product.busRef.registrationNumber != null %}
-                                    <i class="fa fa-check-circle" style="color:lightblue; margin-right:5px;" title="Verified"></i>                                
-                                {% endif %}  
-                                <b class="badge badge-warning" style="font-size: 12px;">{{product.busRef.busName}}</b>
-                                <i style="margin-left: 2%; font-size: 12px;">{{product.branchName}}</i>
+                            <!-- Card body -->
+                            <div class="card-body">
+                            <h5 class="card-title fw-bold mb-2">
+                                {{product.busRef.busName}}
+                                <small class="text-muted d-block">{{product.branchName}}</small>
                             </h5>
 
-                            <!-- buttons on the right, description on the left -->
-                            <div class="d-flex align-items-start gap-3">
-                                <p class="text-muted card-text mb-0 clamped-text flex-grow-1" style="height: 50px; overflow: hidden; font-size: 12px;">
-                                    <sup>
-                                        {% if product.operateAllTime == True %}
-                                            Business Hours: <b>24/7</b>
-                                        {% else %}                                           
-                                            Business Hours: <b>{{product.fromTime}}</b> to <b>{{product.toTime}}</b>                             
-                                        {% endif %}
-                                    </sup>
-                                    <br/>
-                                    {% if product.branchAddress %}
-                                        {{product.branchAddress}}
-                                    {% endif %}
-                                    
-                                </p>
-                                <div class="d-flex flex-column gap-2 ms-2 buttons-right" style="min-width:48px;">
-                                    <!-- Share + Call row -->
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="button" class="btn btn-sm btn-outline-primary share-btn p-1" aria-label="Share" data-title="Business Name" data-id="2344">
-                                            <i class="fa fa-share-alt" aria-hidden="true"></i>
-                                        </button>
-                                        <!-- Call button -->
-                                        <a href="tel:{{product.branchTel}}" class="btn btn-sm btn-outline-success p-1" aria-label="Call" title="Call">
-                                            <i class="fa fa-phone" aria-hidden="true"></i>
-                                        </a>
-                                    </div>
+                            <p class="card-text text-muted mb-3" style="font-size: 13px; min-height: 50px;">
+                                {% if product.operateAllTime %}
+                                Business Hours: <b>24/7</b>
+                                {% else %}
+                                Business Hours: <b>{{product.fromTime}}</b> – <b>{{product.toTime}}</b>
+                                {% endif %}
+                                <br>
+                                {% if product.branchAddress %}
+                                {{product.branchAddress}}
+                                {% endif %}
+                            </p>
 
-                                    <!-- Copy + WhatsApp row -->
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn p-1" aria-label="Copy link" data-id="2344">
-                                            <i class="fa fa-copy" aria-hidden="true"></i>
-                                        </button>
-                                        <!-- WhatsApp button -->
-                                        <a href="https://wa.me/{{product.branchTel}}" target="_blank" class="btn btn-sm btn-outline-success p-1" aria-label="WhatsApp" title="Chat on WhatsApp">
-                                            <i class="fa fa-whatsapp" aria-hidden="true"></i>
-                                        </a>
-                                    </div>
+                            <!-- Action buttons -->
+                            <div class="d-flex justify-content-between">
+                                <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" title="Share">
+                                    <i class="fa fa-share-alt"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy link">
+                                    <i class="fa fa-copy"></i>
+                                </button>
+                                </div>
+                                <div class="btn-group" role="group">
+                                <a href="tel:{{product.branchTel}}" class="btn btn-sm btn-outline-success" title="Call">
+                                    <i class="fa fa-phone"></i>
+                                </a>
+                                <a href="https://wa.me/{{product.branchTel}}" target="_blank" class="btn btn-sm btn-outline-success" title="WhatsApp">
+                                    <i class="fa fa-whatsapp"></i>
+                                </a>
                                 </div>
                             </div>
-                            <div class="ellipsis-indicator" aria-hidden="true">…</div>
+                            </div>
                         </div>
                     </div> 
                 {% endif %}             
@@ -241,80 +263,74 @@
             {% for product in combinedResult %}
                 {% if product.obj == 2 %}
                         {% if product.belongsToModel == 'Retail & Wholesale Business' %}
-                            <div class="col-md-6 col-lg-4 card shadow" style="margin-bottom: 2%;">
-                                <a class="d-block mx-auto portfolio-item" href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}"  style="position:relative;" id='product{{product.retailAndWholesaleRef.branchRef.branchID}}{{product.productCode}}' onclick="productDetails('{{product.productName}}', '{{product.productCode}}', '{{product.discountRate}}', '{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice}}', '{{product.productDescription}}', '{{product.retailAndWholesaleRef.branchRef.branchID}}', '{{product.retailAndWholesaleRef.branchRef.branchName}}', '{{product.retailAndWholesaleRef.branchRef.branchTel}}', '{{product.retailAndWholesaleRef.branchRef.branchEmail}}', '{{product.productImageRef.image.url}}')">
-                                    <div class="d-flex portfolio-item-caption position-absolute h-100 w-100">
-                                        <div class="text-center text-white my-auto portfolio-item-caption-content w-100"></div>
-                                    </div>
-                                    <!-- overlay icons placed inside the image (top-right) -->
-                                    <div class="overlay-actions" style="position:absolute;top:8px;right:8px;z-index:50;display:flex;gap:6px;">
-                                    </div>
-                                    {% if not product.productImageRef.image %}
-                                        <img class="img-thumbnail img-fluid shadow" src="{% static 'img/default.jpeg' %}">
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card shadow h-100 border-0">
+                                    <!-- Product image with overlay -->
+                                    <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}"
+                                    id="product{{product.retailAndWholesaleRef.branchRef.branchID}}{{product.productCode}}"
+                                    onclick="productDetails('{{product.productName}}','{{product.productCode}}','{{product.discountRate}}','{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice}}','{{product.productDescription}}','{{product.retailAndWholesaleRef.branchRef.branchID}}','{{product.retailAndWholesaleRef.branchRef.branchName}}','{{product.retailAndWholesaleRef.branchRef.branchTel}}','{{product.retailAndWholesaleRef.branchRef.branchEmail}}','{{product.productImageRef.image.url}}')"
+                                    class="position-relative d-block">
+                                    
+                                    {% if product.productImageRef.image %}
+                                        <img class="card-img-top img-fluid rounded shadow" src="{{product.productImageRef.image.url}}" alt="{{product.productName}}">
                                     {% else %}
-                                        <img class="img-thumbnail img-fluid shadow" src="{{product.productImageRef.image.url}}">                            
-                                    {% endif %}                            
-                                </a>
-                                
-                                <div class="card-body px-4 py-4 px-md-5" style="margin-top: 5px;">
-                                    <!-- product title / supplier -->
-                                    <div class="fw-bold card-title d-flex justify-content-between align-items-start" style="height: auto; gap:8px; margin-bottom:8px;">
-                                        <div style="flex-grow:1; overflow: hidden;">
-                                            <span class="product-name d-block" style="font-size: 12px;" title="{{ product.productName }}" >{{ product.productName|default:"Product Name" }}</span>
-                                            <div class="small text-muted">
-                                                <i>Supplier:</i> <b class="supplier-name" style="font-size: 12px;">{{ product.busRef.busName|default:"Supplier" }}</b><br/>
-                                                <sup>{{ product.retailAndWholesaleRef.branchRef.branchName|default:"Supplier" }}</sup>
-                                            </div>
-                                        </div>
-                                        <!-- pricing row: aligned to the right -->
-                                        <div class="mb-2 d-flex flex-column align-items-end gap-1" style="border: ridge 1px silver; background-color: black; padding: 5px">
-                                            {% if product.discountRate == 0 and product.retailAndWholesaleRef.discountRef.discount == 0 %}
-                                                <span  style='color:white'><i>&#8373</i><b class="product-price">{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</b></span>
-                                            {% else %}
-                                                <span class="fw-bold product-price" style='color:brown'><s><i>&#8373</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2|default:"0.00" }}</s></span>
-                                                <span class="fw-bold product-price" style='color:white'><i>&#8373</i><b>{{ product.priceAfterDiscount|floatformat:2 |default:"0.00" }}</b></span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
+                                        <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default.jpeg' %}" alt="Default image">
+                                    {% endif %}
 
-                                    <!-- description + action buttons on right -->
-                                    <div class="d-flex align-items-start gap-3">
-                                        <p class="text-muted card-text mb-0 clamped-text flex-grow-1" style="height: 50px; overflow: hidden; font-size: 12px;">
-                                            {{ product.productDescription|default:"" }}
+                                    <!-- Overlay actions -->
+                                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                                        <button type="button" class="btn btn-sm btn-light share-btn" title="Share">
+                                        <i class="fa fa-share-alt"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light copy-btn" title="Copy link">
+                                        <i class="fa fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    </a>
+
+                                    <!-- Card body -->
+                                    <div class="card-body">
+                                    <!-- Product title and supplier -->
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                        <h6 class="card-title fw-bold mb-1" style="font-size:14px;">
+                                            {{ product.productName|default:"Product Name" }}
+                                        </h6>
+                                        <p class="text-muted mb-0" style="font-size:12px;">
+                                            Supplier: <b>{{ product.busRef.busName|default:"Non" }}</b><br>
+                                            <small>{{ product.retailAndWholesaleRef.branchRef.branchName|default:"Supplier" }}</small>
                                         </p>
+                                        </div>
 
-                                        <!-- Container with flex-grow pushes icons to bottom -->
-                                        <div class="d-flex flex-column" style="height:100%;">
-                                            <div class="mt-auto d-flex gap-3 ms-2 buttons-right align-items-end" style="min-width:48px;">
-                                                
-                                                <!-- Share + Call -->
-                                                <div class="d-flex flex-column align-items-center gap-1">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary share-btn p-1" aria-label="Share" data-title="{{ product.name }}" data-id="{{ product.id }}" title="Share">
-                                                        <i class="fa fa-share-alt" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </button>
-                                                    <a href="tel:{{product.retailAndWholesaleRef.branchRef.branchTel}}" class="btn btn-sm btn-outline-success p-1" aria-label="Call" title="Call">
-                                                        <i class="fa fa-phone" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </a>
-                                                </div>
-
-                                                <!-- Copy + WhatsApp -->
-                                                <div class="d-flex flex-column align-items-center gap-1">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary copy-btn p-1" aria-label="Copy link" data-id="{{ product.id }}" title="Copy link">
-                                                        <i class="fa fa-copy" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </button>
-                                                    <a href="https://wa.me/{{product.retailAndWholesaleRef.branchRef.branchTel}}?text=Interested:%20{{ product.productName }}%20({{ product.productCode }})" 
-                                                    target="_blank" 
-                                                    class="btn btn-sm btn-outline-success p-1" 
-                                                    aria-label="WhatsApp" 
-                                                    title="Chat on WhatsApp">
-                                                        <i class="fa fa-whatsapp" aria-hidden="true" style="font-size:0.95rem;"></i>
-                                                    </a>
-
-                                                </div>
-                                            </div>
+                                        <!-- Pricing aligned right -->
+                                        <div class="text-end">
+                                        {% if product.discountRate == 0 and product.retailAndWholesaleRef.discountRef.discount == 0 %}
+                                            <span class="fw-bold text-primary" style="font-size:16px;">
+                                            <i>&#8373;</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted d-block" style="font-size:13px;">
+                                            <s><i>&#8373;</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}</s>
+                                            </span>
+                                            <span class="fw-bold text-success" style="font-size:16px;">
+                                            <i>&#8373;</i>{{ product.priceAfterDiscount|floatformat:2 }}
+                                            </span>
+                                        {% endif %}
                                         </div>
                                     </div>
-                                    <div class="ellipsis-indicator" aria-hidden="true">…</div>
+
+                                    <!-- Description -->
+                                    <p class="card-text text-muted mb-3" style="font-size:12px; height:50px; overflow:hidden;">
+                                        {{ product.productDescription|default:"No description available" }}
+                                    </p>
+
+                                    <!-- Action buttons -->
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-primary" title="Add to Cart">
+                                        <i class="fa fa-shopping-cart"></i> Add
+                                        </a>
+                                    </div>
+                                    </div>
                                 </div>
                             </div>
                     {% elif product.belongsToModel == 'Hotel'  %}
@@ -323,8 +339,6 @@
                {% endif %}               
             {% endfor %}             
         </div>
-
-
     </div>
 </section>
 

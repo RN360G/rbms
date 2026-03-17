@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from salesApp.models import CashOnhand
 from usersApp.models import UserRef
-from accountsApp.models import OperationExpenses, Asset, Liability, Equity, Accounts, AccountTransaction, CashDenominations, TransferFundsRecord, OversAndShortages, OversAndShortagesRecord, SuspenseAccount, ShortagePaymentRecord, OverWithdrawalRecord
+from accountsApp.models import OperationExpenses, Asset, Liability, Equity, Accounts, AccountTransaction, CashDenominations, TransferFundsRecord, OversAndShortages, OversAndShortagesRecord, SuspenseAccount, ShortagePaymentRecord, OverWithdrawalRecord, OnlineAccounts
 from loginAndOutApp.views import loginSessions
 from salesApp.models import CustomerItemsPurchased, StockAdjustment
 import datetime as dt
@@ -29,6 +29,7 @@ class AccountsView(generic.View):
               '402':haveAccess(request, '402'), 
               '403':haveAccess(request, '403'), 
               '404':haveAccess(request, '404'),
+              '405':haveAccess(request, '405'),
 
               '5':haveAccess(request, '5'),
               '500':haveAccess(request, '500'), 
@@ -71,7 +72,9 @@ class AccountsView(generic.View):
             totalOver = shortages.aggregate(Sum('overAmount'))['overAmount__sum']
 
             totalAmountTobeAuthorize = suspenseCashOnHand.aggregate(Sum('amount'))['amount__sum']
-            return render(request, 'accounts/branchAccount.html', {'accounts': acc, 'uAccess':access, 'branchAccountTransactions': transactions, 'toAccounts': toAccounts, 'branchAccountBal': branchAccountBal, 'suspenesAccountFunds': suspenseCashOnHand, 'totalAmt': totalAmountTobeAuthorize, 'suspenseInterbranch': suspenseInterbranch, 'shortages': shortages, 'totalShortages': totalShortages, 'totalOvers': totalOver})
+
+            onlineAccounts = OnlineAccounts.objects.filter(branchRef=loginSessions(request, 'branch'))
+            return render(request, 'accounts/branchAccount.html', {'accounts': acc, 'uAccess':access, 'branchAccountTransactions': transactions, 'toAccounts': toAccounts, 'branchAccountBal': branchAccountBal, 'suspenesAccountFunds': suspenseCashOnHand, 'totalAmt': totalAmountTobeAuthorize, 'suspenseInterbranch': suspenseInterbranch, 'shortages': shortages, 'totalShortages': totalShortages, 'totalOvers': totalOver, 'onlineAccounts': onlineAccounts})
     
     def post(self, request, type):
         return HttpResponse()
@@ -1026,3 +1029,49 @@ class IncomeStatementView(generic.View):
         request.session['incomeStatementType'] = statementType
         request.session['incomeStatementBranch'] = branchID
         return redirect('salesIncomeState')
+    
+
+# Add online payment accounts
+def addOnlinePaymentAccounts(request):
+    with atomic():
+        accountNumber = request.POST.get('accountNumber')
+        accountName = request.POST.get('accountName')
+        accountType = request.POST.get('accountType')
+        
+        db = OnlineAccounts()
+        db.branchRef = loginSessions(request, 'branch')
+        db.accountNumber = accountNumber
+        db.accountName = accountName
+        db.accountType = accountType
+        db.date = dt.datetime.today()
+        if accountType == "Bank Account":
+            bankName = request.POST.get('bankName')
+            bankbranch = request.POST.get('bankbranch')
+            db.bankName = bankName
+            db.bankBranchName = bankbranch        
+        else:
+            subscriber = request.POST.get('subscriber')
+            db.subscriber = subscriber
+        db.save()
+
+        # create branch account
+        account = Accounts()
+        account.busRef = loginSessions(request, 'business')
+        account.branchRef = loginSessions(request, 'branch')
+        account.accountType = accountType
+        account.accountName = accountName
+        account.accountNumber = accountNumber
+        account.save()
+        activityLogs(request, loginSessions(request, 'user').userID, 'Online Acc Added', f'You added {accountType} with account number: {accountNumber}')
+        return redirect('accounts', type='branch')
+
+
+# delete online account
+def deleteOnlineAccount(request, pk):
+    with atomic():
+        onlineAcc = OnlineAccounts.objects.get(Q(id=pk))
+        acc = Accounts.objects.get(Q(accountNumber=onlineAcc.accountNumber)) 
+        activityLogs(request, loginSessions(request, 'user').userID, 'Deleted Online Account', f'You deleted online account with account number {acc.accountNumber} with an amount of : {acc.accountBalance} as the time of deletion')
+        acc.delete()
+        onlineAcc.delete()
+    return redirect('accounts', type='branch')

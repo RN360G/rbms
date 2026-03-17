@@ -322,7 +322,7 @@ class UploadProfileImage(generic.View):
 
     def post(self, request):
         file = request.FILES['upload']
-        image = ImageUpload(request, 'profile')
+        image = ImageUpload()
         image.upload(file, request.session['userID'])
         return redirect(to='profile')
 

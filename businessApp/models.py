@@ -15,7 +15,6 @@ class Business(models.Model):
     description = models.CharField(max_length=500, default='')
 
 
-
 class BusinessBranch(models.Model):
     busRef = models.ForeignKey('Business', on_delete=models.CASCADE)
     branchID = models.CharField(max_length=15)

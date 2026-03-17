@@ -8,5 +8,6 @@ urlpatterns =[
     path('loginoptions', views.LogIn.loginOptions, name='loginOptions'),
     path('customerlogin', views.CustomerLogins.as_view(), name='customerLogins'),
     path('createcustomeracc', views.CreateCustomerAccount.as_view(), name='createCustomerAccount'),
-    path('generatenewpin', views.GenerateNewPin.as_view(), name='generateNewPin')
+    path('generatenewpin', views.GenerateNewPin.as_view(), name='generateNewPin'),
+    path('signoutcustomer', views.CustomerLogout.as_view(), name='customerLogout'),
 ]

@@ -30,6 +30,7 @@ urlpatterns = [
     path('sales/', include('salesApp.urls')),
     path('accounts/', include('accountsApp.urls')),
     path('richnet360/', include('richnet360.urls')),
+    path('onlineorderapp/', include('onlineOrderApp.urls')),
     path('admin/', admin.site.urls),
 ]
 

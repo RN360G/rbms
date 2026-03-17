@@ -34,6 +34,7 @@ busAccess = {
     '402':['Branch Account Fund Transfer', 'This will allow the user to transfer fund from branch account', '4'],
     '403':['Branch Account Fund Deposit and Withdrawal', 'This will allow the user to deposit or withdraw funds from branch account', '4'],
     '404':['Branch Account Fund Transfer Authorization', 'This will allow the user to authorize fund transfer of a branch account', '4'],
+    '405':['Online Payment Accounts', 'Assign online payment accounts to to business branches', '4'],
 
     '500':['Business Account Fund Transfer', 'This will allow the user to transfer fund from business account', '5'],
     '501':['Business Account Fund Deposit and Withdrawal', 'This will allow the user to deposit or withdraw funds from business account', '5'],
@@ -57,4 +58,5 @@ busAccess = {
     '14':['Awaiting Collection', 'This will allow the user have access to items awaiting collection page', '6'],
     '15':['Repayments', 'This will allow the user have access to repayments page', '6'],
     '16':['Refund', 'This will allow the user refund amount of the returned items', '6'],
+    '17':['Online Order', 'This will allow the user to receiver online orders', '6'],
     }

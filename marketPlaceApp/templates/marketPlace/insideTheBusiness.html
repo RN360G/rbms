@@ -1,164 +1,200 @@
-{% extends "dashboardApp/rbms.html" %}
+{% extends "marketPlace/rbms.html" %}
 {% load static %}
 
-{% block rbms %}
-<body class="bg-light">
+{% block rbmsM %}
+    <style>
+      .business-name {
+        display: inline-block;
+        max-width: 300px; /* adjust to fit your navbar */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1rem; /* fixed size */
+    }
+
+    </style>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <!-- Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="{% url 'generalMarket' %}">
-                <img src="{% static 'img/rn360_4.jpeg' %}" alt="Logo" style="width:40px; height:40px; object-fit:cover;" class="me-2 rounded-circle">
-                <span class="fw-bold text-white"><b>{{branch.busRef.busName}}</b> <br/> <sup>{{branch.branchName}}<sup></span>
-            </a>
+            <span class="navbar-brand d-flex align-items-center">
+                <img src="{% static 'img/rn360_4.jpeg' %}" 
+                    alt="Logo" 
+                    style="width:40px; height:40px; object-fit:cover;" 
+                    class="me-2 rounded-circle">
 
-           <!-- Search Bar --> 
-           <form id="searchForm" class="d-flex ms-3" role="search">
-             <input id="searchInput" class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
-                <button class="btn btn-outline-light" type="submit">
-                    <i class="fa fa-search"></i> 
-                </button> 
-            </form>
+                <span class="fw-bold text-white business-name">
+                    <b>{{branch.busRef.busName}}</b> <br/> 
+                    <sup>{{branch.branchName}}</sup>
+                </span>
+            </span>
 
-            <!-- Back Icon 
-            <button class="btn btn-outline-light me-3" onclick="history.back()" aria-label="Go Back">
-            <i class="fa fa-arrow-left"></i>
-            </button>-->
 
-            <!-- Contact & Hours -->
-            <div class="ms-auto d-flex align-items-center text-white">
-            <span class="me-3"><i class="fa fa-phone"></i> {{branch.branchTel}}</span>
-            
-            {% if branch.operateAllTime %}
-              <span><i class="fa fa-clock"></i> Active <b>247</b></span>
-            {% else %}
-              <span><i class="fa fa-clock"></i>Active from <b>{{branch.fromTime}}</b> to <b>{{branch.toTime}}</b></span>      
-            {% endif %}
-              
-            
-            </div>
+            <!-- Search Bar --> 
+            <!--<form id="searchForm" class="d-flex ms-3" role="search">
+              <input id="searchInputField" class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
+                  <button class="btn btn-outline-light" type="submit">
+                      <i class="fa fa-search"></i> 
+                  </button> 
+              </form>-->
+
+          <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto" 
+              style="overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%;">
+              <li class="nav-item shadow me-2">
+              <a class="nav-link" href="#all"><i class="fa fa-building"></i> Other Branches</a>
+              </li>
+              <li class="nav-item shadow me-2">
+              <a class="nav-link" href="#products"><i class="fa fa-info"></i> About Us</a>
+              </li>
+          </ul>
+
+<!-- Contact & Hours -->
+<div class="ms-auto d-flex flex-wrap align-items-center text-white">
+    <span class="me-3">
+        <i class="fa fa-phone"></i> {{branch.branchTel}}
+    </span>
+
+    {% if branch.operateAllTime %}
+        <span>
+            <i class="fa fa-clock"></i> Active <b>247</b>
+        </span>
+    {% else %}
+        <span>
+            <i class="fa fa-clock"></i> Active from 
+            <b>{{branch.fromTime}}</b> to <b>{{branch.toTime}}</b>
+        </span>
+    {% endif %}
+</div>
+
         </div>
     </nav>
 
 
-  <!-- Page Content -->
-  <div class="container py-5">
-    <div class="row g-4">        
-        {% for product in products %}
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                
-                {% if product.productImageRef %}
-                   <img src="{{product.productImageRef.image.url}}" class="card-img-top" alt="Product Image">
-                {% else %}
-                    <img src="{% static 'img/default.jpeg' %}" class="card-img-top" alt="Product Image">                    
-                {% endif %}                        
-                
-                <div class="card-body">
-                    <h5 class="card-title" style="color: black">{{product.productName}}</h5>
-                    <p class="card-text mb-1"><b>Product Code:</b> {{product.productCode}}</p>
-                    <p class="card-text mb-1"><b>Type:</b> {{product.productCategory}}</p>
-                    <!--<p class="card-text mb-1"><b>Minimum Order:</b> 10 units</p>-->
-                    <!--<p class="card-text mb-1"><b>Delivery:</b> Available</p>-->
-                    <hr>                    
-                    {% if product.totalDiscaount > 0 %}
-                        <p class="card-text mb-1">
-                            <b>Discount:</b> {{product.totalDiscaount|floatformat:2}}%
-                        </p>
-                        <p class="card-text mb-1">
-                            <b>Old Price: </b> 
-                            <i style="color: #c67605">GH&#8373</i><span class="text-decoration-line-through text-muted">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span>
-                        </p>
-                        <p class="card-text mb-1"><b>New Price:</b> 
-                            <i style="color: #c67605">GH&#8373</i><span class="text-success fw-bold">{{product.priceAfterDiscount|floatformat:2}}</span>
-                        </p>
+    <!-- Page Content -->
+    <div class="container py-5">
+      <div class="row g-4">        
+          {% for product in products %}
+              <div class="col-md-3">
+                  <div class="card h-100 shadow-sm">
+                  
+                <div class="position-relative">
+                    {% if product.productImageRef %}
+                        <img src="{{product.productImageRef.image.url}}" class="card-img-top" alt="Product Image">
                     {% else %}
-                        <p class="card-text mb-1"><b>Price:</b><i style="color: #c67605">GH&#8373</i><span class="fw-bold">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span></p>                        
+                        <img src="{% static 'img/default.jpeg' %}" class="card-img-top" alt="Product Image">                    
                     {% endif %}
-                </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <!-- Details button 
-                    <button type="button" class="btn btn-sm btn-outline-primary"  data-bs-toggle="modal" data-bs-target="#productModalP001">
-                        <i class="fa fa-info-circle"></i> Details
-                    </button>-->
 
-                    <!-- Details button -->
-                    <a class="btn btn-sm btn-outline-primary" href="{% url 'generalMarketProductDetails' branch.branchID product.productCode %}">
-                        <i class="fa fa-info-circle"></i> Details
-                    </a>
-                    <!-- WhatsApp button -->
-                    <a href="https://wa.me/{{product.retailAndWholesaleRef.branchRef.branchTel}}?text=Interested:%20Product%20Name%20(P001)" 
-                        target="_blank" 
-                        class="btn btn-sm btn-outline-success">
-                        <i class="fa fa-whatsapp"></i>
-                    </a>
+                    <!-- Overlay icons horizontally -->
+                    <div class="position-absolute top-0 end-0 p-2 d-flex flex-row gap-2">
+                        <!-- Copy button -->
+                        <button class="btn btn-sm btn-light" onclick="copyProductCode('{{product.productCode}}')" title="Copy Code">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                        <!-- Share button -->
+                        <button class="btn btn-sm btn-light" onclick="shareProduct('{{product.productName}}')" title="Share Product">
+                            <i class="fa fa-share-alt"></i>
+                        </button>
+                    </div>
                 </div>
 
-                </div>
-            </div>            
-        {% endfor %}
+                      
+                  
+                  <div class="card-body">
+                      <h5 class="card-title" style="color: white"><b>{{product.productName}}</b></h5>
+                      <p class="card-text mb-1"><b>Product Code:</b> {{product.productCode}}</p>
+                      <p class="card-text mb-1"><b>Type:</b> {{product.productCategory}}</p>
+                      <!--<p class="card-text mb-1"><b>Minimum Order:</b> 10 units</p>-->
+                      <!--<p class="card-text mb-1"><b>Delivery:</b> Available</p>-->
+                      <hr>                    
+                      {% if product.totalDiscaount > 0 %}
+                          <p class="card-text mb-1">
+                              <b>Discount:</b> {{product.totalDiscaount|floatformat:2}}%
+                          </p>
+                          <p class="card-text mb-1">
+                              <b>Old Price: </b> 
+                              <i style="color: #c67605">GH&#8373</i><span class="text-decoration-line-through text-muted">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span>
+                          </p>
+                          <p class="card-text mb-1"><b>New Price:</b> 
+                              <i style="color: #c67605">GH&#8373</i><span class="text-success fw-bold">{{product.priceAfterDiscount|floatformat:2}}</span>
+                          </p>
+                      {% else %}
+                          <p class="card-text mb-1"><b>Price:</b><i style="color: #c67605">GH&#8373</i><span class="fw-bold">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span></p>                        
+                      {% endif %}
+                  </div>
+                  <div class="card-footer d-flex justify-content-between">
+                      <!-- Details button 
+                      <button type="button" class="btn btn-sm btn-outline-primary"  data-bs-toggle="modal" data-bs-target="#productModalP001">
+                          <i class="fa fa-info-circle"></i> Details
+                      </button>-->
+
+                      <!-- Details button -->
+                      <a class="btn btn-sm btn-outline-primary" href="{% url 'generalMarketProductDetails' branch.branchID product.productCode %}">
+                          <i class="fa fa-shopping-cart"></i> Add
+                      </a>
+                      <!-- WhatsApp button -->
+                      <a href="https://wa.me/{{product.retailAndWholesaleRef.branchRef.branchTel}}?text=Interested:%20Product%20Name%20(P001)" 
+                          target="_blank" 
+                          class="btn btn-sm btn-outline-success">
+                          <i class="fa fa-whatsapp"></i>
+                      </a>
+                  </div>
+
+                  </div>
+              </div>            
+          {% endfor %}
+      </div>
     </div>
-  </div>
 
 
-  <!--Product details==========================================================================-->
-
-<div class="modal fade" id="productModalP001" tabindex="-1" aria-labelledby="productModalLabelP001" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="productModalLabelP001">Product Name (P001)</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Product images -->
-        <div class="d-flex flex-column align-items-center gap-3">
-          <img src="{% static 'img/default.jpeg' %}" class="img-fluid rounded shadow" alt="Product Image 1">
-          <img src="{% static 'img/default.jpeg' %}" class="img-fluid rounded shadow" alt="Product Image 2">
-          <img src="{% static 'img/default.jpeg' %}" class="img-fluid rounded shadow" alt="Product Image 3">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<button onclick="scrollToTop()" id="scrollBtn" class="btn btn-dark">
-  <i class="fa fa-arrow-up"></i>
-</button>
+    <style>
+    #scrollBtn {
+      display: none; /* Hidden by default */
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 99;
+    }
+    </style>
 
 
-<style>
-#scrollBtn {
-  display: none; /* Hidden by default */
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 99;
-}
-</style>
+    <script>
+        window.onscroll = function() {toggleScrollBtn()};
 
+        function toggleScrollBtn() {
+          const btn = document.getElementById("scrollBtn");
+          if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            btn.style.display = "block";
+          } else {
+            btn.style.display = "none";
+          }
+        }
 
-<script>
-window.onscroll = function() {toggleScrollBtn()};
+        function scrollToTop() {
+          window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+    </script>
 
-function toggleScrollBtn() {
-  const btn = document.getElementById("scrollBtn");
-  if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-    btn.style.display = "block";
-  } else {
-    btn.style.display = "none";
-  }
+    <script>
+function copyProductCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        alert("Product code copied: " + code);
+    });
 }
 
-function scrollToTop() {
-  window.scrollTo({top: 0, behavior: 'smooth'});
+function shareProduct(name) {
+    if (navigator.share) {
+        navigator.share({
+            title: "Check out this product",
+            text: "Interested in: " + name,
+            url: window.location.href
+        }).catch(err => console.log("Share failed:", err));
+    } else {
+        alert("Sharing not supported on this browser.");
+    }
 }
 </script>
 
-</body>
-{% endblock rbms %}
+{% endblock rbmsM %}
 
 

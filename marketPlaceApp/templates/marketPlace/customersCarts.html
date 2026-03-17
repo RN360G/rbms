@@ -2,56 +2,109 @@
 {% block rbmsM %}
 <div class="container my-4">
   <h2 class="mb-4"><i class="fa fa-shopping-cart"></i> Your Cart</h2>
-
+  <a href="{% url 'purchaseHistory' 0 %}" class="btn btn-primary fa fa-shopping-cart" style="float: right; margin: 2%;" id="purchasehistoryBtn">Purchase History</a>
+  
+  <br/>
+  <br/>
+  <hr/>
   {% if carts %}
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
-        <tr>
-          <th>Product</th>
-          <th>Image</th>
-          <th>Quantity</th>
-          <th>Unit Price</th>
-          <th>Total</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in carts %}
-          <tr>
-            <td style="color: white">
-              <b>{{ item.productRef.productName }}</b><br>
-              <small>Code: {{ item.productRef.productCode }}</small>
-            </td>
-            <td>
-              {% if item.product.productImageRef %}
-                <img src="{{ item.productRef.productImageRef.image.url }}" alt="{{ item.product.productName }}" class="img-thumbnail" style="width:80px;">
-              {% endif %}
-            </td>
-            <td style="color: white">{{ item.quantity }}</td>
-            <td style="color: white">₵{{ item.unitPrice}}</td>
-            <td style="color: white">{{item.totalPrice}}</td>
-            <td>
-              <form method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-danger">
-                  <i class="fa fa-trash"></i> Remove
-                </button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      {% if not request.user_agent.is_mobile %}
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Batch & Cart Code</th>
+                <th>Product</th>          
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th>Supplier</th>
+                <th>Actions/Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in carts %}
+                <tr>
+                  <td style="color: white"><b>{{item.batchCode}}</b><br/><sup>{{ item.orderID }}</sup> <br/><sup>{{ item.date }}</sup></td>
+                  <td style="color: white">
+                    <b>{{ item.productRef.productName }}</b><br>
+                    <small>Code: {{ item.productRef.productCode }}</small>
+                  </td>
+                  <td style="color: white">{{ item.quantity }}</td>
+                  <td style="color: white">₵{{ item.unitPrice}}</td>
+                  <td style="color: white">{{item.totalPrice}}</td>
+                  <td style="color: white">{{item.branhRef.busRef.busName}} <br/> <sup>{{item.branhRef.branchName}}</sup></td>
+                  <td>              
+                    {% if item.status == 'Waiting Payment Request' %}
+                      <a href="{% url 'removeCustomerMarketCart' item.id %}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Remove</a>      
+                    {% else %}
+                    <b style="color: wheat">{{item.status}}</b>        
+                    {% endif %} 
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          
+          <!--Mobile View================================================================================================================-->
+          {% else %}           
+          <div class="d-md-none">
+            {% for item in carts %}
+              <div class="card mb-2 bg-dark text-white">
+                <div class="card-body">
+                  <h6 class="card-title">
+                    <b>{{item.productRef.productName}}</b> 
+                    <small class="text-muted">({{ item.productRef.productCode }})</small>
+                  </h6>
+                  <p class="mb-1"><b>Batch:</b> {{item.batchCode}} <br><b>Cart ID:</b> {{ item.orderID }}</p>
+                  <p class="mb-1"><b>Date:</b> {{item.date}}</p>
+                  <p class="mb-1"><b>Quantity:</b> {{ item.quantity }}</p>
+                  <p class="mb-1"><b>Unit Price:</b> ₵{{ item.unitPrice }}</p>
+                  <p class="mb-1"><b>Total:</b> ₵{{ item.totalPrice }}</p>
+                  <p class="mb-1"><b>Supplier:</b> {{item.branhRef.busRef.busName}} <br><sup>{{item.branhRef.branchName}}</sup></p>
+                  <div>
+                    {% if item.status == 'Waiting Payment Request' %}
+                      <a href="{% url 'removeCustomerMarketCart' item.id %}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Remove</a>
+                    {% else %}
+                      <b style="color: wheat">{{item.status}}</b>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
 
-    <!-- Cart Summary -->
-    <div class="text-end mt-3">
-      <h4>Total: ₵3333</h4>
-      <a href="" class="btn btn-primary">
-        <i class="fa fa-credit-card"></i> Proceed to Checkout
-      </a>
-    </div>
+      {% endif %} 
+      <!-- Cart Summary -->
+      <div class="text-end mt-3">
+        <h4>Total: ₵{{totalPrice}}</h4>
+        <a href="{% url 'paymentRequestPage' 0 %}" class="btn btn-primary" id="paymentRequestPage">
+          <i class="fa fa-credit-card"></i> Request Payment
+        </a>
+      </div>
   {% else %}
     <p>Your cart is empty.</p>
   {% endif %}
 </div>
+  <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get stored value from localStorage (example: cart ID or item count)
+            const storedValue = localStorage.getItem("customerTel"); // or "cart_items_count"
+
+            if (storedValue) {
+                const purchasehistoryBtn = document.getElementById("purchasehistoryBtn");
+                const paymentRequestPage = document.getElementById("paymentRequestPage");
+
+                // Option 1: append as query parameter
+                //cartLink.href = cartLink.href + "?id=" + storedValue;
+
+                // Option 2: append as path segment (if your Django URL expects /cart/<id>/)
+                //cartLink.href = cartLink.href + '/' + storedValue + "/";
+                purchasehistoryBtn.href = `/purchasehistory/${storedValue}/`;
+                paymentRequestPage.href = `/paymentrequestpage/${storedValue}/`;
+            }
+            else{
+
+            }
+        });
+  </script>
 {% endblock rbmsM %}

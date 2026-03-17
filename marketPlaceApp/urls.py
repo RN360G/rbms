@@ -7,4 +7,11 @@ urlpatterns = [
     path('rn360b/<businessID>/<branchID>', views.InsideBusiness.as_view(), name="insideBuisness"),
     path('rn360b_product/<branchID>/<productCode>', views.ProductDetails.as_view(), name='generalMarketProductDetails'),
     path('carts/<tel>/', views.ProductDetails.addedCarts, name='marketAddedCarts'),
+    path('purchasehistory/<tel>/', views.ProductDetails.purchaseHistory, name='purchaseHistory'),
+    path('removecustomeritemfromcart/<pk>', views.ProductDetails.removeItemFromCart, name='removeCustomerMarketCart'),
+    path('paymentrequestpage/<tel>/', views.ProductDetails.paymentRequestPage, name='paymentRequestPage'),
+    path('customerrequestpayment/<batchCode>', views.ProductDetails.requestPayment, name='customerRequestPayment'),
+    path('paymentinstructions/<branchID>/<tel>/<batchCode>', views.ProductDetails.paymentInstructions, name='paymentInstructions'),
+    path('autocomplete-items/', views.autocomplete_items, name='autocomplete_items'),
+    path('autocomplete-items-specific-market/', views.autocomplete_items_specific_Market, name='autocomplete_items_specific_Market'),
 ]

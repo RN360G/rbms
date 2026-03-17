@@ -1,0 +1,63 @@
+{% extends "marketPlace/rbms.html" %} 
+{% block rbmsM %}
+<div class="container bg-gradient-light py-5 shadow">
+    <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3"><i class="fa fa-arrow-left"></i> Back</a>
+  <h2 class="text-center mb-4">
+    <span class="fa fa-credit-card"></span> How to Make Payment
+  </h2>
+  <p class="text-center mb-3">
+    Please use any of the following payment methods. 
+    <i class="text-danger">Please do not forget to use the <b class="fw-bold text-success">{{acceptanceCode}}</b> as your reference for easy identification.</i>
+  </p>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover w-100">
+      <thead class="table-dark">
+        <tr>
+          <th>Method</th>
+          <th>Details</th>
+          <th>Reference Code</th>
+        </tr>
+      </thead>
+      <tbody>        
+        {% for account in accounts %}           
+           {% if account.accountType == "Mobile Money Account" %}
+              <!-- MoMo -->
+              <tr style="color: white">
+                <td style="color: white"><span class="fa fa-mobile"></span> Mobile Money (MoMo)</td>
+                <td style="color: white">
+                  <p><strong>MoMo Number:</strong> {{account.accountNumber}}</p>
+                  <p><strong>MoMo Name:</strong> {{account.accountName}}</p>
+                  <p><strong>MoMo Subscriber:</strong> {{account.subscriber}}</p>
+                </td>
+                <td class="fw-bold text-success">{{acceptanceCode}}</td>
+              </tr>
+           {% else %}
+              <!-- Bank -->
+              <tr>
+                <td style="color: white"><span class="fa fa-university"></span> Bank Transfer</td>
+                <td style="color: white">
+                  <p><strong>Account Number:</strong> {{account.accountNumber}}</p>
+                  <p><strong>Account Name:</strong> {{account.accountName}}</p>                  
+                  <p><strong>Bank Name:</strong> {{account.bankName}}</p>
+                  <p><strong>Bank Branch:</strong> {{account.bankBranchName}}</p>
+                </td>
+                <td class="fw-bold text-success">{{acceptanceCode}}</td>
+              </tr>            
+           {% endif %}          
+        {% endfor %}
+        <!-- Other -->
+        <tr>
+          <td style="color: white"><span class="fa fa-money"></span> Other Payment Options</td>
+          <td style="color: white">
+            <p>Please contact our office on <b class="fw-bold text-success"><u>{{branch.branchTel}}</u></b> for details on additional payment methods.</p>
+          </td>
+          <td class="fw-bold text-success"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+    <h3 class="text-center mb-3">
+        <i class="text-danger">Please do not forget to use the <b class="fw-bold text-success">{{acceptanceCode}}</b> as your reference for easy identification.</i>
+    </h3>
+</div>
+{% endblock rbmsM %}

@@ -6,7 +6,10 @@
         <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
             <i class="fa fa-arrow-left"></i> Back
         </a>
-
+        <span style="margin-left: 2%; float: right" id="customerInfo">Your Details: <i class="fa fa-user"></i><b id="customerName"></b> | <i class="fa fa-phone"></i><b id="customerTel"></b></span>
+        <br/>
+        <br/>
+        <hr/>
         <div class="row">
 
             <!-- Images -->
@@ -50,14 +53,14 @@
                 
                 {% if product.totalDiscount > 0 %}
                     <p><b>Discount:</b> {{ product.totalDiscount }}%</p>
-                    <p><b>Old Price:</b> 
+                    <p><b>Old unit Price:</b> 
                         <span class="text-decoration-line-through text-muted"><i style="color: #c67605">GH&#8373</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice }}</span>
                     </p>
-                    <p><b>New Price:</b> 
+                    <p><b>New Unit Price:</b> 
                         <span class="text-success fw-bold"><i style="color: #c67605">GH&#8373</i>{{ product.priceAfterDiscount }}</span>
                     </p>
                 {% else %}
-                    <p><b>Price:</b> 
+                    <p><b>Unit Price:</b> 
                         <span class="text-success fw-bold"><i style="color: #c67605">GH&#8373</i>{{ product.priceAfterDiscount }}</span>
                     </p>                
                 {% endif %}
@@ -68,8 +71,14 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="customerPhone" class="form-label"><b>Your Phone Number</b></label>
-                            <input type="tel" class="form-control" id="customerPhone" name="customerPhone" placeholder="Enter your phone number" required>
+                            <input type="hidden" class="form-control" id="customerPhone" name="customerPhone" placeholder="Enter your phone number" required>
+                        </div>
+                        <!-- Total Price Display -->
+                        <div class="mb-3">
+                            <label><b>Total Price:</b></label>
+                            <p id="totalPrice" class="fw-bold text-success">
+                                <i style="color: #c67605">GH&#8373</i>{{ product.priceAfterDiscount|floatformat:2 }}
+                            </p>
                         </div>
                         <!-- Quantity -->
                         <div class="mb-3">
@@ -105,23 +114,49 @@
 
     <script>
         const input = document.getElementById("customerPhone");
-        const saveBtn = document.getElementById("saveBtn");
-
-        // Save value to localStorage
-        saveBtn.addEventListener("click", () => {
-        const value = input.value;
-        localStorage.setItem("customerTel", value);
-        input.value = value; // update immediately
-        });
+        const cusTel = document.getElementById('customerTel');
+        const cusName = document.getElementById('customerName'); 
 
         // Load value from localStorage when page loads
         window.addEventListener("DOMContentLoaded", () => {
         const storedValue = localStorage.getItem("customerTel");
-        if (storedValue) {
-            input.value = storedValue; // optional: prefill input
+        const storedName = localStorage.getItem('customerName');
+        if (storedValue) {            
+            cusTel.textContent = storedValue;
+            cusName.textContent = storedName;
+            input.value = storedValue;
+            document.getElementById("customerInfo").style.display = "inline";
+            
+        }
+        else{
+            document.getElementById("customerInfo").style.display = "none";
         }
         });
     </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const quantityInput = document.getElementById("quantity");
+            const totalPriceDisplay = document.getElementById("totalPrice");
+
+            // Get unit price from template
+            const unitPrice = parseFloat("{{ product.priceAfterDiscount }}");
+
+            function updateTotal() {
+            const qty = parseInt(quantityInput.value) || 0;
+            const total = qty * unitPrice;
+            totalPriceDisplay.innerHTML = `<i style="color: #c67605">GH&#8373</i>${total.toFixed(2)}`;
+            }
+
+            // Initial calculation
+            updateTotal();
+
+            // Update when quantity changes
+            quantityInput.addEventListener("input", updateTotal);
+        });
+    </script>
+
 
 
 {% endblock rbmsM %}

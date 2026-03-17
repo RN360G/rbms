@@ -44,6 +44,10 @@
                                 <li class="nav-item"><a class="nav-link" href="{% url 'salesToBeCollectedItems' %}"><i class="fas fa-cart-plus"></i><span style="font-weight: bold; font-size: larger;">Awaiting Collection (Paid)</span></a></li>
                             {% endif %}
 
+                            {% if request.session.onlineOrder %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'onlineOrderManager' %}"><i class="fas fa-cart-plus"></i><span style="font-weight: bold; font-size: larger;">Online Order</span></a></li>
+                            {% endif %}
+
                             {% if request.session.cashAnalysis %}
                                 <li class="nav-item"><a class="nav-link" href="{% url 'cashAnalysis' %}"><i class="fas fa-money"></i><span style="font-weight: bold; font-size: larger;">Cash Analyses</span></a></li>
                             {% endif %}
@@ -248,9 +252,9 @@
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle w-100 mb-2" data-bs-toggle="dropdown" href="#">
-                                        {{request.session.userNames}} <br/>
-                                        <sup style="color: burlywood;">{{request.session.userID}}</sup>
-                                        <img class="border rounded-circle img-profile" src="{{ request.session.profileImage }}">
+                                        <b>{{request.session.userNames}}</b> <br/>                                        
+                                        <img class="border rounded-circle img-profile" src="{{ request.session.profileImage }}" width="40" height="40">
+                                        <b style="color: burlywood;">{{request.session.userID}}</b>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end shadow">
                                         <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
@@ -286,6 +290,10 @@
                                     
                                         {% if request.session.awaitingCollection %}
                                         <li class="nav-item"><a class="nav-link" href="{% url 'salesToBeCollectedItems' %}"><i class="fas fa-cart-plus"></i><span style="font-weight: bold; font-size: larger;">Awaiting Collection (Paid)</span></a></li>
+                                        {% endif %}
+
+                                        {% if request.session.onlineOrder %}
+                                            <li class="nav-item"><a class="nav-link" href="{% url 'onlineOrderManager' %}"><i class="fas fa-cart-plus"></i><span style="font-weight: bold; font-size: larger;">Online Order</span></a></li>
                                         {% endif %}
 
                                         {% if request.session.cashAnalysis %}

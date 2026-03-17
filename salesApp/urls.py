@@ -57,6 +57,6 @@ urlpatterns = [
     path('salesrefund', views.Refund.as_view(), name='salesRefund'),
     path('salescustomerrefund/<pk>', views.Refund.customerRefund, name='salesCustomerRefund'),
     path('salessaverefund/<pk>', views.Refund.saveCustomerRefund, name='salesSaveRefund'),
-    path('salessetminimumandonlineorder/<pk>', views.SetProductProperties.minimumAndOnlineOrder, name='salesMinimumAndOnlineOrder'),
+    path('salessetminimumandonlineorder/<pk>', views.SetProductProperties.minimumAndOnlineOrder, name='salesMinimumAndOnlineOrder'),    
 ]
 

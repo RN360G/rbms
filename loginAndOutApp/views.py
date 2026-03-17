@@ -5,10 +5,14 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import User
 from usersApp.models import UserRef
 from businessApp.models import BusinessBranch, Business
+from marketPlaceApp.models import CustomerInfor, CustomerAddToCart, DeliveryAddress
 from django.db.models import Sum, Q
 from django.contrib import messages
 from usersApp.views import setStatus, UserAccess
 from imageApp.models import Images
+import random as rd
+from sms import sendSMS
+from django.db.transaction import atomic
 
 
 # Create your views here.
@@ -103,7 +107,43 @@ class CustomerLogins(generic.View):
         return render(request, 'loginApp/customerLogin.html')
     
     def post(self, request):
-        return HttpResponse('')
+        customerTel = request.POST.get('customerTel')
+        pin = request.POST.get('pin')
+
+        tel = str(customerTel)
+        tel = tel[1:]
+        tel = f'+233{tel}'
+        
+        customer = CustomerInfor.objects.filter(Q(tel=tel))
+        if customer.exists():
+            customer = customer[0]
+            if check_password(password=pin, encoded=customer.pin):
+                if customer.status != 'Verified':
+                    customer.status = 'Verified'
+                    customer.save()
+                    messages.set_level(request, messages.INFO)
+                    messages.info(request, {'message': 'You have successfully logged in. Please click the OK button to save your phone number — this is required for all transactions. For your security, always remember to log out when using a public computer.', 'title': f'Hi {customer.customerName}. Welcome to RN360B'},  extra_tags='customerLogInSuccessful')                    
+                    return render(request, 'loginApp/storeCustomerPhoneNumber.html', {'tel': customer.tel, 'customerName': customer.customerName})
+                else:
+                    messages.set_level(request, messages.INFO)
+                    messages.info(request, {'message': 'You have successfully logged in. Please click the OK button to save your phone number — this is required for all transactions. For your security, always remember to log out when using a public computer.', 'title': f'Hi {customer.customerName}. Welcome to RN360B'},  extra_tags='customerLogInSuccessful')                    
+                    return render(request, 'loginApp/storeCustomerPhoneNumber.html', {'tel': customer.tel, 'customerName': customer.customerName})
+            else:
+                messages.set_level(request, messages.WARNING)
+                messages.warning(request, {'message': 'Log in failed. Please check your credentials and try again.', 'title': 'Log in Failed'},  extra_tags='customerLogInFaild')                    
+                return render(request, 'loginApp/state.html')
+        else:
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'Log in failed. Please check your credentials and try again.', 'title': 'Log in Failed'},  extra_tags='customerLogInFaild')                    
+            return render(request, 'loginApp/state.html')
+        
+
+# customer logout
+class CustomerLogout(generic.View):
+    def get(self, request):
+            messages.set_level(request, messages.INFO)
+            messages.info(request, {'message': 'You are about to sign out. Please confirm to proceed. For your security, we will clear your details from the browser to protect your privacy. If you are using a public computer, remember to close the browser window after signing out.', 'title': 'Sign out'},  extra_tags='signOutCustomer')  
+            return render(request, 'loginApp/removeCustomerStoredPhonenumber.html')
     
 
 # create customer account
@@ -112,8 +152,47 @@ class CreateCustomerAccount(generic.View):
         return render(request, 'loginApp/createCustomerAcc.html')
     
     def post(self, request):
-        
-        return HttpResponse()
+        with atomic():
+            fullName = request.POST.get('fullName')
+            tel = request.POST.get('tel')
+            
+            # add country code to the phone number
+            tel = str(tel)
+            tel = tel[1:]
+            tel = f'+233{tel}'
+
+            # check if account is verified
+            check = CustomerInfor.objects.filter(Q(tel=tel))
+            if check.exists():
+                db = check[0]
+                if db.status == 'Verified':
+                    messages.set_level(request, messages.ERROR)
+                    messages.error(request, {'message': f'Account with phone number {tel} already exist.', 'title': f'{tel} already exist'},  extra_tags='customerTelAlreadyExist')
+                    return render(request, 'loginApp/state.html')
+                else:
+                    newPin = f'{rd.randrange(0, 9)}{rd.randrange(0, 9)}{rd.randrange(0, 9)}{rd.randrange(0, 9)}'
+                    db.status = 'Pending'
+                    db.pin = make_password(password=newPin)
+                    db.customerName = fullName
+                    db.save()
+                    print('===================================================================================='+newPin)
+                    messages.set_level(request, messages.INFO)
+                    messages.info(request, {'message': f'You have successfuly created an account with {tel}.', 'title': f'New Account is Created'},  extra_tags='customerAccountCreated')
+                    sendSMS(tel, ' Your new pin is: ' + str(newPin) + '.Please do not share your pin with anyone.')
+                    return render(request, 'loginApp/state.html')
+            else:
+                newPin = f'{rd.randrange(0, 9)}{rd.randrange(0, 9)}{rd.randrange(0, 9)}{rd.randrange(0, 9)}'
+                db = CustomerInfor()
+                db.tel = tel
+                db.status = 'Pending'
+                db.pin = make_password(password=newPin)     
+                db.customerName = fullName
+                db.save()
+                print('===================================================================================='+newPin)
+                messages.set_level(request, messages.INFO)
+                messages.info(request, {'message': f'You have successfuly created an account with {tel}.', 'title': f'New Account is Created'},  extra_tags='customerAccountCreated')
+                sendSMS(tel, 'Your pin is: ' + str(newPin) + '.Please do not share your pin with anyone.')            
+                return render(request, 'loginApp/state.html')
     
 
 # generate new pin: use when the customer forget his pin
@@ -122,7 +201,31 @@ class GenerateNewPin(generic.View):
         return render(request, 'loginApp/generateNewPin.html')
     
     def post(self, request):
-        return HttpResponse()
+        with atomic():
+            tel = request.POST.get('tel')
+            
+            # add country code to the phone number
+            tel = str(tel)
+            tel = tel[1:]
+            tel = f'+233{tel}'
+            
+            newPin = f'{rd.randrange(0, 9)}{rd.randrange(0, 9)}{rd.randrange(0, 9)}{rd.randrange(0, 9)}'
+            check = CustomerInfor.objects.filter(Q(tel=tel))
+            if check.exists():
+                db = check[0]
+                db.status = 'Pending'
+                db.pin = make_password(password=newPin)
+                db.save()
+                print('===================================================================================='+newPin)
+                messages.set_level(request, messages.INFO)
+                messages.info(request, {'message': f'You have successfuly generated new PIN. You new PIN has been sent to {tel}.', 'title': f'New PIN generated'},  extra_tags='customerAccountCreated')
+                sendSMS(tel, ' Your new pin is: ' + str(newPin) + '.Please do not share your pin with anyone.')
+                return render(request, 'loginApp/state.html')
+            else:
+                messages.set_level(request, messages.ERROR)
+                messages.error(request, {'message': f'Account with {tel} do not exist.', 'title': f'Wrong Phone number'},  extra_tags='customerPhoneNumberNotExist')
+                sendSMS(tel, ' Your new pin is: ' + str(newPin) + '.Please do not share your pin with anyone.')
+                return render(request, 'loginApp/state.html')
 
 
 class CreatePassword(generic.View):
@@ -130,27 +233,28 @@ class CreatePassword(generic.View):
         return render(request, 'loginApp/createPassword.html')
 
     def post(self, request):
-        user = UserRef.objects.get(Q(userID=str(request.session['userID'])))
-        confirmPassW = request.POST.get('confirmPassW')
-        passW = request.POST.get('passW')
+        with atomic():
+            user = UserRef.objects.get(Q(userID=str(request.session['userID'])))
+            confirmPassW = request.POST.get('confirmPassW')
+            passW = request.POST.get('passW')
 
-        if len(str(passW)) >= 6:
-            if str(passW)== str(confirmPassW):
-                 user.password = make_password(password=passW)
-                 user.passwordIsSet = True
-                 user.save()
-                 messages.set_level(request, messages.SUCCESS)
-                 messages.success(request, {'message': 'You have successfuly created your password.', 'title': 'Password Creation is Successfuly', 'otherInfo': 'Please click the button below to log in to your account'},
-                               extra_tags='passwordCreated')
+            if len(str(passW)) >= 6:
+                if str(passW)== str(confirmPassW):
+                    user.password = make_password(password=passW)
+                    user.passwordIsSet = True
+                    user.save()
+                    messages.set_level(request, messages.SUCCESS)
+                    messages.success(request, {'message': 'You have successfuly created your password.', 'title': 'Password Creation is Successfuly', 'otherInfo': 'Please click the button below to log in to your account'},
+                                extra_tags='passwordCreated')
+                else:
+                    messages.set_level(request, messages.ERROR)
+                    messages.error(request, {'message': 'Passwords do not match. Please try again.', 'title': 'Password Error'},
+                                extra_tags='passwordCreationDontMatch')
             else:
                 messages.set_level(request, messages.ERROR)
-                messages.error(request, {'message': 'Passwords do not match. Please try again.', 'title': 'Password Error'},
-                               extra_tags='passwordCreationDontMatch')
-        else:
-            messages.set_level(request, messages.ERROR)
-            messages.error(request, {'message': 'The Password should not be less than six(6) characters.', 'title': 'Password Error'},
-                               extra_tags='passwordLessThenSixCharacters')
-        return render(request, 'loginApp/state.html')
+                messages.error(request, {'message': 'The Password should not be less than six(6) characters.', 'title': 'Password Error'},
+                                extra_tags='passwordLessThenSixCharacters')
+            return render(request, 'loginApp/state.html')
     
 
 def logout(request, userID):
@@ -214,6 +318,7 @@ def dashboardMenuAccess(request):
     request.session['awaitingCollection'] = False
     request.session['repayments'] = False
     request.session['refund'] = False
+    request.session['onlineOrder'] = False    
     userAccess = UserAccess.objects.filter(Q(userRef=user))
 
     if user.userIsAdmin:
@@ -233,6 +338,7 @@ def dashboardMenuAccess(request):
         request.session['awaitingCollection'] = True
         request.session['repayments'] = True
         request.session['refund'] = True
+        request.session['onlineOrder'] = True        
     else:
         for uA in userAccess:
             if uA.accessRef.accessCode == '1':
@@ -267,6 +373,9 @@ def dashboardMenuAccess(request):
                 request.session['repayments'] = True
             if uA.accessRef.accessCode == '16':
                 request.session['refund'] = True
+            if uA.accessRef.accessCode == '17':
+                request.session['onlineOrder'] = True
+                
         
 
 

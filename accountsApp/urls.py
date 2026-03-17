@@ -19,4 +19,6 @@ urlpatterns = [
     path('depositandwithdrawalfrombranchacc/', views.AccountsView.depositAndWithdrawalFromBranchAcc, name='depositAndWithdrawalFromBranchAcc'),
     path('payroll/', views.PayRoll.as_view(), name='payRoll'),
     path('salesincomestatement/', views.IncomeStatementView.as_view(), name='salesIncomeState'),
+    path('addedonlineaccount/', views.addOnlinePaymentAccounts, name='addOnlinePaymentAccounts'), 
+    path('deleteonlineaccount/<pk>', views.deleteOnlineAccount, name='deleteOnlineAccount'),
 ]

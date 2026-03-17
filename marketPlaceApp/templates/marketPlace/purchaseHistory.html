@@ -1,0 +1,79 @@
+{% extends "marketPlace/rbms.html" %} 
+{% block rbmsM %}
+<div class="container my-4">
+  <h2 class="mb-4"><i class="fa fa-shopping-cart"></i>Transactions History</h2>
+    <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3"><i class="fa fa-arrow-left"></i> Back</a>
+  {% if carts %}
+
+      {% if not request.user_agent.is_mobile %}  
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th>Date</th>
+                <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carts %}
+                <tr>
+                    <td style="color: white">
+                    <b>{{ item.productRef.productName }}</b><br>
+                    <small>Code: {{ item.productRef.productCode }}</small>
+                    </td>
+                    <td style="color: white">{{ item.quantity }}</td>
+                    <td style="color: white">₵{{ item.unitPrice}}</td>
+                    <td style="color: white">{{item.totalPrice}}</td>
+                    <td style="color: white">{{item.date}}</td>
+                    <td style="color: white">
+                      {% if item.status == "Payment Confirmed" %}
+                          <span class="mb-1"><b style="color: green">{{ item.status }}</b></span>
+                        {% else %}
+                          <span class="mb-1">{{ item.status }}</span>                         
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+
+       <!--Mobile View=================================================================================================================-->
+      {% else %}     
+        <div class="table-responsive mx-0 px-0">
+          <table class="table w-100 mb-0" id="productCartTable">
+            <tbody>
+              {% for item in carts %}
+                <tr>
+                  <td class="p-0 border-0">
+                    <div class="card shadow-sm rounded-0 mb-2">
+                      <div class="card-body p-2">
+                        <h4 class="card-title mb-1 fw-bold">
+                          {{ item.productRef.productName }}
+                        </h4>
+                        <p class="mb-1"><small>Code: {{ item.productRef.productCode }}</small></p>
+                        <p class="mb-1"><strong>Quantity:</strong> {{ item.quantity }}</p>
+                        <p class="mb-1"><strong>Unit Price:</strong> ₵{{ item.unitPrice }}</p>
+                        <p class="mb-1"><strong>Total:</strong> {{ item.totalPrice }}</p>
+                        <p class="mb-1"><strong>Date:</strong> {{ item.date }}</p>
+                          {% if item.status == "Payment Confirmed" %}
+                            <p class="mb-1"><strong>Status:</strong> <b style="color: green">{{ item.status }}</b></p>
+                          {% else %}
+                            <p class="mb-1"><strong>Status:</strong> {{ item.status }}</p>                         
+                          {% endif %}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>      
+      {% endif %}
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+</div>
+{% endblock rbmsM %}

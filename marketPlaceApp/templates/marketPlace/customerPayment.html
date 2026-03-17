@@ -1,0 +1,133 @@
+{% extends "marketPlace/rbms.html" %} 
+{% block rbmsM %}
+<div class="container my-4">
+  <h2 class="mb-4"><i class="fa fa-money"></i> Request Payment</h2>
+  <a href="{% url 'marketAddedCarts' 0 %}" class="btn btn-primary fa fa-shopping-cart" style="float: right; margin: 2%;" id="purchasehistoryBtn">Back To Cart</a>
+  <br/>
+  <br/>
+  <hr/>
+  {% if carts %}
+    
+    {% if not request.user_agent.is_mobile %} 
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Batch Code</th>
+            <th>Supplier</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in carts %}
+            <tr>
+              <td style="color: white">{{item.batchCode}}</td>
+              <td style="color: white">{{ item.branhRef__busRef__busName }} <br/> <sup>{{ item.branhRef__branchName }} ({{ item.branhRef__branchID}})</sup></td>
+              <td style="color: white">{{item.totalPrice}}</td>
+              <td style="color: white">{{item.status}}</td>
+              <td>
+                  
+                  {% if item.status == 'Request Accepted'%}
+                    <a href="{% url 'paymentInstructions' item.branhRef__branchID item.customerTel item.batchCode %}" class="btn btn-primary fa fa-credit-card" style="background: brown">Choose Payment Methods</a>                  
+                  {% else %}
+                    <form method="post" action="{% url 'customerRequestPayment' item.batchCode %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="hidden" class="form-control" id="customerTel" name="customerTel" value="{{item.customerTel}}" required>
+                            <input type="hidden" class="form-control" id="branchID" name="branchID" value="{{item.branhRef__branchID}}" required>
+                        </div>
+                        <!-- Add to Cart Button -->
+                        
+                        {% if item.status == 'Waiting Payment Request' %}
+                            <button type="submit" class="btn btn-primary" id='saveBtn'><i class="fa fa-money"></i> Request For Payment</button>
+                        {% elif item.status == 'Pending Payment Request'  %}
+                            <button type="submit" class="btn btn-danger" id='saveBtn'><i class="fa fa-remove"></i> Cancel Request</button>                        
+                        {% endif %}         
+
+                    </form>
+                  {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!--Mobile View==================================================================================================================-->
+      {% else %}
+        <div class="table-responsive mx-0 px-0">
+          <table class="table w-100 mb-0" id="cartTable">
+            <tbody>
+              {% for item in carts %}
+                <tr>
+                  <td class="p-0 border-0">
+                    <div class="card shadow-sm rounded-0 mb-2">
+                      <div class="card-body p-2">
+                        <h6 class="card-title mb-1 fw-bold">
+                          Batch Code: <b style="color: goldenrod">{{ item.batchCode }}</b>
+                        </h6>
+                        <p class="mb-1">
+                          <strong>Supplier:</strong> {{ item.branhRef__busRef__busName }}<br>
+                          <sup>{{ item.branhRef__branchName }} ({{ item.branhRef__branchID }})</sup>
+                        </p>
+                        <p class="mb-1"><strong>Total Price:</strong> {{ item.totalPrice }}</p>
+                        
+                        {% if item.status == "Payment Confirmed" %}
+                          <p class="mb-1"><strong>Status:</strong> <b style="color: green">{{ item.status }}</b></p>
+                        {% else %}
+                          <p class="mb-1"><strong>Status:</strong> {{ item.status }}</p>                         
+                        {% endif %}
+
+                        <!-- Actions -->
+                        <div class="mt-2">
+                          {% if item.status == 'Request Accepted' %}
+                            <a href="{% url 'paymentInstructions' item.branhRef__branchID item.customerTel item.batchCode %}" 
+                              class="btn btn-primary btn-sm w-100" style="background: brown">
+                              <i class="fa fa-credit-card"></i> Choose Payment Methods
+                            </a>
+                          {% else %}
+                            <form method="post" action="{% url 'customerRequestPayment' item.batchCode %}">
+                              {% csrf_token %}
+                              <input type="hidden" name="customerTel" value="{{item.customerTel}}">
+                              <input type="hidden" name="branchID" value="{{item.branhRef__branchID}}">
+
+                              {% if item.status == 'Waiting Payment Request' %}
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                  <i class="fa fa-money"></i> Request For Payment
+                                </button>
+                              {% elif item.status == 'Pending Payment Request' %}
+                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                  <i class="fa fa-remove"></i> Cancel Request
+                                </button>
+                              {% endif %}
+                            </form>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+    {% endif %}
+
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+</div>
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const storedValue = localStorage.getItem("customerTel"); // or "cart_items_count"
+
+            if (storedValue) {
+                const purchasehistoryBtn = document.getElementById("purchasehistoryBtn");
+                purchasehistoryBtn.href = `/carts/${storedValue}/`;
+            }
+            else{
+
+            }
+        });
+  </script>
+{% endblock rbmsM %}

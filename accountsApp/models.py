@@ -210,3 +210,17 @@ class PayRoll(models.Model):
     wageType = models.CharField(max_length=20) # Annual Salary(Salary), hourly wages 
     currentSalary = models.FloatField(default=0.00)
 
+
+#online payment accounts
+class OnlineAccounts(models.Model):
+    branchRef = models.ForeignKey('businessApp.BusinessBranch', on_delete=models.CASCADE)
+    accountNumber = models.CharField(max_length=30)
+    accountName = models.CharField(max_length=50)
+    accountType = models.CharField(max_length=15, default='Mobile Money Account') # Mobile Money Account, Bank Account
+    subscriber = models.CharField(max_length=30, default="")
+    bankName = models.CharField(max_length=30, default="")
+    bankBranchName = models.CharField(max_length=30, default="")
+    date = models.DateField()
+
+
+

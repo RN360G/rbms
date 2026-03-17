@@ -136,89 +136,86 @@
 
 <body>
     <nav class="navbar navbar-expand-md sticky-top py-3 navbar-dark bg-dark" id="mainNav">
-        <div class="container-fluid">
-            <!-- Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="/">
-            <span class="bs-icon-sm bs-icon-circle bs-icon-primary shadow d-flex justify-content-center align-items-center me-2 bs-icon"
-                    style="overflow:hidden; width:2.5rem; height:2.5rem; flex-shrink:0;">
-                <img src="{% static 'img/rn360_4.jpeg' %}" alt="Brand"
-                    style="width:100%; height:100%; object-fit:cover; display:block;">
-            </span>
-            <span class="fs-3">
-                <b style="color:red">RN</b><b style="color:white">360B</b>
-            </span>
-            </a>
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+        <span class="bs-icon-sm bs-icon-circle bs-icon-primary shadow d-flex justify-content-center align-items-center me-2 bs-icon"
+                style="overflow:hidden; width:2.5rem; height:2.5rem; flex-shrink:0;">
+            <img src="{% static 'img/rn360_4.jpeg' %}" alt="Brand"
+                style="width:100%; height:100%; object-fit:cover; display:block;">
+        </span>
+        <span class="fs-3">
+            <b style="color:red">RN</b><b style="color:white">360B</b>
+        </span>
+        </a>
 
-            <!-- Right-side quick actions -->
-            <div class="d-flex align-items-center ms-auto">
-            <button id="installBtn" class="btn btn-outline-light btn-sm me-3">
-                <i class="bi bi-download"></i> Install RN360B
-            </button>
-            <a id="searchToggle" class="nav-link me-3" style="cursor:pointer;">
-                <i class="fa fa-search"></i>
-            </a>
-            <!-- Navbar toggler -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navcol-1">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            </div>
-
-            <!-- Collapsible content -->
-            <div class="collapse navbar-collapse mt-3 mt-md-0" id="navcol-1">
-            <!-- Scrollable nav items -->
-            <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto" style="overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%;">
-                <li class="nav-item shadow me-2">
-                    <a class="nav-link" href="#all"><i class="fa fa-circle"></i> All</a>
-                </li>
-                <li class="nav-item shadow me-2">
-                    <a class="nav-link" href="#products"><i class="fa fa-cart-plus"></i> Products</a>
-                </li>
-                <li class="nav-item shadow me-2">
-                    <a class="nav-link" href="#businesses"><i class="fa fa-building"></i> Businesses</a>
-                </li>
-
-                <!-- Dropdown for Others -->
-                <li class="nav-item dropdown shadow me-2">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="othersDropdown" role="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-building"></i> Others
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="othersDropdown">
-                        <li><a class="dropdown-item" href="#other1">Other 1</a></li>
-                        <li><a class="dropdown-item" href="#other2">Other 2</a></li>
-                        <li><a class="dropdown-item" href="#other3">Other 3</a></li>
-                        <li><a class="dropdown-item" href="#other4">Other 4</a></li>
-                    </ul>
-                </li>
-            </ul>
-
-
-            <!-- Search form -->
-            <form id="searchForm" class="form-inline my-2 my-lg-0 d-none ms-md-auto me-3">
-                <div class="input-group">
-                <input id="navSearchInput" class="form-control" type="search" placeholder="Search" aria-label="Search">
-                <button id="navSearchBtn" class="btn btn-outline-success" type="submit">Search</button>
-                </div>
-            </form>
-
-            <!-- Auth links -->
-            <a class="nav-link fa fa-lock me-3" href="{% url 'loginOptions' %}"> Sign In</a>
-            <a class="nav-link fa fa-plus me-3" href="{% url 'addBusiness' %}"> Create Business</a>
-            
-            <!-- Cart icon moved here -->
-            <a href="{% url 'marketAddedCarts' 0 %}" class="nav-link fa fa-cart-plus me-3" style="font-size:20px;" id="cart_id"></a>
-            </div>
+        <!-- Right-side quick actions -->
+        <div class="d-flex align-items-center ms-auto">
+        <button id="installBtn" class="btn btn-outline-light btn-sm me-3">
+            <i class="bi bi-download"></i> Install RN360B
+        </button>
+        <a id="searchToggle" class="nav-link me-3" style="cursor:pointer;">
+            <i class="fa fa-search"></i>
+        </a>
+        <!-- Navbar toggler -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navcol-1">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         </div>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse mt-3 mt-md-0" id="navcol-1">
+        <!-- Scrollable nav items -->
+        <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto" 
+            style="overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%;">
+            <li class="nav-item shadow me-2">
+            <a class="nav-link" href="#all"><i class="fa fa-circle"></i> All</a>
+            </li>
+            <li class="nav-item shadow me-2">
+            <a class="nav-link" href="#products"><i class="fa fa-cart-plus"></i> Products</a>
+            </li>
+            <li class="nav-item shadow me-2">
+            <a class="nav-link" href="#businesses"><i class="fa fa-building"></i> Businesses</a>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown shadow me-2">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="othersDropdown" role="button">
+                <i class="fa fa-building"></i> Others
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="othersDropdown">
+                <li><a class="dropdown-item" href="#other1">Other 1</a></li>
+                <li><a class="dropdown-item" href="#other2">Other 2</a></li>
+                <li><a class="dropdown-item" href="#other3">Other 3</a></li>
+                <li><a class="dropdown-item" href="#other4">Other 4</a></li>
+            </ul>
+            </li>
+        </ul>
+
+        <!-- Search form -->
+        <!--<form id="searchForm" class="form-inline my-2 my-lg-0 d-none ms-md-auto me-3">
+            <div class="input-group">
+            <input id="navSearchInput" class="form-control" type="search" placeholder="Search" aria-label="Search">
+            <button id="navSearchBtn" class="btn btn-outline-success" type="submit">Search</button>
+            </div>
+        </form>-->
+
+        <!-- Auth links -->
+        <a class="nav-link fa fa-sign-in me-3" href="{% url 'loginOptions' %}"> Sign In</a>
+        <a class="nav-link fa fa-sign-out me-3" href="{% url 'customerLogout' %}"> sign Out</a>
+        <a class="nav-link fa fa-plus me-3" href="{% url 'addBusiness' %}"> Create Business</a>
+
+        <!-- Cart icon -->
+        <a href="{% url 'marketAddedCarts' 0 %}" class="nav-link fa fa-cart-plus me-3" 
+            style="font-size:20px;" id="cart_id"></a>
+        </div>
+    </div>
     </nav>
-
-
-
-    <!-- moved search form: placed under the navbar (keeps layout outside of .navbar) -->
+    <!-- moved search form: placed under the navbar (keeps layout outside of .navbar) --> 
     <div id="navSearchContainer" class="d-none" aria-hidden="true">
         <div class="container" style="padding-top:6px;padding-bottom:6px;">
-            <form id="searchForm" class="form-inline my-0">
+            <form id="searchForm" action="{% url 'generalMarket' %}" class="form-inline my-0">
                 <div class="input-group" style="max-width:420px;">
-                    <input id="navSearchInput" class="form-control" type="search" placeholder="Search" aria-label="Search">
+                    <input id="navSearchInput" name="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
                     <button id="navSearchBtn" class="btn btn-outline-success" type="submit">Search</button>
                 </div>
             </form>
@@ -233,13 +230,12 @@
     </button>
 
     <script src="{% static 'jsM/bootstrap.bundle.min.js' %}"></script>
-    <!--<script src="{% static 'js/jquery.min.js' %}"></script>-->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'jsM/freelancer.js' %}"></script>
     <script src="{% static 'jsM/bold-and-dark.js' %}"></script>
     <script src="{% static 'js/bs-init.js' %}"></script>
     <script src="{% static 'js/theme.js' %}"></script>
     <script src="{% static 'jsM/stylish-portfolio.js' %}"></script> 
-
     <style>
         /* ensure the moved search container visually sits under the navbar */
         #navSearchContainer {
@@ -293,7 +289,7 @@
                 if (window.scrollY > showAt) btn.classList.add('show');
                 else btn.classList.remove('show');
             };
-
+            
             // show/hide on scroll
             window.addEventListener('scroll', toggle, { passive: true });
             // initial state
@@ -322,7 +318,8 @@
                 behavior: "smooth" // smooth scrolling effect
             });
         });
-    </script>    
+    </script> 
+       
 
 
     <!--use install button-->
@@ -375,7 +372,55 @@
         });
     </script>
 
-
-
+    <!--Hide Cart icon when not sign in-->
+    <script>
+        // Load value from localStorage when page loads
+            window.addEventListener("DOMContentLoaded", () => {
+            const storedValue = localStorage.getItem("customerTel");
+            if (storedValue) {
+                document.getElementById("cart_id").style.display = "inline";            
+            }
+            else{
+                document.getElementById("cart_id").style.display = "none";
+            }
+            });
+    </script>   
     
+    <!--Search for items======================================================-->
+    <script>
+        $(document).ready(function(){
+        let $input = $("#navSearchInput");
+        let $container = $("<div>").addClass("list-group position-absolute w-100").css("z-index", "1000");
+        $input.parent().append($container);
+
+        $input.on("keyup", function(){
+            let query = $(this).val();        
+            if(query.length < 2){
+            $container.empty();
+            return;
+            }            
+
+            $.ajax({
+                url: "/autocomplete-items/",
+                type: 'GET',
+                dataType: 'json',
+                data: { 'q': query },
+                success: function(data){            
+                    $container.empty();
+                    $.each(data, function(i, item){
+                    let $option = $("<button>")
+                        .attr("type", "button")
+                        .addClass("list-group-item list-group-item-action")
+                        .text(item)
+                        .on("click", function(){
+                        $input.val(item);
+                        $container.empty();
+                        });
+                    $container.append($option);
+                    });
+                }
+            });
+        });
+        });
+    </script>
 </body>

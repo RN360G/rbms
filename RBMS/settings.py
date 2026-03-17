@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'realEstateApp',
     'restaurantAndBarApp',
     'richnet360',
+    'onlineOrderApp',
     'django_user_agents',
     'django.contrib.admin',
     'django.contrib.auth',
