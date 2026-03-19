@@ -54,8 +54,8 @@ class Equity(models.Model):
 class Accounts(models.Model):
     busRef = models.ForeignKey('businessApp.Business', on_delete=models.CASCADE)
     branchRef = models.ForeignKey('businessApp.BusinessBranch', on_delete=models.CASCADE, null=True)
-    accountType = models.CharField(max_length=15) # Business Account, Branch Account     
-    accountName = models.CharField(max_length=50)
+    accountType = models.CharField(max_length=50) # Business Account, Branch Account     
+    accountName = models.CharField(max_length=100)
     accountNumber = models.CharField(unique=True, max_length=20)
     accountBalance = models.FloatField(default=0.00)
 
@@ -63,8 +63,8 @@ class Accounts(models.Model):
 # transactions on the accounts
 class AccountTransaction(models.Model):
     accountRef = models.ForeignKey(Accounts, on_delete=models.CASCADE)
-    transactionType = models.CharField(max_length=10) # Credit, Debit
-    transactionID = models.CharField(max_length=50)
+    transactionType = models.CharField(max_length=30) # Credit, Debit
+    transactionID = models.CharField(max_length=100)
     amount = models.FloatField(default=0.00)
     balance = models.FloatField(default=0.00)
     narration = models.CharField(max_length=500)
@@ -121,19 +121,19 @@ class CashDenominations(models.Model):
     coins5pesewasTotal = models.FloatField(default=0.00)
     coins1pesewaTotal = models.FloatField(default=0.00)
     CashOnhandRef = models.ForeignKey(CashOnhand, on_delete=models.DO_NOTHING, null=True)
-    status = models.CharField(max_length=20, default="Fund not transfered")
+    status = models.CharField(max_length=50, default="Fund not transfered")
 
 
 # record of fund transfers between accounts    
 class TransferFundsRecord(models.Model):
-    transferType = models.CharField(max_length=10)  # Transfering, Receiving
+    transferType = models.CharField(max_length=50)  # Transfering, Receiving
     fromAccountRef = models.ForeignKey(Accounts, on_delete=models.CASCADE, related_name='from_account')
     toAccountRef = models.ForeignKey(Accounts, on_delete=models.CASCADE, related_name='to_account')
-    transactionID = models.CharField(max_length=50)
+    transactionID = models.CharField(max_length=100)
     amount = models.FloatField(default=0.00)
     narration = models.CharField(max_length=500)
     date = models.DateTimeField()
-    transerStatus = models.CharField(max_length=20)  # Pending, Confirmed, Rejected
+    transerStatus = models.CharField(max_length=50)  # Pending, Confirmed, Rejected
     enteredBy = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING, related_name='entered_by')
     confirmBy = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING, null=True, related_name='confirm_by')
 
@@ -150,7 +150,7 @@ class OversAndShortages(models.Model):
 # detailed records of overs and shortages
 class OversAndShortagesRecord(models.Model):
     oversAndShortagesRef = models.ForeignKey(OversAndShortages, on_delete=models.CASCADE)
-    transactionType = models.CharField(max_length=10)  # Over, Shortage
+    transactionType = models.CharField(max_length=50)  # Over, Shortage
     amount = models.FloatField(default=0.00)
     date = models.DateTimeField()
 
@@ -158,7 +158,7 @@ class OversAndShortagesRecord(models.Model):
 # shortage payments records
 class ShortagePaymentRecord(models.Model):
     oversAndShortagesRef = models.ForeignKey(OversAndShortages, on_delete=models.CASCADE)
-    paymentType = models.CharField(max_length=20)  # Make Payment, Clear Shortage
+    paymentType = models.CharField(max_length=50)  # Make Payment, Clear Shortage
     amount = models.FloatField(default=0.00)
     balance = models.FloatField(default=0.00)
     narration = models.CharField(max_length=500)
@@ -172,7 +172,7 @@ class OverWithdrawalRecord(models.Model):
     branchRef = models.ForeignKey('businessApp.BusinessBranch', on_delete=models.CASCADE)
     accountRef = models.ForeignKey(Accounts, on_delete=models.CASCADE)
     oversAndShortagesRef = models.ForeignKey(OversAndShortages, on_delete=models.CASCADE)
-    withdrawalType = models.CharField(max_length=20)  # Moved, Deposit
+    withdrawalType = models.CharField(max_length=50)  # Moved, Deposit
     amount = models.FloatField(default=0.00)
     balance = models.FloatField(default=0.00)
     narration = models.CharField(max_length=500)
@@ -183,8 +183,8 @@ class OverWithdrawalRecord(models.Model):
 # suspense account for inter branch and business transactions
 class SuspenseAccount(models.Model):
     busRef = models.ForeignKey('businessApp.Business', on_delete=models.CASCADE)
-    option = models.CharField(max_length=20, default='cashOnHand')  # cashOnHand, interBranch, branchToBusiness
-    transactionID = models.CharField(max_length=50)
+    option = models.CharField(max_length=50, default='cashOnHand')  # cashOnHand, interBranch, branchToBusiness
+    transactionID = models.CharField(max_length=100)
     fromBranch = models.ForeignKey('businessApp.BusinessBranch', on_delete=models.CASCADE, null=True, related_name='from_branch')
     toBranch = models.ForeignKey('businessApp.BusinessBranch', on_delete=models.CASCADE, null=True, related_name='to_branch')
     fromAccountRef = models.ForeignKey(Accounts, on_delete=models.CASCADE, related_name='suspense_from_account')
@@ -192,7 +192,7 @@ class SuspenseAccount(models.Model):
     amount = models.FloatField(default=0.00)
     oversAmount = models.FloatField(default=0.00) 
     shortageAmount = models.FloatField(default=0.00) 
-    description = models.CharField(max_length=255, null=True)
+    description = models.CharField(max_length=500, null=True)
     date = models.DateTimeField()
     enteredBy = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING)
 
@@ -214,12 +214,12 @@ class PayRoll(models.Model):
 #online payment accounts
 class OnlineAccounts(models.Model):
     branchRef = models.ForeignKey('businessApp.BusinessBranch', on_delete=models.CASCADE)
-    accountNumber = models.CharField(max_length=30)
+    accountNumber = models.CharField(max_length=50)
     accountName = models.CharField(max_length=50)
-    accountType = models.CharField(max_length=15, default='Mobile Money Account') # Mobile Money Account, Bank Account
-    subscriber = models.CharField(max_length=30, default="")
-    bankName = models.CharField(max_length=30, default="")
-    bankBranchName = models.CharField(max_length=30, default="")
+    accountType = models.CharField(max_length=50, default='Mobile Money Account') # Mobile Money Account, Bank Account
+    subscriber = models.CharField(max_length=100, default="")
+    bankName = models.CharField(max_length=100, default="")
+    bankBranchName = models.CharField(max_length=100, default="")
     date = models.DateField()
 
 

@@ -4,52 +4,52 @@ from django.db import models
 # Create your models here.
 
 class Business(models.Model):
-    busID = models.CharField(max_length=15)
-    busName = models.CharField(max_length=50)
-    busTel = models.CharField(max_length=20)
-    busEmail = models.CharField(max_length=50)
-    busOwner = models.CharField(max_length=50)
+    busID = models.CharField(max_length=50)
+    busName = models.CharField(max_length=100)
+    busTel = models.CharField(max_length=50)
+    busEmail = models.CharField(max_length=100)
+    busOwner = models.CharField(max_length=100)
     billRef = models.ForeignKey('richnet360.Bill', on_delete=models.DO_NOTHING, null=True)
     registrationNumber = models.CharField(max_length=100, null=True) # this part wll be entered and verified by RN360 only  
-    status = models.CharField(max_length=30, default='Active') # Active, Inactive, Closed
+    status = models.CharField(max_length=50, default='Active') # Active, Inactive, Closed
     description = models.CharField(max_length=500, default='')
 
 
 class BusinessBranch(models.Model):
     busRef = models.ForeignKey('Business', on_delete=models.CASCADE)
-    branchID = models.CharField(max_length=15)
-    branchName = models.CharField(max_length=50)
-    branchTel = models.CharField(max_length=20)
-    branchEmail = models.CharField(max_length=50)
+    branchID = models.CharField(max_length=50)
+    branchName = models.CharField(max_length=100)
+    branchTel = models.CharField(max_length=50)
+    branchEmail = models.CharField(max_length=100)
     branchType = models.CharField(max_length=50)  # Manufacturer, Distributor, Hotel, Resturant & Bar, Farm, etc
     operateAllTime = models.BooleanField(default=True)
     fromTime = models.TimeField(null=True)
     toTime = models.TimeField(null=True)
     onlineVisibility = models.BooleanField(default=False)
-    branchAddress = models.CharField(max_length=100, null=True)
+    branchAddress = models.CharField(max_length=200, null=True)
 
 
 class CodeBought(models.Model):
-    momoNumber = models.CharField(max_length=20)
-    pin = models.CharField(max_length=4)
+    momoNumber = models.CharField(max_length=50)
+    pin = models.CharField(max_length=30)
     date = models.DateField()
 
 
 class BusinessAccess(models.Model):
-    accessTitle = models.CharField(max_length=50)
-    accessDescription = models.CharField(max_length=50)
-    accessCode = models.CharField(max_length=6)
-    accessGroupCode = models.CharField(max_length=2)    
+    accessTitle = models.CharField(max_length=100)
+    accessDescription = models.CharField(max_length=200)
+    accessCode = models.CharField(max_length=30)
+    accessGroupCode = models.CharField(max_length=10)    
     thisAccessIsPayable = models.BooleanField(default=False)
     date = models.DateField()
 
 
 class Printers(models.Model):
     branchRef = models.ForeignKey(BusinessBranch, on_delete=models.CASCADE)
-    printerType = models.CharField(max_length=30)
+    printerType = models.CharField(max_length=100)
     id1 = models.CharField(max_length=100, null=True) # vendor ID , IP, devfile
-    id2 = models.CharField(max_length=30, null=True) # Product ID, port number
-    printerLabel = models.CharField(max_length=30)
+    id2 = models.CharField(max_length=100, null=True) # Product ID, port number
+    printerLabel = models.CharField(max_length=100)
 
 class AssignPrinterToUser(models.Model):
     printerRef = models.ForeignKey(Printers, on_delete=models.CASCADE)
