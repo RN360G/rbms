@@ -21,7 +21,7 @@ class BusinessBranch(models.Model):
     branchName = models.CharField(max_length=50)
     branchTel = models.CharField(max_length=20)
     branchEmail = models.CharField(max_length=50)
-    branchType = models.CharField(max_length=15)  # Manufacturer, Distributor, Hotel, Resturant & Bar, Farm, etc
+    branchType = models.CharField(max_length=50)  # Manufacturer, Distributor, Hotel, Resturant & Bar, Farm, etc
     operateAllTime = models.BooleanField(default=True)
     fromTime = models.TimeField(null=True)
     toTime = models.TimeField(null=True)
