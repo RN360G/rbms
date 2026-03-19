@@ -7,7 +7,7 @@ import datetime as dt
 from richnet360.models import ChargesType, Charges, Bill, BillPayments, CheckNextBillDate
 from django.contrib import messages
 from django.db import transaction
-
+from usersApp.models import UserRef
 
 # Create your views here.
 
@@ -130,7 +130,18 @@ class Richnet360(generic.View):
             else:
                 messages.set_level(request, messages.WARNING)
                 messages.warning(request, {'message': f'You have entered wrong business ID', 'title': 'Wrong Business ID'}, extra_tags='wrongBusinessID')
-                return render(request, 'richnet360/state.html')        
+                return render(request, 'richnet360/state.html')   
+
+    def businessAdmin(request, pk):
+        user = None
+        business = Business.objects.get(Q(id=pk))
+        branch = BusinessBranch.objects.filter(Q(busRef=business))
+        if branch.exists():
+            branch = branch[0]        
+            user = UserRef.objects.filter(Q(busRef=branch))
+            if user.exists():
+                user = user[0]
+        return render(request, 'richnet360/admin.html', {'user': user})     
     
 
 # billing the business activities

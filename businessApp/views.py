@@ -17,7 +17,6 @@ from imageApp.models import Images
 from django.contrib.auth.hashers import check_password
 from loginAndOutApp.views import dashboardMenuAccess
 from escpos.printer import File, Network, Usb, Serial, Dummy, Win32Raw
-from celery import Celery
 
 
 class AddBusiness(generic.View):

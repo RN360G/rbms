@@ -48,7 +48,10 @@
 
                                 <td>{{ dat.registrationNumber }}</td>
                                 <td>{{ dat.busOwner }}</td>
-                                <td><a href="" class="btn btn-outline-dark fa fa-money"> Transactions</a></td>
+                                <td>
+                                    <a href="{% url 'businessAdmin' dat.id %}" class="btn btn-outline-dark fa fa-user"> Admin</a>
+                                    <a href="" class="btn btn-outline-dark fa fa-money"> Transactions</a>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

@@ -10,7 +10,6 @@ from django.db import transaction
 from warehouseApp.models import Product
 from richnet360.views import BillBusiness
 from PIL import Image, ImageOps
-import cv2
 import loginAndOutApp.views as logV
 import os
 

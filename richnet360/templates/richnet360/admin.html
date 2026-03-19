@@ -1,0 +1,70 @@
+{% extends "dashboardApp/index.html" %}
+{% load static %}
+
+
+{% block index %}
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+            <a href="{% url 'richnetDashboard' %}" class="btn btn-outline-dark fa fa-backwad-arrow">Back</a>
+        </ul>
+        <br/>
+        <div class="tab-content">
+            <div class="container bg-gradient-light py-5 shadow">
+                <h2><span class="fa fa-list"></span> Your Profiles</h2>
+                <div class="row">
+                    <div class="col-md-5">
+                        <h3><u>Bio Info:</u></h3>
+                        <p>
+                            First Name: <b>{{user.userRef.firstName}}</b> <br/>
+                            Last Name: <b>{{user.userRef.surname}}</b> <br/>
+                            DOB: <b>{{user.userRef.dob}}</b>
+                        </p>
+                    </div>
+                    <div class="col-md-5">
+                        <h3><u>Countact:</u></h3>
+                        <p>
+                            Phone number: <b>{{user.userRef.tel}}</b> <br/>
+                            Email: <b>{{user.userRef.email}}</b> <br/>
+                            Country: <b>{{user.userRef.country}}</b><br/>
+                            Home Town: <b>{{user.userRef.homeTown}}</b>                        
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3><u>Current Branch:</u></h3>
+                        <p>
+                            Current Branch: <b>{{user.busRef.branchName}}</b> ({{user.busRef.branchID}}) <br/>
+                            Branch Type: <b>{{user.busRef.branchType}}</b> <br/>
+                            Branch Tel: <b>{{user.busRef.branchTel}}</b><br/>
+                            Branch Email: <b>{{user.busRef.branchEmail}}</b>
+                        </p>
+
+                    </div>
+                    <div class="col-md-6">
+                        <h3><u>Other Info:</u></h3>
+                        You have <u>Administrator Access Level</u>: <b>{{user.userIsAdmin }}</b><br/>
+                        Qualification: <b>{{user.userRef.qualification}}</b>
+                    </div>
+                </div>
+                
+                {% if not user.passwordIsSet %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3><u>User ID</u></h3>
+                            <p>
+                                User ID: <b>{{user.userID}}</b><br/>
+                            </p>
+
+                            <h3><u>Temporal Password</u></h3>
+                            <p>
+                                Password: <b>{{user.password}}</b><br/>
+                            </p>
+                        </div>
+                    </div>                    
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock index %}

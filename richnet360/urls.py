@@ -8,6 +8,7 @@ urlpatterns = [
     path('logoutrn360admin/', loginViews.logoutRN360Admin, name='logoutRN360Admin'),
     path('addcharges/', views.Richnet360.addCharges, name='addCharges'),
     path('confirmregistrationnumber/', views.Richnet360.registrationNumber, name='registrationNumber'),
-    path('changebusinessstatus/', views.Richnet360.changeStatus, name='changeBusStatus')
+    path('changebusinessstatus/', views.Richnet360.changeStatus, name='changeBusStatus'),
+    path('businessadmin/<pk>', views.Richnet360.businessAdmin, name='businessAdmin'),
 ]
 

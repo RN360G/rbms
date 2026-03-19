@@ -64,7 +64,7 @@ class Quantities(models.Model):
 # telly the quantities in and out of the product
 class RetailWholesalesTally(models.Model):
     retailAndWholesaleRef = models.ForeignKey(RetailAndWholesale, on_delete=models.CASCADE)
-    transactionType = models.CharField(default='In')  # Out, In
+    transactionType = models.CharField(max_length=5, default='In')  # Out, In
     quantity = models.FloatField(default=0.0)
     balance = models.FloatField(default=0.0)
     unitQuantity = models.FloatField(default=0.0)
