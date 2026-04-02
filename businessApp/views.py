@@ -14,6 +14,7 @@ from usersApp.models import UserRef
 from businessApp.businessAccess import busAccess
 from usersApp.views import activityLogs, haveAccess, setNewUser
 from imageApp.models import Images
+from imageApp.views import ImageUpload
 from django.contrib.auth.hashers import check_password
 from loginAndOutApp.views import dashboardMenuAccess
 from escpos.printer import File, Network, Usb, Serial, Dummy, Win32Raw
@@ -51,68 +52,75 @@ class AddBusiness(generic.View):
         tel = tel[1:]
         tel = f'+233{tel}'
 
-        with transaction.atomic():
-            # create bill table for this business
-            #today = dt.datetime.strptime(str(dt.datetime.now()), "%Y-%m-%d")
-            bill = Bill()
-            bill.nextBillDate = dt.datetime.now() + dt.timedelta(days=30)
-            bill.save()
+        checkPhoneNumber = Business.objects.filter(Q(busTel=tel))
+        if checkPhoneNumber.exists():
+            messages.set_level(request, messages.WARNING)
+            messages.warning(request, {'message': 'Your phone has aready been used for another Account. Please use another phone number. Thank you.',
+                              'title': 'Phone number already exist'},
+                               extra_tags='telPhoneForAlreadyBeenUsedForAnotherBusiness')
+        else:
+            with transaction.atomic():
+                # create bill table for this business
+                #today = dt.datetime.strptime(str(dt.datetime.now()), "%Y-%m-%d")
+                bill = Bill()
+                bill.nextBillDate = dt.datetime.now() + dt.timedelta(days=30)
+                bill.save()
 
-            chkID = Business.objects.all().order_by('-id')
-            nextID = 1000001
-            if chkID.exists():
-                a = chkID[0]
-                nextID = int(a.busID) + 1
-            bus = Business()
-            bus.busID = nextID
-            bus.busName = busName
-            bus.busEmail = emial
-            bus.busTel = tel
-            bus.busOwner = str(fName) + ' ' + str(sName)
-            bus.billRef = bill
-            bus.save()
-            
-            # busID session
-            request.session['busID'] = str(bus.busID)
+                chkID = Business.objects.all().order_by('-id')
+                nextID = 1000001
+                if chkID.exists():
+                    a = chkID[0]
+                    nextID = int(a.busID) + 1
+                bus = Business()
+                bus.busID = nextID
+                bus.busName = busName
+                bus.busEmail = emial
+                bus.busTel = tel
+                bus.busOwner = str(fName) + ' ' + str(sName)
+                bus.billRef = bill
+                bus.save()
+                
+                # busID session
+                request.session['busID'] = str(bus.busID)
 
-            # create business account
-            account = Accounts()
-            account.busRef = bus
-            account.accountType = "Business Account"
-            account.accountName = busName
-            account.accountNumber = nextID
-            account.save()
+                # create business account
+                account = Accounts()
+                account.busRef = bus
+                account.accountType = "Business Account"
+                account.accountName = busName
+                account.accountNumber = nextID
+                account.save()
 
-            # create branch
-            busBranch = BusinessBranch()
-            busBranch.busRef = bus
-            busBranch.branchName = 'Head Branch'
-            busBranch.branchID =  str(bus.busID) + '' + str('1')
-            busBranch.branchEmail = emial
-            busBranch.branchTel = tel
-            busBranch.branchType = busType            
-            busBranch.save()
+                # create branch
+                busBranch = BusinessBranch()
+                busBranch.busRef = bus
+                busBranch.branchName = 'Head Branch'
+                busBranch.branchID =  str(bus.busID) + '' + str('1')
+                busBranch.branchEmail = emial
+                busBranch.branchTel = tel
+                busBranch.branchType = busType            
+                busBranch.save()
 
-            # set branchID session
-            request.session['branchID'] = str(busBranch.branchID)
+                # set branchID session
+                request.session['branchID'] = str(busBranch.branchID)
 
-            # create branch account
-            account = Accounts()
-            account.busRef = bus
-            account.branchRef = busBranch
-            account.accountType = "Branch Account"
-            account.accountName = busBranch.branchName
-            account.accountNumber = busBranch.branchID
-            account.save()
-                    
-            # session for the new user
-            request.session['userID'] = str(nextID) + '001'
-            setNewUser(request,nextID,busBranch, fName, sName, dob, '', town, qualification, emial, tel, True)
-            messages.set_level(request, messages.INFO)
-            messages.success(request, {'message': 'You have successfully created new Business Account.',
-                              'title': 'New Business Account', 'credential': 'Check your SMS for your tamporal PASSWORD', 
-                              'business': [busName, busType, emial, tel, str(bus.busOwner), bus.busID, busBranch.branchID]},
-                               extra_tags='New Business')
+                # create branch account
+                account = Accounts()
+                account.busRef = bus
+                account.branchRef = busBranch
+                account.accountType = "Branch Account"
+                account.accountName = busBranch.branchName
+                account.accountNumber = busBranch.branchID
+                account.save()
+                        
+                # session for the new user
+                request.session['userID'] = str(nextID) + '001'
+                setNewUser(request,nextID,busBranch, fName, sName, dob, '', town, qualification, emial, tel, True)
+                messages.set_level(request, messages.INFO)
+                messages.success(request, {'message': 'You have successfully created new Business Account.',
+                                'title': 'New Business Account', 'credential': 'Check your SMS for your tamporal PASSWORD', 
+                                'business': [busName, busType, emial, tel, str(bus.busOwner), bus.busID, busBranch.branchID]},
+                                extra_tags='New Business')
         return render(request, 'businessApp/state.html')
 
 
@@ -157,10 +165,15 @@ class BusinessSettings(generic.View):
                     db.date = dt.datetime.now()
                     db.save()
         dashboardMenuAccess(request)
+
+        image = Images.objects.filter(Q(subjectID=loginSessions(request, 'business').busID) & Q(busRef=loginSessions(request, 'business')))
+        if image.exists():
+            image = image[0]
+
         if request.user_agent.is_mobile:
-            return render(request, 'businessApp/businessSettingsMobile.html', {'business': self.business, 'uAccess': access2, 'branches': self.branches, 'user': self.user, 'owner': owner, 'picture': picture})
+            return render(request, 'businessApp/businessSettingsMobile.html', {'business': self.business, 'uAccess': access2, 'branches': self.branches, 'user': self.user, 'owner': owner, 'picture': picture, 'image': image})
         else:
-            return render(request, 'businessApp/businessSettings.html', {'business': self.business, 'uAccess': access2, 'branches': self.branches, 'user': self.user, 'owner': owner, 'picture': picture})
+            return render(request, 'businessApp/businessSettings.html', {'business': self.business, 'uAccess': access2, 'branches': self.branches, 'user': self.user, 'owner': owner, 'picture': picture, 'image': image})
     
     def post(self, request):
         if not haveAccess(request, '201'):
@@ -280,24 +293,31 @@ class BusinessSettings(generic.View):
         
     # edit business info
     def editBusinessInfo(request):
-        if not haveAccess(request, '200'):
-            messages.set_level(request, messages.WARNING)
-            messages.warning(request, {'message': 'You do not have access to edit business information.', 'title': 'Access Denied'}, extra_tags='accessDenied')
-            return render(request, 'user/state.html')
-        busName = request.POST.get('busName')
-        email = request.POST.get('email')
-        tel = request.POST.get('tel')
-        name = request.POST.get('name')
+        with transaction.atomic():
+            if not haveAccess(request, '200'):
+                messages.set_level(request, messages.WARNING)
+                messages.warning(request, {'message': 'You do not have access to edit business information.', 'title': 'Access Denied'}, extra_tags='accessDenied')
+                return render(request, 'user/state.html')
+            busName = request.POST.get('busName')
+            email = request.POST.get('email')
+            tel = request.POST.get('tel')
+            name = request.POST.get('name')
+            upload = request.FILES.get('upload')            
 
-        business = Business.objects.get(Q(busID=str(request.session['busID'])))
-        business.busName = busName
-        business.busEmail = email
-        business.busTel = tel
-        business.busOwner = name
-        business.save()
-        activityLogs(request, str(request.session['userID']), 'Edited Business Information', 'Edited business information to Business Name: '+ str(busName) + '; Email: '+ str(email) + '; Tel: '+ str(tel))
-        dashboardMenuAccess(request)
-        return redirect(to='businessSettings')
+            business = Business.objects.get(Q(busID=str(request.session['busID'])))
+            business.busName = busName
+            business.busEmail = email
+            business.busTel = tel
+            business.busOwner = name
+            if upload:
+                # upload business flyer
+                image = ImageUpload()
+                busFlyer = image.uploadBusinessFlyer(request, upload)
+                business.busLogo = busFlyer                
+            business.save()        
+            activityLogs(request, str(request.session['userID']), 'Edited Business Information', 'Edited business information to Business Name: '+ str(busName) + '; Email: '+ str(email) + '; Tel: '+ str(tel))
+            dashboardMenuAccess(request)
+            return redirect(to='businessSettings')
     
     # assign printers
     def assignPriter(request):

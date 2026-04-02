@@ -21,6 +21,7 @@ from django.contrib import messages
 from usersApp.views import activityLogs, haveAccess
 from django.db.transaction import atomic
 from django.contrib.auth.hashers import check_password
+from itertools import chain
 import random as rd
 from sms import sendSMS
 import pytz
@@ -247,7 +248,7 @@ class SetProductProperties(generic.View):
         adjustments = StockAdjustment.objects.filter(Q(retailAndWholesaleRef=product.retailAndWholesaleRef)).order_by('-id')
         discount = IndividualDiscount.objects.get(Q(branchRef=loginSessions(request, 'branch')) & Q(productRef=product))
         otherImages = OtherFiles.objects.filter(Q(imageRef__busRef = loginSessions(request, 'business')) & Q(imageRef__subjectID=product.productCode))
-        image = Images.objects.filter(Q(subjectID=product.productCode))
+        image = Images.objects.filter(Q(subjectID=product.productCode) & Q(busRef=loginSessions(request, 'business')))
         if image.exists():
             image = image[0]
         if request.user_agent.is_mobile:
@@ -371,10 +372,6 @@ class SetProductProperties(generic.View):
             product.retailAndWholesaleRef.save()        
             activityLogs(request, loginSessions(request, 'user').userID, 'online and mim order', f'Changed online and minimum order of the product: {product.productName} ({product.productCode})') 
         return HttpResponseRedirect('/sales/salesproductproperties/' + str(product.id))
-
-
-
-
 
     # restock level of the product
     def setRestockLevel(request, pk):
@@ -710,7 +707,7 @@ class Suppliers(generic.View):
             messages.warning(request, {'message': 'You do not have access to suppliers management page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
             return render(request, 'user/state.html')  
         dashboardMenuAccess(request)
-        suppliers = ProductSuppliers.objects.filter(Q(branchRef=loginSessions(request, 'branch'))).order_by('-amountOwed', '-id')
+        suppliers = ProductSuppliers.objects.filter(Q(branchRef=loginSessions(request, 'branch'))).order_by('-amountOwed', '-id')        
         return render(request, 'sales/suppliers.html', {'suppliers': suppliers})
     
     def post(self, request):
@@ -732,8 +729,7 @@ class Suppliers(generic.View):
                 supplier.save()
             activityLogs(request, loginSessions(request, 'user').userID, 'Supplier Added', f'You added a supplier with name : {supplierName} and telephone number: {tel}')  
         return redirect(to='salesSuppliers')
-    
-    
+        
     def supplierDetails(request, pk):
         dashboardMenuAccess(request)
         suppliers = ProductSuppliers.objects.get(Q(id=pk))
@@ -741,12 +737,19 @@ class Suppliers(generic.View):
                                       Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & 
                                       Q(disbleRef__productIsDisabled=False))
         suppliesRecords = SupplyQuantityRecords.objects.filter(Q(supplierRef=suppliers)).order_by('-id')
+        tempSupplyItems = TempSupplyQuantity.objects.filter(Q(supplierRef=suppliers) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
+
+        context = {
+            'products': products,
+            'supplier': suppliers,
+            'suppliesRecords': suppliesRecords,
+            'tempSupplyItems': tempSupplyItems
+            }
         if request.user_agent.is_mobile:
-            return render(request, 'sales/supplierDetailsMobile.html', {'supplier': suppliers, 'products': products, 'suppliesRecords': suppliesRecords})
+            return render(request, 'sales/supplierDetailsMobile.html', context)
         else:
-            return render(request, 'sales/supplierDetails.html', {'supplier': suppliers, 'products': products, 'suppliesRecords': suppliesRecords}) 
-    
-    
+            return render(request, 'sales/supplierDetails.html', context) 
+        
     # save supply records
     def supplyRecords(request):  
         if not haveAccess(request, '12'):
@@ -805,7 +808,6 @@ class Suppliers(generic.View):
             else:
                 n = 0 
                 getUnitCostTotal = 0 
-
                 supplier.save()
                 sup.save()          
                 for proID in products:
@@ -813,8 +815,6 @@ class Suppliers(generic.View):
                     q = qty[n]
                     c = cost[n]
                     getUnitCostTotal += float(q) * float(c) 
-                    print(float(c) * float(q))
-                    print(proID)
                     n = n + 1
 
                     idv = IndividualItemsSupplied()
@@ -824,7 +824,9 @@ class Suppliers(generic.View):
                     idv.unityCost = float(c)   
                     idv.totalCost = float(q) * float(c)
                     if idv.totalCost > 0:
-                        idv.save()     
+                        idv.save() 
+                        temp = TempSupplyQuantity.objects.filter(Q(productRef__productCode=proID) & Q(supplierRef=supplier) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))    
+                        temp.delete()
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
             
     # save suppliers payments
@@ -873,10 +875,38 @@ class Suppliers(generic.View):
     #supplies items details
     def suppliesItemsDetails(request, sup, pk):
         supplierRecord = SupplyQuantityRecords.objects.get(Q(id=pk)) 
-        inds = IndividualItemsSupplied.objects.filter(Q(supplyRef=supplierRecord))
-        tempSupplies = TempSupplyQuantity.objects.filter(Q(supplierRef=supplierRecord.supplierRef) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
-        return render(request, 'sales/supplierItems.html', {'individualItems': inds, 'sup': sup, 'supplierRecord': supplierRecord, 'tempSupplies': tempSupplies})
+        inds = IndividualItemsSupplied.objects.filter(Q(supplyRef=supplierRecord))        
+        with atomic():            
+            products = Product.objects.filter(Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & Q(disbleRef__productIsDisabled=False))
+            tempSupplyQuantity = TempSupplyQuantity.objects.filter(Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
+            for p in products:
+                check = tempSupplyQuantity.filter(Q(productRef=p))
+                if not check.exists():
+                    temp = TempSupplyQuantity()
+                    temp.branchRef = loginSessions(request, 'branch')
+                    temp.userRef = loginSessions(request, 'user')
+                    temp.productRef = p
+                    temp.save()
+        return render(request, 'sales/supplierItems.html', {'individualItems': inds, 'sup': sup, 'supplierRecord': supplierRecord})
     
+    # get all items for supply record
+    def generateItemsForSupplyRecord(request, pk):
+        with atomic():          
+            supplier = ProductSuppliers.objects.get(Q(id=pk))  
+            products = Product.objects.filter(Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & Q(disbleRef__productIsDisabled=False))
+            tempSupplyQuantity = TempSupplyQuantity.objects.filter(Q(supplierRef=supplier) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
+            for p in products:
+                check = tempSupplyQuantity.filter(Q(productRef=p))
+                if not check.exists():
+                    temp = TempSupplyQuantity()
+                    temp.branchRef = loginSessions(request, 'branch')
+                    temp.userRef = loginSessions(request, 'user')
+                    temp.productRef = p
+                    temp.supplierRef = supplier                    
+                    temp.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+             
+
     #Disable wrong transaction
     def disableWrongTransaction(request):
         if not haveAccess(request, '12'):
@@ -918,19 +948,19 @@ class Suppliers(generic.View):
     # store temporary supply quantity before saving the supply record
     def storeTemporarySupply(request):
         productCode= request.POST.get('productCode')
-        quantity = request.POST.get('qty')
+        quantity = request.POST.get('qty')        
         cost = request.POST.get('cost')
+        print(cost)
         supplierKey = request.POST.get('supplierKey')
         opt = request.POST.get('opt')
         supplier = ProductSuppliers.objects.get(Q(id=supplierKey))
-        
-
         check = TempSupplyQuantity.objects.filter(Q(productRef__productCode=productCode) & Q(supplierRef=supplier) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
         if opt == 'add':
             if check.exists():
                 temp = check[0]
                 temp.qty = quantity
-                temp.cost = cost
+                temp.unityCost = cost
+                temp.totalCost = round(float(quantity) * float(cost), 2)
                 temp.save()
             else:
                 temp = TempSupplyQuantity()
@@ -939,7 +969,8 @@ class Suppliers(generic.View):
                 temp.branchRef = loginSessions(request, 'branch')
                 temp.userRef = loginSessions(request, 'user')
                 temp.qty = quantity
-                temp.cost = cost
+                temp.unityCost = cost
+                temp.totalCost = round(float(quantity) * float(cost), 2)
                 temp.save()
         else:
             if check.exists():
@@ -948,7 +979,7 @@ class Suppliers(generic.View):
     
     # display temporary supply quantity before saving the supply record
     def displayTemporarySupply(request):
-        supplierKey = request.GET.get('supplierKey')
+        supplierKey = request.GET.get('supplier')
         supplier = ProductSuppliers.objects.get(Q(id=supplierKey))
         tempSupplies = TempSupplyQuantity.objects.filter(Q(supplierRef=supplier) & Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
         data = []
@@ -957,8 +988,8 @@ class Suppliers(generic.View):
                 'productCode': temp.productRef.productCode,
                 'productName': temp.productRef.productName,
                 'quantity': temp.qty,
-                'cost': temp.cost,
-                'totalCost': float(temp.qty) * float(temp.cost)
+                'cost': temp.unityCost,
+                'totalCost': float(temp.qty) * float(temp.unityCost)
             })
         return JsonResponse({'tempSupplies': data})   
 

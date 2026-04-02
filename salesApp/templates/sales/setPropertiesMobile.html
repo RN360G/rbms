@@ -223,6 +223,7 @@
             <table width="100%" class="table table-striped table-bordered table-hover w-100 mb-0" id="dataTables-example">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Date</th> 
                         <th>Qty</th>   
                         <th>Bal</th>                    
@@ -234,6 +235,7 @@
                 <tbody>
                     {% for tal in tally %}
                         <tr class="even gradeA">
+                            <td>{{forloop.counter}}</td>
                             <td>{{ tal.date}}</td>
                             {% if tal.retailAndWholesaleRef.measureRef.stockedUnit == 'Piece' and tal.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' or tal.retailAndWholesaleRef.measureRef.stockedUnit == tal.retailAndWholesaleRef.measureRef.soldUnit %}
 
@@ -456,12 +458,14 @@
                 <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example2">
                     <thead>
                         <tr>
+                            <th style="display:none;">id</th>
                             <th>Adjustments</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for tal in adjustments %}
                             <tr>
+                                <td style="display:none;">{{forloop.counter}}</td>
                                 <td>
                                     <div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
                                         <div class="card-body p-2">
@@ -605,6 +609,19 @@
         var image = document.getElementById('electImageOutput');
         image.src = URL.createObjectURL(event.target.files[0]);
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#dataTables-example').DataTable({
+            order: [[0, "desc"]],   // sort by Count column, descending
+            columnDefs: [
+                { targets: 0, visible: false } // hide Count column properly
+            ],
+            scrollX: true,          // allow horizontal scroll on small screens
+            responsive: false       // prevent auto-hiding
+        });
+    });
 </script>
 {% endblock warehouseMobile %}
 

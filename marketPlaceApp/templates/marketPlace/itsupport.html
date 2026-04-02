@@ -1,0 +1,58 @@
+{% extends "marketPlace/rbms.html" %}
+{% load static %}
+{% block rbmsM %}
+
+<style>
+  body {
+    margin: 0;
+    background: #000000;
+    color: #333;
+  }
+  header {
+    background: #000000;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  header img {
+    max-height: 80px;
+    margin-bottom: 10px;
+  }
+  .container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .contact-info p {
+    margin: 10px 0;
+    font-size: 16px;
+  }
+  .contact-info i {
+    margin-right: 8px;
+    color: #004080;
+  }
+  .contact-info a {
+    color: #004080;
+    text-decoration: none;
+  }
+</style>
+
+<header>
+  <img src="{% static 'img/rn360bbb.png' %}" alt="RN360B">
+  <h1>IT Support</h1>
+</header>
+
+<div class="container">
+  <h2>Contact Information</h2>
+  <div class="contact-info">
+    <p><i class="fas fa-user"></i><strong>Name:</strong> Richard Agyei Fosu</p>
+    <p><i class="fas fa-phone-alt"></i><strong>Phone:</strong> <a href="tel:+233243851841">+233 243 851 841</a></p>
+    <p><i class="fab fa-whatsapp"></i><strong>WhatsApp:</strong> <a href="https://wa.me/233547779146" target="_blank">Chat on WhatsApp</a></p>
+    <p><i class="fas fa-envelope"></i><strong>Email:</strong> <a href="mailto:richnet360@gmail.com">richnet360@gmail.com</a></p>
+    <p><i class="fas fa-map-marker-alt"></i><strong>Address:</strong> Nkoranza, Bono East, Ghana</p>
+  </div>
+{% endblock rbmsM %}
+

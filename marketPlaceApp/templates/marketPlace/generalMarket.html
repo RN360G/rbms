@@ -14,32 +14,32 @@
     <!-- Carousel inner -->
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="{% static 'imgM/team/safe.png' %}" class="d-block w-100 img-fluid" alt="Featured Product"
-             style="max-height:400px; object-fit:cover;">
+        <img src="{% static 'img/rn360BFit.png' %}" class="d-block w-100 img-fluid" alt="Featured Product"
+             style="max-height:600px; object-fit:cover;">
         <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
-          <h5 class="fw-bold">New Arrivals</h5>
-          <p>Discover the latest products in our store.</p>
-          <a href="#" class="btn btn-primary btn-sm">Shop Now</a>
+          <h5 class="fw-bold">RN360B Products</h5>
+          <p>Discover quality products in RN360B Mall</p>
+          <a href="#products" class="btn btn-primary btn-sm">Products</a>
         </div>
       </div>
 
       <div class="carousel-item">
-        <img src="{% static 'imgM/team/safe.png' %}" class="d-block w-100 img-fluid" alt="Discount Offer"
-             style="max-height:400px; object-fit:cover;">
+        <img src="{% static 'img/rn360BFit.png' %}" class="d-block w-100 img-fluid" alt="Discount Offer"
+             style="max-height:600px; object-fit:cover;">
         <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
-          <h5 class="fw-bold">Exclusive Discounts</h5>
-          <p>Save big on selected items today.</p>
-          <a href="#" class="btn btn-success btn-sm">View Deals</a>
+          <h5 class="fw-bold">RN360B Businesses</h5>
+          <p>RN360B: Built for quality, trusted by businesses.</p>
+          <a href="#businesses" class="btn btn-success btn-sm">Businesses</a>
         </div>
       </div>
 
       <div class="carousel-item">
-        <img src="{% static 'imgM/team/safe.png' %}" class="d-block w-100 img-fluid" alt="Best Sellers"
-             style="max-height:400px; object-fit:cover;">
+        <img src="{% static 'img/rn360BFit.png' %}" class="d-block w-100 img-fluid" alt="Best Sellers"
+             style="max-height:600px; object-fit:cover;">
         <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
-          <h5 class="fw-bold">Best Sellers</h5>
-          <p>Shop the most popular items loved by customers.</p>
-          <a href="#" class="btn btn-warning btn-sm">Browse</a>
+          <h5 class="fw-bold">Richnet 360 Business</h5>
+          <p>Quality first. RN360B is your business home.</p>
+          <!--<a href="#" class="btn btn-warning btn-sm">Browse</a>-->
         </div>
       </div>
     </div>
@@ -67,12 +67,17 @@
                         <div class="card shadow h-100 border-0">
                             <!-- Product image -->
                             <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="position-relative">
-                            <img class="card-img-top img-fluid rounded" src="{% static 'img/default.jpeg' %}" alt="{{product.busRef.busName}}">
-                            {% if product.busRef.registrationNumber != null %}
-                                <span class="badge bg-info position-absolute top-0 start-0 m-2">
-                                <i class="fa fa-check-circle"></i> Verified
-                                </span>
-                            {% endif %}
+                                {% if product.busRef.busLogo.image %}
+                                    <img class="card-img-top img-fluid rounded shadow" src="{{product.busRef.busLogo.image.url}}" alt="{{product.busRef.busName}}">
+                                {% else %}
+                                    <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default.png' %}" alt="Default image">
+                                {% endif %}
+                                
+                                {% if product.busRef.registrationNumber != null %}
+                                    <span class="badge bg-info position-absolute top-0 start-0 m-2">
+                                    <i class="fa fa-check-circle"></i> Verified
+                                    </span>
+                                {% endif %}
                             </a>
 
                             <!-- Card body -->
@@ -97,12 +102,12 @@
                             <!-- Action buttons -->
                             <div class="d-flex justify-content-between">
                                 <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-outline-primary" title="Share">
+                                <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="btn btn-sm btn-outline-primary share-btn" title="Share">
                                     <i class="fa fa-share-alt"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy link">
+                                </a>
+                                <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="btn btn-sm btn-outline-secondary copy-btn" title="Copy link">
                                     <i class="fa fa-copy"></i>
-                                </button>
+                                </a>
                                 </div>
                                 <div class="btn-group" role="group">
                                 <a href="tel:{{product.branchTel}}" class="btn btn-sm btn-outline-success" title="Call">
@@ -115,7 +120,7 @@
                             </div>
                             </div>
                         </div>
-                    </div>
+                    </div>    
 
                 {% elif product.obj == 2 %}
                         {% if product.belongsToModel == 'Retail & Wholesale Business' %}
@@ -127,21 +132,21 @@
                                     onclick="productDetails('{{product.productName}}','{{product.productCode}}','{{product.discountRate}}','{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice}}','{{product.productDescription}}','{{product.retailAndWholesaleRef.branchRef.branchID}}','{{product.retailAndWholesaleRef.branchRef.branchName}}','{{product.retailAndWholesaleRef.branchRef.branchTel}}','{{product.retailAndWholesaleRef.branchRef.branchEmail}}','{{product.productImageRef.image.url}}')"
                                     class="position-relative d-block">
                                     
-                                    {% if product.productImageRef.image %}
-                                        <img class="card-img-top img-fluid rounded shadow" src="{{product.productImageRef.image.url}}" alt="{{product.productName}}">
-                                    {% else %}
-                                        <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default.jpeg' %}" alt="Default image">
-                                    {% endif %}
+                                        {% if product.productImageRef.image %}
+                                            <img class="card-img-top img-fluid rounded shadow" src="{{product.productImageRef.image.url}}" alt="{{product.productName}}">
+                                        {% else %}
+                                            <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default2.png' %}" alt="Default image">
+                                        {% endif %}
 
-                                    <!-- Overlay actions -->
-                                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
-                                        <button type="button" class="btn btn-sm btn-light share-btn" title="Share">
-                                        <i class="fa fa-share-alt"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-light copy-btn" title="Copy link">
-                                        <i class="fa fa-copy"></i>
-                                        </button>
-                                    </div>
+                                        <!-- Overlay actions -->
+                                        <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                                            <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-light share-btn" title="Share">
+                                                <i class="fa fa-share-alt"></i>
+                                            </a>
+                                            <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-light copy-btn" title="Copy link">
+                                                <i class="fa fa-copy"></i>
+                                            </a>
+                                        </div>
                                     </a>
 
                                     <!-- Card body -->
@@ -152,6 +157,13 @@
                                         <h6 class="card-title fw-bold mb-1" style="font-size:14px;">
                                             {{ product.productName|default:"Product Name" }}
                                         </h6>
+                                        <p class="text-muted mb-0" style="font-size:12px;">                                            
+                                            {% if product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' %}
+                                                min Order: <b>{{ product.retailAndWholesaleRef.minimumOrder|floatformat:0}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</b>
+                                            {% else %}
+                                                min Order: <b>{{ product.retailAndWholesaleRef.minimumOrder}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</b>                                                
+                                            {% endif %}                                          
+                                        </p>
                                         <p class="text-muted mb-0" style="font-size:12px;">
                                             Supplier: <b>{{ product.busRef.busName|default:"Non" }}</b><br>
                                             <small>{{ product.retailAndWholesaleRef.branchRef.branchName|default:"Supplier" }}</small>
@@ -160,6 +172,9 @@
 
                                         <!-- Pricing aligned right -->
                                         <div class="text-end">
+                                        <p class="text-muted mb-0" style="font-size:12px;">                                            
+                                          Unit Price:
+                                        </p>
                                         {% if product.discountRate == 0 and product.retailAndWholesaleRef.discountRef.discount == 0 %}
                                             <span class="fw-bold text-primary" style="font-size:16px;">
                                             <i>&#8373;</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}
@@ -196,7 +211,6 @@
             {% endfor %}             
         </div>
 
-
         <!--business only====================================================================================================================-->
         <div class="row" style="margin: 1%;" id='businesses'>            
             {% for product in combinedResult %}           
@@ -205,12 +219,16 @@
                         <div class="card shadow h-100 border-0">
                             <!-- Product image -->
                             <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="position-relative">
-                            <img class="card-img-top img-fluid rounded" src="{% static 'img/default.jpeg' %}" alt="{{product.busRef.busName}}">
-                            {% if product.busRef.registrationNumber != null %}
-                                <span class="badge bg-info position-absolute top-0 start-0 m-2">
-                                <i class="fa fa-check-circle"></i> Verified
-                                </span>
-                            {% endif %}
+                                {% if product.busRef.busLogo.image %}
+                                    <img class="card-img-top img-fluid rounded shadow" src="{{product.busRef.busLogo.image.url}}" alt="{{product.busRef.busName}}">
+                                {% else %}
+                                    <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default.png' %}" alt="Default image">
+                                {% endif %}
+                                {% if product.busRef.registrationNumber != null %}
+                                    <span class="badge bg-info position-absolute top-0 start-0 m-2">
+                                    <i class="fa fa-check-circle"></i> Verified
+                                    </span>
+                                {% endif %}
                             </a>
 
                             <!-- Card body -->
@@ -235,12 +253,12 @@
                             <!-- Action buttons -->
                             <div class="d-flex justify-content-between">
                                 <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-outline-primary" title="Share">
+                                <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="btn btn-sm btn-outline-primary share-btn" title="Share">
                                     <i class="fa fa-share-alt"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Copy link">
+                                </a>
+                                <a href="{% url 'insideBuisness' product.busRef.busID product.branchID %}" class="btn btn-sm btn-outline-secondary copy-btn" title="Copy link">
                                     <i class="fa fa-copy"></i>
-                                </button>
+                                </a>
                                 </div>
                                 <div class="btn-group" role="group">
                                 <a href="tel:{{product.branchTel}}" class="btn btn-sm btn-outline-success" title="Call">
@@ -271,21 +289,21 @@
                                     onclick="productDetails('{{product.productName}}','{{product.productCode}}','{{product.discountRate}}','{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice}}','{{product.productDescription}}','{{product.retailAndWholesaleRef.branchRef.branchID}}','{{product.retailAndWholesaleRef.branchRef.branchName}}','{{product.retailAndWholesaleRef.branchRef.branchTel}}','{{product.retailAndWholesaleRef.branchRef.branchEmail}}','{{product.productImageRef.image.url}}')"
                                     class="position-relative d-block">
                                     
-                                    {% if product.productImageRef.image %}
-                                        <img class="card-img-top img-fluid rounded shadow" src="{{product.productImageRef.image.url}}" alt="{{product.productName}}">
-                                    {% else %}
-                                        <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default.jpeg' %}" alt="Default image">
-                                    {% endif %}
+                                        {% if product.productImageRef.image %}
+                                            <img class="card-img-top img-fluid rounded shadow" src="{{product.productImageRef.image.url}}" alt="{{product.productName}}">
+                                        {% else %}
+                                            <img class="card-img-top img-fluid rounded shadow" src="{% static 'img/default2.png' %}" alt="Default image">
+                                        {% endif %}
 
-                                    <!-- Overlay actions -->
-                                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
-                                        <button type="button" class="btn btn-sm btn-light share-btn" title="Share">
-                                        <i class="fa fa-share-alt"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-light copy-btn" title="Copy link">
-                                        <i class="fa fa-copy"></i>
-                                        </button>
-                                    </div>
+                                        <!-- Overlay actions -->
+                                        <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                                            <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-light share-btn" title="Share">
+                                                <i class="fa fa-share-alt"></i>
+                                            </a>
+                                            <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-light copy-btn" title="Copy link">
+                                                <i class="fa fa-copy"></i>
+                                            </a>
+                                        </div>
                                     </a>
 
                                     <!-- Card body -->
@@ -296,6 +314,13 @@
                                         <h6 class="card-title fw-bold mb-1" style="font-size:14px;">
                                             {{ product.productName|default:"Product Name" }}
                                         </h6>
+                                        <p class="text-muted mb-0" style="font-size:12px;">                                            
+                                            {% if product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece' %}
+                                                min Order: <b>{{ product.retailAndWholesaleRef.minimumOrder|floatformat:0}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</b>
+                                            {% else %}
+                                                min Order: <b>{{ product.retailAndWholesaleRef.minimumOrder}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</b>                                                
+                                            {% endif %}                                          
+                                        </p>
                                         <p class="text-muted mb-0" style="font-size:12px;">
                                             Supplier: <b>{{ product.busRef.busName|default:"Non" }}</b><br>
                                             <small>{{ product.retailAndWholesaleRef.branchRef.branchName|default:"Supplier" }}</small>
@@ -304,6 +329,9 @@
 
                                         <!-- Pricing aligned right -->
                                         <div class="text-end">
+                                        <p class="text-muted mb-0" style="font-size:12px;">                                            
+                                          Unit Price:
+                                        </p>
                                         {% if product.discountRate == 0 and product.retailAndWholesaleRef.discountRef.discount == 0 %}
                                             <span class="fw-bold text-primary" style="font-size:16px;">
                                             <i>&#8373;</i>{{ product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2 }}
@@ -427,7 +455,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // toast
-    function showToast(msg = 'Link copied') {
+    function showToast(msg = 'Link copied') 
+    {
         const t = document.createElement('div');
         t.className = 'copy-toast';
         t.textContent = msg;
@@ -436,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 1400);
     }
 
-    // clipboard helper (Clipboard API + textarea fallback)
+    // clipboard helper 
     async function copyToClipboard(text) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
@@ -458,11 +487,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function buildUrlForBtn(btn) {
-        const id = btn.dataset.id || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim() || '';
-        const title = btn.dataset.title || btn.closest('.card')?.querySelector('h5')?.innerText?.trim() || document.title;
-        const url = window.location.origin + window.location.pathname + '#biz-' + (id || '');
+        const id = btn.dataset.id 
+            || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim() 
+            || '';
+        const title = btn.dataset.title 
+            || btn.closest('.card')?.querySelector('h5')?.innerText?.trim() 
+            || document.title;
+        const url = btn.getAttribute('href'); // use the href directly
+
         return { id, title, url };
     }
+
 
     // Copy button: silently copy link
     document.querySelectorAll('.copy-btn').forEach(btn => {

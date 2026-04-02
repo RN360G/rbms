@@ -9,6 +9,7 @@ class Business(models.Model):
     busTel = models.CharField(max_length=50)
     busEmail = models.CharField(max_length=100)
     busOwner = models.CharField(max_length=100)
+    busLogo = models.ForeignKey('imageApp.Images', on_delete=models.DO_NOTHING, null=True)
     billRef = models.ForeignKey('richnet360.Bill', on_delete=models.DO_NOTHING, null=True)
     registrationNumber = models.CharField(max_length=100, null=True) # this part wll be entered and verified by RN360 only  
     status = models.CharField(max_length=50, default='Active') # Active, Inactive, Closed

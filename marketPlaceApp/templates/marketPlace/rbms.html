@@ -141,7 +141,7 @@
         <a class="navbar-brand d-flex align-items-center" href="/">
         <span class="bs-icon-sm bs-icon-circle bs-icon-primary shadow d-flex justify-content-center align-items-center me-2 bs-icon"
                 style="overflow:hidden; width:2.5rem; height:2.5rem; flex-shrink:0;">
-            <img src="{% static 'img/rn360_4.jpeg' %}" alt="Brand"
+            <img src="{% static 'img/rn360b640x480.png' %}" alt="Brand"
                 style="width:100%; height:100%; object-fit:cover; display:block;">
         </span>
         <span class="fs-3">
@@ -178,7 +178,7 @@
             <a class="nav-link" href="#businesses"><i class="fa fa-building"></i> Businesses</a>
             </li>
             <!-- Dropdown -->
-            <li class="nav-item dropdown shadow me-2">
+            <!--<li class="nav-item dropdown shadow me-2">
             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="othersDropdown" role="button">
                 <i class="fa fa-building"></i> Others
             </a>
@@ -188,7 +188,7 @@
                 <li><a class="dropdown-item" href="#other3">Other 3</a></li>
                 <li><a class="dropdown-item" href="#other4">Other 4</a></li>
             </ul>
-            </li>
+            </li>-->
         </ul>
 
         <!-- Search form -->
@@ -200,6 +200,7 @@
         </form>-->
 
         <!-- Auth links -->
+        <a class="nav-link fas fa-headset me-3" href="{% url 'itSupport' %}"> IT Support</a>
         <a class="nav-link fa fa-sign-in me-3" href="{% url 'loginOptions' %}"> Sign In</a>
         <a class="nav-link fa fa-sign-out me-3" href="{% url 'customerLogout' %}"> sign Out</a>
         <a class="nav-link fa fa-plus me-3" href="{% url 'addBusiness' %}"> Create Business</a>
@@ -319,8 +320,6 @@
             });
         });
     </script> 
-       
-
 
     <!--use install button-->
     <script>
@@ -343,11 +342,11 @@
             });
         });
 
-        // Detect when app is installed
+        //Detect when app is installed
         window.addEventListener("appinstalled", () => {
-        console.log("App successfully installed");
-        const installBtn = document.getElementById("installBtn");
-        installBtn.style.display = "none"; // hide the button
+            console.log("App successfully installed");
+            const installBtn = document.getElementById("installBtn");
+            installBtn.style.display = "none"; // hide the button
         });
     </script>
 

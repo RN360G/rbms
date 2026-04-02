@@ -29,43 +29,43 @@
                     <sup>{{branch.branchName}}</sup>
                 </span>
             </span>
-
-
-            <!-- Search Bar --> 
+          <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto" 
+              style="overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%;">
+              <li class="nav-item shadow me-2">
+                <a class="nav-link" href="{% url 'otherBranches' branch.branchID %}"><i class="fa fa-building"></i> Branches</a>
+              </li>
+             <li class="nav-item shadow me-2">
+                <a class="nav-link" href="#all"><i class="fa fa-building"></i> Promotions</a>
+              </li>
+              <li class="nav-item shadow me-2">
+                <a class="nav-link" href="{% url 'aboutUs' branch.branchID %}"><i class="fa fa-info"></i> About Us</a>
+              </li>
+          </ul>
+             <!-- Search Bar --> 
             <!--<form id="searchForm" class="d-flex ms-3" role="search">
               <input id="searchInputField" class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
                   <button class="btn btn-outline-light" type="submit">
                       <i class="fa fa-search"></i> 
                   </button> 
-              </form>-->
+            </form> -->
 
-          <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto" 
-              style="overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%;">
-              <li class="nav-item shadow me-2">
-              <a class="nav-link" href="#all"><i class="fa fa-building"></i> Other Branches</a>
-              </li>
-              <li class="nav-item shadow me-2">
-              <a class="nav-link" href="#products"><i class="fa fa-info"></i> About Us</a>
-              </li>
-          </ul>
+            <!-- Contact & Hours -->
+            <div class="ms-auto d-flex flex-wrap align-items-center text-white">
+                <span class="me-3">
+                    <i class="fa fa-phone"></i> {{branch.branchTel}}
+                </span>
 
-<!-- Contact & Hours -->
-<div class="ms-auto d-flex flex-wrap align-items-center text-white">
-    <span class="me-3">
-        <i class="fa fa-phone"></i> {{branch.branchTel}}
-    </span>
-
-    {% if branch.operateAllTime %}
-        <span>
-            <i class="fa fa-clock"></i> Active <b>247</b>
-        </span>
-    {% else %}
-        <span>
-            <i class="fa fa-clock"></i> Active from 
-            <b>{{branch.fromTime}}</b> to <b>{{branch.toTime}}</b>
-        </span>
-    {% endif %}
-</div>
+                {% if branch.operateAllTime %}
+                    <span>
+                        <i class="fa fa-clock"></i> Active <b>247</b>
+                    </span>
+                {% else %}
+                    <span>
+                        <i class="fa fa-clock"></i> Active from 
+                        <b>{{branch.fromTime}}</b> to <b>{{branch.toTime}}</b>
+                    </span>
+                {% endif %}
+            </div>
 
         </div>
     </nav>
@@ -82,44 +82,46 @@
                     {% if product.productImageRef %}
                         <img src="{{product.productImageRef.image.url}}" class="card-img-top" alt="Product Image">
                     {% else %}
-                        <img src="{% static 'img/default.jpeg' %}" class="card-img-top" alt="Product Image">                    
+                        <img src="{% static 'img/default2.png' %}" class="card-img-top" alt="Product Image">                    
                     {% endif %}
 
                     <!-- Overlay icons horizontally -->
-                    <div class="position-absolute top-0 end-0 p-2 d-flex flex-row gap-2">
-                        <!-- Copy button -->
-                        <button class="btn btn-sm btn-light" onclick="copyProductCode('{{product.productCode}}')" title="Copy Code">
-                            <i class="fa fa-copy"></i>
-                        </button>
-                        <!-- Share button -->
-                        <button class="btn btn-sm btn-light" onclick="shareProduct('{{product.productName}}')" title="Share Product">
+                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                        <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-light share-btn" title="Share">
                             <i class="fa fa-share-alt"></i>
-                        </button>
+                        </a>
+                        <a href="{% url 'generalMarketProductDetails' product.retailAndWholesaleRef.branchRef.branchID product.productCode %}" class="btn btn-sm btn-light copy-btn" title="Copy link">
+                            <i class="fa fa-copy"></i>
+                        </a>
                     </div>
-                </div>
-
-                      
+                </div>                     
                   
                   <div class="card-body">
                       <h5 class="card-title" style="color: white"><b>{{product.productName}}</b></h5>
                       <p class="card-text mb-1"><b>Product Code:</b> {{product.productCode}}</p>
                       <p class="card-text mb-1"><b>Type:</b> {{product.productCategory}}</p>
-                      <!--<p class="card-text mb-1"><b>Minimum Order:</b> 10 units</p>-->
+                      
+                      {% if product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece'  %}
+                        <p class="card-text mb-1"><b>Min Order:</b> {{product.retailAndWholesaleRef.minimumOrder | floatformat:0}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</p>
+                      {% else %}
+                        <p class="card-text mb-1"><b>Min Order:</b> {{product.retailAndWholesaleRef.minimumOrder}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</p>                        
+                      {% endif %}              
                       <!--<p class="card-text mb-1"><b>Delivery:</b> Available</p>-->
-                      <hr>                    
+                      <hr>
+                                         
                       {% if product.totalDiscaount > 0 %}
                           <p class="card-text mb-1">
                               <b>Discount:</b> {{product.totalDiscaount|floatformat:2}}%
                           </p>
                           <p class="card-text mb-1">
-                              <b>Old Price: </b> 
+                              <b>Old Unit Price: </b> 
                               <i style="color: #c67605">GH&#8373</i><span class="text-decoration-line-through text-muted">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span>
                           </p>
-                          <p class="card-text mb-1"><b>New Price:</b> 
+                          <p class="card-text mb-1"><b>New Unit Price:</b> 
                               <i style="color: #c67605">GH&#8373</i><span class="text-success fw-bold">{{product.priceAfterDiscount|floatformat:2}}</span>
                           </p>
                       {% else %}
-                          <p class="card-text mb-1"><b>Price:</b><i style="color: #c67605">GH&#8373</i><span class="fw-bold">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span></p>                        
+                          <p class="card-text mb-1"><b>Unit Price:</b><i style="color: #c67605">GH&#8373</i><span class="fw-bold">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span></p>                        
                       {% endif %}
                   </div>
                   <div class="card-footer d-flex justify-content-between">
@@ -175,25 +177,86 @@
         }
     </script>
 
-    <script>
-function copyProductCode(code) {
-    navigator.clipboard.writeText(code).then(() => {
-        alert("Product code copied: " + code);
-    });
-}
 
-function shareProduct(name) {
-    if (navigator.share) {
-        navigator.share({
-            title: "Check out this product",
-            text: "Interested in: " + name,
-            url: window.location.href
-        }).catch(err => console.log("Share failed:", err));
-    } else {
-        alert("Sharing not supported on this browser.");
-    }
-}
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // toast
+        function showToast(msg = 'Link copied') 
+        {
+            const t = document.createElement('div');
+            t.className = 'copy-toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            requestAnimationFrame(() => t.style.opacity = '1');
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 1400);
+        }
+
+        // clipboard helper 
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+            }
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                return true;
+            } catch (e) {
+                document.body.removeChild(ta);
+                return false;
+            }
+        }
+
+        function buildUrlForBtn(btn) {
+            const id = btn.dataset.id 
+                || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim() 
+                || '';
+            const title = btn.dataset.title 
+                || btn.closest('.card')?.querySelector('h5')?.innerText?.trim() 
+                || document.title;
+            const url = btn.getAttribute('href'); // use the href directly
+
+            return { id, title, url };
+        }
+
+
+        // Copy button: silently copy link
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const { url } = buildUrlForBtn(btn);
+                const ok = await copyToClipboard(url);
+                showToast(ok ? 'Link copied' : 'Copy failed');
+            });
+        });
+
+        // Share button: open WhatsApp (mobile/desktop)
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const { title, url } = buildUrlForBtn(btn);
+                if (e.shiftKey) {
+                    // open email client
+                    const mailto = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(title + '\n' + url);
+                    window.location.href = mailto;
+                    return;
+                }
+                // open WhatsApp (wa.me works on mobile and opens web on desktop)
+                const wa = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
+                // user gesture -> should not be blocked
+                window.open(wa, '_blank', 'noopener,noreferrer');
+            });
+        });
+    });
+
+    </script>
 
 {% endblock rbmsM %}
 

@@ -130,7 +130,7 @@ class IndividualItemsSupplied(models.Model):
 # record temparily the quantity supplied 
 class TempSupplyQuantity(models.Model):
     branchRef = models.ForeignKey(BusinessBranch, on_delete=models.CASCADE)
-    supplierRef = models.ForeignKey(ProductSuppliers, on_delete=models.CASCADE)
+    supplierRef = models.ForeignKey(ProductSuppliers, on_delete=models.CASCADE, null=True)
     userRef = models.ForeignKey('usersApp.UserRef', on_delete=models.DO_NOTHING)  
     productRef = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     qty = models.FloatField(default=0)

@@ -83,7 +83,7 @@
         <div class="tab-pane" role="tabpanel" id="busDetails">
             <div class="container bg-gradient-light py-5 shadow">
                 <h2>Business Details</h2>
-                <form class="user" method="post" action="{% url 'editBusinessInfo' %}">
+                <form class="user" method="post" action="{% url 'editBusinessInfo' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
@@ -102,15 +102,21 @@
                         </div>
                     </div>   
                     <hr/>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label" for="name">Business Logo</label>
-                            <input class="form-control" type="text" id="name" name="name" style="color: goldenrod;" value="{{business.busOwner}}" required>
+                    <h3>Business Flyer</h3>
+                    <div class="row" style="width: 50%">
+                        <div class="col-md-6">                            
+                            <label class="form-label" for="sellingPrice">Select Image <b style="color: red">*</b></label>
+                            <input type="file" class="form-control" name="upload" id="electImage" onchange="loadImage(event)" accept="image/*">                                                
+                            <div class="card shadow-sm">
+                                <img src="{{ image.image.url }}" class="card-img-top img-fluid" id="electImageOutput" alt="Product Image" height="60" width="60">
+                                <div class="card-body p-2">
+                                    <p class="mb-0"><small>Uploaded on {{ image.date|date:"Y-m-d H:i" }}</small></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                     <hr/>
-                    <h3 class="text-center">Business Owner's Details</h3>
+                    <h3>Business Owner's Details</h3>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -363,8 +369,11 @@
                 describe.innerHTML = "Enter your printer name with the exact name from Windows settings";
             }
     });
+</script>
 
-    
-
+<script>
+    var loadImage = function (event){
+        var image = document.getElementById('electImageOutput');
+        image.src = URL.createObjectURL(event.target.files[0]);    }
 </script>
 {% endblock index %}

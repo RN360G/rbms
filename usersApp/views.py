@@ -321,9 +321,9 @@ class UploadProfileImage(generic.View):
         return render(request, 'user/profilePicture.html')
 
     def post(self, request):
-        file = request.FILES['upload']
+        file = request.FILES.get('upload')
         image = ImageUpload()
-        image.upload(file, request.session['userID'])
+        image.uploadProfileUser(request, file)
         return redirect(to='profile')
 
 

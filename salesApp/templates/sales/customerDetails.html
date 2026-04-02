@@ -146,12 +146,14 @@
                             <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example">
                                 <thead class="d-none d-md-table-header-group">
                                     <tr>
+                                        <th style="display:none;">id</th>
                                         <th>Transactions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for trans in transactions %}
                                         <tr>
+                                            <td style="display:none;">{{forloop.counter}}</td>
                                             <td>
                                                 <div class="card mb-2 shadow-sm" style="margin-left:0; margin-right:0;">
                                                     <div class="card-body p-2">
@@ -215,18 +217,18 @@
 
                 
                 <!-- Advance Payment Items ==============================================================================================================================-->
-                <div class="tab-pane active" role="tabpanel" id="advancePayItems">
-                        <h4 class="text-center">
-                            <span class="fa fa-cart-plus"></span> Advance Payment Items 
-                            <span style="float: right">Total Price: <b>{{ advancePayTotalPrice }}</b></span>
-                        </h4>
+                <div class="tab-pane" role="tabpanel" id="advancePayItems">
+                        <p>
+                            <span class="fa fa-cart-plus"> Advance Payment Items</span><br/> 
+                            <span>Total Price: <b>{{ advancePayTotalPrice }}</b></span>
+                        </p>
                     <div class="container-fluid bg-gradient-light py-5 shadow px-0">
                         <div class="table-responsive mx-0 px-0">
                         <table class="table table-bordered table-hover w-100 mb-0" id="dataTables-example3">
                             <thead class="d-none d-md-table-header-group">
-                            <tr>
-                                <th>Advance Payment Items</th>
-                            </tr>
+                                <tr>
+                                    <th>Advance Payment Items</th>
+                                </tr>
                             </thead>
                             <tbody>
                             {% for trans in advancePayitems %}
@@ -256,6 +258,18 @@
                     </div>
                 </div>
             </div>
+            <script>
+              $(document).ready(function() {
+                $('#dataTables-example').DataTable({
+                  order: [[0, "desc"]],   // sort by Count column, descending
+                  columnDefs: [
+                    { targets: 0, visible: false } // hide Count column properly
+                  ],
+                  scrollX: true,          // allow horizontal scroll on small screens
+                  responsive: false       // prevent auto-hiding
+                });
+              });
+          </script>
         </div>
     {% endblock warehouseMobile %}
     

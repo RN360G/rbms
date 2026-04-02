@@ -1,0 +1,123 @@
+{% extends "marketPlace/rbms.html" %}
+{% load static %}
+
+{% block rbmsM %}
+    <style>
+      .business-name {
+        display: inline-block;
+        max-width: 300px; /* adjust to fit your navbar */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1rem; /* fixed size */
+    }
+    </style>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <!-- Logo -->
+            <span class="navbar-brand d-flex align-items-center">
+                <img src="{% static 'img/rn360_4.jpeg' %}" 
+                    alt="Logo" 
+                    style="width:40px; height:40px; object-fit:cover;" 
+                    class="me-2 rounded-circle">
+
+                <span class="fw-bold text-white business-name">
+                    <b>{{business.busName}}</b> <br/> 
+                    <sup>{{business.branchName}}</sup>
+                </span>
+            </span>
+
+
+          <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto" 
+              style="overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%;">
+              <li class="nav-item shadow me-2">
+                <a class="nav-link" href="{% url 'otherBranches' branch.branchID %}"><i class="fa fa-building"></i> Branches</a>
+              </li>
+             <li class="nav-item shadow me-2">
+                <a class="nav-link" href="#all"><i class="fa fa-building"></i> Promotions</a>
+              </li>
+              <li class="nav-item shadow me-2">
+                <a class="nav-link" href="{% url 'aboutUs' branch.branchID %}"><i class="fa fa-info"></i> About Us</a>
+              </li>
+          </ul>
+
+            <!-- Contact & Hours -->
+            <div class="ms-auto d-flex flex-wrap align-items-center text-white">
+                <span class="me-3">
+                    <i class="fa fa-phone"></i> {{branch.branchTel}}
+                </span>
+
+                {% if branch.operateAllTime %}
+                    <span>
+                        <i class="fa fa-clock"></i> Active <b>247</b>
+                    </span>
+                {% else %}
+                    <span>
+                        <i class="fa fa-clock"></i> Active from 
+                        <b>{{branch.fromTime}}</b> to <b>{{branch.toTime}}</b>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container my-5">
+    <!-- Business Logo & Name -->
+    <div class="text-center mb-4">
+        {% if business.busLogo.image %}
+            <img src="{{ business.busLogo.image.url }}" alt="{{ business.busName }} Logo" 
+                class="img-fluid mb-3" style="max-height:300px;">
+        {% else %}
+            <img src="{% static 'img/default.jpeg' %}" alt="Default Logo" 
+                class="img-fluid mb-3" style="max-height:300px;">
+        {% endif %}
+        <h2 class="fw-bold">{{ business.busName }}</h2>
+        <p class="text-muted">{{ business.branchName }}</p>
+    </div>
+
+    <!-- Head Branch Info -->
+    <div class="card shadow mb-5 border-0">
+        <div class="card-body text-center">
+        <h4 class="fw-bold">Head Branch</h4>
+        <p class="text-muted mb-2">
+            Address: {{ address|default:"No address available" }}
+        </p>
+        <p class="text-muted mb-2">
+            Phone: <a href="tel:{{ tel }}">{{ tel }}</a>
+        </p>
+        </div>
+    </div>
+
+    <!-- Other Branches -->
+    <h4 class="fw-bold mb-3 text-center">Our Branches</h4>
+    <div class="row">
+        {% for branch in branches %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card shadow h-100 border-0">
+            <div class="card-body">
+                <h5 class="fw-bold">{{ branch.branchName }}</h5>
+                <p class="text-muted mb-2">
+                Email: <a href="mailto:{{ branch.branchEmail }}">{{ branch.branchEmail }}</a>
+                </p>
+                <p class="text-muted mb-2">
+                Phone: <a href="tel:{{ branch.branchTel }}">{{ branch.branchTel }}</a>
+                </p>
+                <p class="text-muted mb-2">
+                WhatsApp: <a href="https://wa.me/{{ branch.branchTel }}" target="_blank">
+                    {{ branch.branchTel }}
+                </a>
+                </p>
+            </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted">No other branches available.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock rbmsM %}
+
+

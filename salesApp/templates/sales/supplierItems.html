@@ -46,10 +46,8 @@
         {% block warehouseMobile %}    
         <div>
             <div class="tab-content">
-                <!-- Customers / Items Received -->
                 <div class="tab-pane active" role="tabpanel" id="customers">
-                    <a href="{% url 'salesSupplierDetails' sup %}" 
-                    class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
+                    <a href="{% url 'salesSupplierDetails' sup %}" class="fa fa-arrow-left btn btn-outline-dark" style="color:black">Back</a>
                 <div class="container-fluid bg-gradient-light py-5 shadow px-0">      
                     <h4><span class="fa fa-cart-arrow-down"></span> Items Received</h4>              
                     <span>Total Cost: <i style="color: #c67605">GH&#8373</i><b>{{ supplierRecord.totalCost|floatformat:"2" }}</b></span>
@@ -88,8 +86,6 @@
                 </div>
             </div>
         </div>
-
-    {% endblock warehouseMobile %}
-    
+    {% endblock warehouseMobile %}    
 {% endif %}
     

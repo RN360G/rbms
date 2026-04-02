@@ -12,14 +12,17 @@
                 <div class="container bg-gradient-light py-5 shadow">
                     <h2><span class="fa fa-list"></span> Upload Profile Picture</h2> 
                     <div class="row">
-                        <div class="col-md-6">
-                            <h3><u>Preview Image</u></h3>
-                        </div>
-                        <div class="col-md-6">
-                            <h3><u>Select Picture</u></h3>
-                            <form method="post" enctype="multipart/form-data">
+                        <div class="col-md-12">
+                            <form method="post" enctype="multipart/form-data" style="width: 30%">
                                 {% csrf_token %}
-                                <input type="file" class="form-control" name="upload" required/>
+                                <label class="form-label" for="sellingPrice">Select Image <b style="color: red">*</b></label>
+                                <input type="file" class="form-control" name="upload" id="electImage" onchange="loadImage(event)" accept="image/*" required>                                                
+                                <div class="card shadow-sm">
+                                    <img src="{{ image.image.url }}" class="card-img-top img-fluid" id="electImageOutput" alt="Product Image" height="60" width="60">
+                                    <div class="card-body p-2">
+                                        <p class="mb-0"><small>Uploaded on {{ image.date|date:"Y-m-d H:i" }}</small></p>
+                                    </div>
+                                </div>
                                 <button type="submit">Upload</button>
                             </form>
                         </div>
@@ -27,6 +30,11 @@
                 </div>
             </div>
         </div>
+        <script>
+            var loadImage = function (event){
+                var image = document.getElementById('electImageOutput');
+                image.src = URL.createObjectURL(event.target.files[0]);    }
+        </script>
     {% endblock index %}
 
     <!--Mobile =====================================================================================================-->
@@ -41,14 +49,17 @@
                 <div class="container bg-gradient-light py-5 shadow">
                     <h3><span class="fa fa-list"></span> Upload Profile Picture</h3> 
                     <div class="row">
-                        <div class="col-md-6">
-                            </h6><u>Preview Image</u></h6>
-                        </div>
-                        <div class="col-md-6">
-                            <h6><u>Select Picture</u></h6>
-                            <form method="post" enctype="multipart/form-data">
+                        <div class="col-md-12">
+                            <form method="post" enctype="multipart/form-data" style="width: 30%">
                                 {% csrf_token %}
-                                <input type="file" class="form-control" name="upload" required/>
+                                <label class="form-label" for="sellingPrice">Select Image <b style="color: red">*</b></label>
+                                <input type="file" class="form-control" name="upload" id="electImage" onchange="loadImage(event)" accept="image/*" required>                                                
+                                <div class="card shadow-sm">
+                                    <img src="{{ image.image.url }}" class="card-img-top img-fluid" id="electImageOutput" alt="Product Image" height="60" width="60">
+                                    <div class="card-body p-2">
+                                        <p class="mb-0"><small>Uploaded on {{ image.date|date:"Y-m-d H:i" }}</small></p>
+                                    </div>
+                                </div>
                                 <button type="submit">Upload</button>
                             </form>
                         </div>
@@ -57,6 +68,11 @@
             </div>
         </div>
         {% endblock mobile %}
+        <script>
+            var loadImage = function (event){
+                var image = document.getElementById('electImageOutput');
+                image.src = URL.createObjectURL(event.target.files[0]);    }
+        </script>
     
 {% endif %}
     

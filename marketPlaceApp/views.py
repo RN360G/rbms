@@ -134,12 +134,29 @@ class InsideBusiness(generic.View):
                    )
         elif branch.branchType == 'Hotel':
             pass
+        products = list(products)
+        rd.shuffle(products)
         return render(request, 'marketPlace/insideTheBusiness.html', {'products': products, 'branch': branch})
     
     def post(self, request, businessID, branchID):
         return HttpResponse()
-
-
+    
+    def otherBranches(request, branchID):
+        branch = BusinessBranch.objects.get(Q(branchID=branchID))
+        bus = Business.objects.get(busID=branch.busRef.busID)
+        otherBranches = BusinessBranch.objects.filter(Q(busRef=branch.busRef))
+        return render(request, 'marketPlace/otherBranches.html', {'branches': otherBranches, 'business': bus, 'branch': branch})
+    
+    def aboutUs(reques, branchID):
+        branch = BusinessBranch.objects.get(Q(branchID=branchID))        
+        bus = Business.objects.get(busID=branch.busRef.busID)
+        allBranches = BusinessBranch.objects.filter(Q(busRef=bus))
+        headBranch = BusinessBranch.objects.filter(Q(busRef=bus))
+        address = headBranch[0].branchAddress
+        email = headBranch[0].branchEmail
+        tel = headBranch[0].branchTel 
+        return render(reques, 'marketPlace/about.html', {'branches': allBranches, 'branch': branch,  'business': bus, 'address': address, 'email': email, 'tel': tel})
+    
 
 # product details
 class ProductDetails(generic.View):
@@ -151,7 +168,7 @@ class ProductDetails(generic.View):
         else:
             generalDiscount = 0.00
 
-        flyer = Images.objects.filter(Q(subjectID=productCode))
+        flyer = Images.objects.filter(Q(subjectID=productCode) & Q(busRef=branch.busRef))
         if flyer.exists():
             flyer = flyer[0]
 
@@ -396,6 +413,11 @@ def autocomplete_items_specific_Market(request):
             results.append(obj.branchType)
             results.append(obj.branchAddress)
     return JsonResponse(results, safe=False)
+
+
+def itSupport(request):
+    return render(request, 'marketPlace/itsupport.html')
+
 
 
 

@@ -500,7 +500,7 @@
 {% else %}
 {% block mobile %}
 <section>
-    <div class="container-fluid bg-gradient-light py-5 shadow">
+    <div class="container-fluid bg-gradient-light py-5 shadow px-0">
         <a href="{% url 'user' %}" class="btn btn-outline-dark fa fa-backwad-arrow">Back</a>
         <h4 class="fw-bold">Access and Role for : <b>{{user.userRef.firstName}} {{user.userRef.surname}}</b> (<i style="color: goldenrod;">{{user.userID}}</i>)</h4>
         <div class="row">

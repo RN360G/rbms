@@ -347,7 +347,6 @@ class CashAnalysisView(generic.View):
         return HttpResponseRedirect('/accounts/cashanalysis/')
     
     
-
 class SuspenseAccountView(generic.View):
     # suspense account for inter branch transfers
     def suspenseAccount(request, transactionType, froBranch, toBranch, fromAccountRef, toAccountRef, amount, overs, shortage, description):
@@ -470,7 +469,6 @@ class SuspenseAccountView(generic.View):
     # authorize fund transfer
     def authorizeFundTransfer(request, transferType, pk, opt):
         suspenseAcc = SuspenseAccount.objects.get(Q(id=pk))
-
         # authorize cash on hand transfer
         if transferType == 'cashOnHand':
             user = UserRef.objects.get(Q(userID=suspenseAcc.fromAccountRef.accountNumber))
@@ -511,6 +509,8 @@ class SuspenseAccountView(generic.View):
                                 oversAndShortagesRecord.transactionType = 'Shortage'
                                 amount = float(totalC)
                                 oversAndShortages.save()
+                                # Debit staff account
+                                accountTransactions(request, fromAccount.accountNumber, 'Debit', float(cashDifference), f'Move shortage amount to shortage records')  
                         else:
                             oversAndShortages = oversAndShortages[0]
                             if cashOnH < totalC:
@@ -542,6 +542,8 @@ class SuspenseAccountView(generic.View):
                             elif cashOnH > totalC:
                                 oversAndShortages.shortageAmount += float(cashDifference)
                                 oversAndShortages.save()
+                                # Debit staff account
+                                accountTransactions(request, fromAccount.accountNumber, 'Debit', float(cashDifference), f'Move shortage amount to shortage records')                                
                                 oversAndShortagesRecord.transactionType = 'Shortage' 
                                 amount = float(totalC)
                         oversAndShortagesRecord.amount = cashDifference

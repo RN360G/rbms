@@ -29,7 +29,7 @@
                                     <th>Transaction type</th>
                                     <th>Receipt Number</th>
                                     <th>Total Cost</th>
-                                    <th>Amount Paid</th>
+                                    <th>Amount Paid/Reversed</th>
                                     <th>Amount Owe</th>
                                     <th>Balance</th>
                                     <th>Narration</th>
@@ -89,6 +89,7 @@
                 <div class="tab-pane" role="tabpanel" id="supply">
                     <div class="container-fluid bg-gradient-light py-5 shadow">
                         <h2><span class="fa fa-money"></span> Record Supplies</h2>
+                        <a href="{% url 'salesGenerateItemsForSupplyRecord' supplier.id %}" class="btn btn-outline-primary">Get Items</a>
                         <form method="post" action="{% url 'salesSupplierRecords' %}">
                             {% csrf_token %}
                             <input type="hidden" value="{{supplier.id}}" id="supplierKey" name="supplierID" />
@@ -105,24 +106,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for product in products %}
+                                            {% for product in tempSupplyItems %}                                     
                                                 <tr class="even gradeA">
-                                                    <td>{{ product.productName}} <br/> {{product.productCode}} <input type="hidden" name="product" id="{{product.productCode}}" value="{{product.productCode}}"/></td>
-                                                    <td><input type='number' class="form-control" value="0" name='qty' id="qty{{product.productCode}}" placeholder='quanty received' min="0" step="any"/></td>
-                                                    <td><input type='number' class="form-control" value="0" name='cost' id="cost{{product.productCode}}" placeholder='Cost' min="0" step="any"/></td>
-                                                    <td>   
-                                                        
-                                                        {% for supp in  tempSupplies  %}
-                                                            {% if product.productCode == supp.productRef.productCode %}
-                                                                <i class="fa fa-check text-success"></i>
-                                                            {% else %}
-                                                                <i class="fa fa-times text-danger"></i>                                        
-                                                            {% endif %}                                                            
-                                                        {% endfor %}
-                                                                                                                    
-
-                                                        <a href="#0" class="btn btn-sm btn-outline-success" onclick="storeTempSupply('{{product.productCode}}', 'add')">Save</a> 
-                                                        <a href="#0" class="btn btn-sm btn-outline-danger" onclick="storeTempSupply('{{product.productCode}}', 'remove')">Remove</a>  
+                                                    <td>{{ product.productRef.productName}} <br/> {{product.productRef.productCode}} <input type="hidden" name="product" id="{{product.productRef.productCode}}" value="{{product.productRef.productCode}}"/></td>
+                                                    <td><input type='number' class="form-control" value="{{product.qty|default:'0'}}" name='qty' id="qty{{product.productRef.productCode}}" placeholder='quanty received' min="0" step="any"/></td>
+                                                    <td><input type='number' class="form-control" value="{{product.unityCost|default:'0'}}" name='cost' id="cost{{product.productRef.productCode}}" placeholder='Cost' min="0" step="any"/></td>
+                                                    <td>
+                                                        <a href="" class="btn btn-sm btn-outline-success" onclick="storeTempSupply('{{product.productRef.productCode}}', 'add')">Save</a> 
+                                                        <a href="" class="btn btn-sm btn-outline-danger" onclick="storeTempSupply('{{product.productRef.productCode}}', 'remove')">Remove</a>  
                                                     </td>
                                                 </tr>
                                             {% endfor %}
@@ -173,7 +164,7 @@
                             <input type="hidden" value="{{supplier.id}}" name="supplierID" />
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label" for="amount">Amount<b style="color: red">*</b></label>
+                                    <label class="form-label" for="amount">Transaction Type<b style="color: red">*</b></label>
                                     <select class="form-control" name='optType'>
                                         <option>Repayment</option>
                                         <option>Reverse Repayment</option>
@@ -286,42 +277,15 @@
                     success: function (response){
                         document.getElementById('qty'+productCode).value = response.quantity;
                         document.getElementById('cost'+productCode).value = response.cost;
-                        alert('2');
                     },
                     error: function (error){
                         alert('error: operation failed!')
                     }
                 });
-            }
-
-            function displayTemsSupplies()
-            {
-                
-                let supplierKey = document.getElementById('supplierKey').value;
-                $.ajax({
-                    url: '/sales/salesdisplaytemporarilysupply',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        'supplierKey': supplierKey,
-                    },
-                    success: function (response){
-                        for(let i=0; i<response.tempSupplies.length; i++)
-                        {
-                            let productCode = response.tempSupplies[i].productRef.productCode;
-                            document.getElementById('qty'+productCode).value = response.tempSupplies[i].quantity;
-                            document.getElementById('cost'+productCode).value = response.tempSupplies[i].cost;
-                        }
-                    },
-                    error: function (error){
-                        alert('error: operation failed!')
-                    }
-                });
-            }
-            displayTemsSupplies();
-            
-            
+            }                      
         </script>
+
+
     {% endblock warehouse %}
 
     

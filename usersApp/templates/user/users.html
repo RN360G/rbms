@@ -404,81 +404,80 @@
             <br/>
             <div class="tab-content">
                 <div class="tab-pane active" role="tabpanel" id="tab-1">
-                    <div class="container-fluid bg-gradient-light py-5 shadow">
+                    <div class="container-fluid bg-gradient-light py-5 shadow px-0">
                         <h2><span class="fa fa-users"></span> Users</h2>
-
                         <div class="table-responsive mx-0 px-0">
-                        <table class="table table-bordered table-hover w-100 mb-0" 
-                                id="dataTables-example" style="width:100%;">
-                            <!-- Hide header on mobile -->
-                            <thead class="d-none d-md-table-header-group">
-                            <tr>
-                                <th>Users</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for dat in users %}
-                            <tr>
-                                <td>
-                                <div class="card mb-2 shadow-sm w-100" style="margin-left:0; margin-right:0;">
-                                    <div class="card-body p-2">
-                                    <!-- Title -->
-                                    <h6 class="card-title mb-1">
-                                        #{{ forloop.counter }} — 
-                                        <span class="fa fa-user" style="color: firebrick"></span> 
-                                        <b style="color: black">{{ dat.userRef.firstName }} {{ dat.userRef.surname }}</b>
-                                    </h6>
-                                    <small class="text-muted">User ID: {{ dat.userID }}</small>
+                            <table class="table table-bordered table-hover w-100 mb-0" 
+                                    id="dataTables-example" style="width:100%;">
+                                <!-- Hide header on mobile -->
+                                <thead class="d-none d-md-table-header-group">
+                                <tr>
+                                    <th>Users</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for dat in users %}
+                                <tr>
+                                    <td>
+                                    <div class="card mb-2 shadow-sm w-100" style="margin-left:0; margin-right:0;">
+                                        <div class="card-body p-2">
+                                        <!-- Title -->
+                                        <h6 class="card-title mb-1">
+                                            #{{ forloop.counter }} — 
+                                            <span class="fa fa-user" style="color: firebrick"></span> 
+                                            <b style="color: black">{{ dat.userRef.firstName }} {{ dat.userRef.surname }}</b>
+                                        </h6>
+                                        <small class="text-muted">User ID: {{ dat.userID }}</small>
 
-                                    <!-- Branch -->
-                                    <p class="mb-1"><strong>Branch:</strong> {{ dat.busRef.branchName }} 
-                                        <br><sup>{{ dat.busRef.branchID }}</sup>
-                                    </p>
+                                        <!-- Branch -->
+                                        <p class="mb-1"><strong>Branch:</strong> {{ dat.busRef.branchName }} 
+                                            <br><sup>{{ dat.busRef.branchID }}</sup>
+                                        </p>
 
-                                    <!-- Details -->
-                                    <p class="mb-1"><strong>DOB:</strong> {{ dat.userRef.dob }}</p>
-                                    <p class="mb-1"><strong>Country:</strong> {{ dat.userRef.country }}</p>
-                                    <p class="mb-1"><strong>Home Town:</strong> {{ dat.userRef.homeTown }}</p>
-                                    <p class="mb-1"><strong>Qualification:</strong> {{ dat.userRef.qualification }}</p>
+                                        <!-- Details -->
+                                        <p class="mb-1"><strong>DOB:</strong> {{ dat.userRef.dob }}</p>
+                                        <p class="mb-1"><strong>Country:</strong> {{ dat.userRef.country }}</p>
+                                        <p class="mb-1"><strong>Home Town:</strong> {{ dat.userRef.homeTown }}</p>
+                                        <p class="mb-1"><strong>Qualification:</strong> {{ dat.userRef.qualification }}</p>
 
-                                    <!-- Status -->
-                                    <p class="mb-1"><strong>Status:</strong>
-                                        {% if dat.status == 'Disabled'%} 
-                                        <span style="color: red;">{{ dat.status }}</span>
-                                        {% elif dat.status == 'Online' %}
-                                        <span style="color: green;">{{ dat.status }}</span>
-                                        {% elif dat.status == 'Enable' %}
-                                        <span style="color: goldenrod;">{{ dat.status }}</span>
-                                        {% else %}
-                                        <span style="color: gray;">{{ dat.status }}</span>
-                                        {% endif %}
-                                    </p>
+                                        <!-- Status -->
+                                        <p class="mb-1"><strong>Status:</strong>
+                                            {% if dat.status == 'Disabled'%} 
+                                            <span style="color: red;">{{ dat.status }}</span>
+                                            {% elif dat.status == 'Online' %}
+                                            <span style="color: green;">{{ dat.status }}</span>
+                                            {% elif dat.status == 'Enable' %}
+                                            <span style="color: goldenrod;">{{ dat.status }}</span>
+                                            {% else %}
+                                            <span style="color: gray;">{{ dat.status }}</span>
+                                            {% endif %}
+                                        </p>
 
-                                    <!-- Actions -->
-                                    <div class="d-flex flex-wrap gap-2 mt-2">
-                                        {% if uAccess.101 %}
-                                        <a href="{% url 'editUser' dat.userID %}" 
-                                            class="btn btn-outline-dark fa fa-edit flex-fill"> Edit</a>
-                                        {% endif %}
-                                        {% if uAccess.102 %}
-                                        <a href="{% url 'accessAndRoles' dat.userID %}" 
-                                            class="btn btn-outline-dark fa fa-clock flex-fill"> Access and Roles</a>
-                                        {% endif %}
+                                        <!-- Actions -->
+                                        <div class="d-flex flex-wrap gap-2 mt-2">
+                                            {% if uAccess.101 %}
+                                            <a href="{% url 'editUser' dat.userID %}" 
+                                                class="btn btn-outline-dark fa fa-edit flex-fill"> Edit</a>
+                                            {% endif %}
+                                            {% if uAccess.102 %}
+                                            <a href="{% url 'accessAndRoles' dat.userID %}" 
+                                                class="btn btn-outline-dark fa fa-clock flex-fill"> Access and Roles</a>
+                                            {% endif %}
+                                        </div>
+                                        </div>
                                     </div>
-                                    </div>
-                                </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
 
                 <div class="tab-pane" role="tabpanel" id="tab-2">
-                    <div class="container bg-gradient-light py-5 shadow">
+                    <div class="container bg-gradient-light py-5 shadow px-0">
                         <h2><span class="fa fa-user-plus"></span> Add User</h2>
                         <form class="user" method="post" action="{% url 'newUser' %}">
                             {% csrf_token %}
