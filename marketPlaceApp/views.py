@@ -21,7 +21,7 @@ class GeneralMarket(generic.View):
     def get(self, request):
         search = request.GET.get('search')
         if not search:
-            products = Product.objects.filter(Q(disbleRef__productIsDisabled=False)).annotate(
+            products = Product.objects.filter(Q(disbleRef__productIsDisabled=False) & Q(retailAndWholesaleRef__isVisibleOnline=True)).annotate(
                     obj = Value(2),
                     generalDiscount= F('discountRate'),
                     priceAfterDiscount=ExpressionWrapper(
@@ -36,6 +36,7 @@ class GeneralMarket(generic.View):
 
             # Products
             products = Product.objects.filter(
+                Q(retailAndWholesaleRef__isVisibleOnline=True),
                 Q(disbleRef__productIsDisabled=False),
                 Q(productName__icontains=query) |
                 Q(productDescription__icontains=query) |
