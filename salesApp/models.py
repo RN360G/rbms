@@ -10,7 +10,7 @@ class RetailAndWholesale(models.Model):
     quantityInStock = models.FloatField(default=0.0) # in pieces, kg, litres, etc
     reorderLevel = models.FloatField(default=0.0) # in pieces, kg, litres, etc. when stock reaches this level, reorder is needed
     partCanBeSold = models.BooleanField(default=True) # whether product can be sold in parts or not
-    isVisibleOnline = models.BooleanField(default=True)
+    isVisibleOnline = models.BooleanField(default=False)
     enableOnlineOrder = models.BooleanField(default=False)
     minimumOrder = models.FloatField(default=1)     
     currentCostPriceRef = models.ForeignKey('CurrentCostAndPrice', on_delete=models.DO_NOTHING)
