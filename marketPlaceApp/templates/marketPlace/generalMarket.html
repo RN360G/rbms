@@ -14,7 +14,7 @@
     <!-- Carousel inner -->
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="{% static 'img/rn360BFit.png' %}" class="d-block w-100 img-fluid" alt="Featured Product"
+        <img src="{% static 'img/rn360bbb.png' %}" class="d-block w-100 img-fluid" alt="Featured Product"
              style="max-height:600px; object-fit:cover;">
         <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
           <h5 class="fw-bold">RN360B Products</h5>
@@ -24,7 +24,7 @@
       </div>
 
       <div class="carousel-item">
-        <img src="{% static 'img/rn360BFit.png' %}" class="d-block w-100 img-fluid" alt="Discount Offer"
+        <img src="{% static 'img/rn360bbb.png' %}" class="d-block w-100 img-fluid" alt="Discount Offer"
              style="max-height:600px; object-fit:cover;">
         <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
           <h5 class="fw-bold">RN360B Businesses</h5>
@@ -34,7 +34,7 @@
       </div>
 
       <div class="carousel-item">
-        <img src="{% static 'img/rn360BFit.png' %}" class="d-block w-100 img-fluid" alt="Best Sellers"
+        <img src="{% static 'img/rn360bbb.png' %}" class="d-block w-100 img-fluid" alt="Best Sellers"
              style="max-height:600px; object-fit:cover;">
         <div class="carousel-caption d-block bg-dark bg-opacity-50 rounded p-3">
           <h5 class="fw-bold">Richnet 360 Business</h5>
@@ -453,113 +453,120 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // toast
-    function showToast(msg = 'Link copied') 
-    {
-        const t = document.createElement('div');
-        t.className = 'copy-toast';
-        t.textContent = msg;
-        document.body.appendChild(t);
-        requestAnimationFrame(() => t.style.opacity = '1');
-        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 1400);
-    }
-
-    // clipboard helper 
-    async function copyToClipboard(text) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+    document.addEventListener('DOMContentLoaded', function () {
+        // toast
+        function showToast(msg = 'Link copied') {
+            const t = document.createElement('div');
+            t.className = 'copy-toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            requestAnimationFrame(() => t.style.opacity = '1');
+            setTimeout(() => {
+                t.style.opacity = '0';
+                setTimeout(() => t.remove(), 300);
+            }, 1400);
         }
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        try {
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            return true;
-        } catch (e) {
-            document.body.removeChild(ta);
-            return false;
-        }
-    }
 
-    function buildUrlForBtn(btn) {
-        const id = btn.dataset.id 
-            || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim() 
-            || '';
-        const title = btn.dataset.title 
-            || btn.closest('.card')?.querySelector('h5')?.innerText?.trim() 
-            || document.title;
-        const url = btn.getAttribute('href'); // use the href directly
-
-        return { id, title, url };
-    }
-
-
-    // Copy button: silently copy link
-    document.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const { url } = buildUrlForBtn(btn);
-            const ok = await copyToClipboard(url);
-            showToast(ok ? 'Link copied' : 'Copy failed');
-        });
-    });
-
-    // Share button: open WhatsApp (mobile/desktop) — Shift+click opens email instead
-    document.querySelectorAll('.share-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const { title, url } = buildUrlForBtn(btn);
-            if (e.shiftKey) {
-                // open email client
-                const mailto = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(title + '\n' + url);
-                window.location.href = mailto;
-                return;
+        // clipboard helper
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (e) {}
             }
-            // open WhatsApp (wa.me works on mobile and opens web on desktop)
-            const wa = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
-            // user gesture -> should not be blocked
-            window.open(wa, '_blank', 'noopener,noreferrer');
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                return true;
+            } catch (e) {
+                document.body.removeChild(ta);
+                return false;
+            }
+        }
+
+        function buildUrlForBtn(btn) {
+            const id = btn.dataset.id
+                || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim()
+                || '';
+            const title = btn.dataset.title
+                || btn.closest('.card')?.querySelector('h5')?.innerText?.trim()
+                || document.title;
+            const url = btn.getAttribute('href'); // relative or absolute
+
+            // ensure absolute URL
+            const absoluteUrl = new URL(url, window.location.origin).href;
+
+            return { id, title, url: absoluteUrl };
+        }
+
+        // Copy button: silently copy link
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const { url } = buildUrlForBtn(btn);
+                const ok = await copyToClipboard(url);
+                showToast(ok ? 'Link copied' : 'Copy failed');
+            });
+        });
+
+        // Share button: open WhatsApp (mobile/desktop) — Shift+click opens email instead
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const { title, url } = buildUrlForBtn(btn);
+                if (e.shiftKey) {
+                    // open email client
+                    const mailto = 'mailto:?subject=' + encodeURIComponent(title) +
+                                '&body=' + encodeURIComponent(title + '\n' + url);
+                    window.location.href = mailto;
+                    return;
+                }
+                // open WhatsApp (wa.me works on mobile and opens web on desktop)
+                const wa = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
+                window.open(wa, '_blank', 'noopener,noreferrer');
+            });
         });
     });
-});
 </script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // existing copy/share handlers...
-    // ...existing code...
+    document.addEventListener('DOMContentLoaded', function () {
+        // existing copy/share handlers...
+        // ...existing code...
 
-    // show non-blocking ellipsis when text is clipped
-    function updateEllipsisIndicators() {
-        document.querySelectorAll('.clamped-text').forEach(el => {
-            // ensure computed height used
-            const isClipped = el.scrollHeight > el.clientHeight + 1;
-            const cardBody = el.closest('.card-body');
-            if (!cardBody) return;
-            let indicator = cardBody.querySelector('.ellipsis-indicator');
-            if (!indicator) {
-                indicator = document.createElement('div');
-                indicator.className = 'ellipsis-indicator';
-                indicator.setAttribute('aria-hidden','true');
-                indicator.textContent = '…';
-                cardBody.appendChild(indicator);
-            }
-            indicator.style.display = isClipped ? 'block' : 'none';
-        });
-    }
+        // show non-blocking ellipsis when text is clipped
+        function updateEllipsisIndicators() {
+            document.querySelectorAll('.clamped-text').forEach(el => {
+                // ensure computed height used
+                const isClipped = el.scrollHeight > el.clientHeight + 1;
+                const cardBody = el.closest('.card-body');
+                if (!cardBody) return;
+                let indicator = cardBody.querySelector('.ellipsis-indicator');
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.className = 'ellipsis-indicator';
+                    indicator.setAttribute('aria-hidden','true');
+                    indicator.textContent = '…';
+                    cardBody.appendChild(indicator);
+                }
+                indicator.style.display = isClipped ? 'block' : 'none';
+            });
+        }
 
-    // run on load and resize (debounced)
-    updateEllipsisIndicators();
-    let rto;
-    window.addEventListener('resize', () => { clearTimeout(rto); rto = setTimeout(updateEllipsisIndicators, 150); });
-});
+        // run on load and resize (debounced)
+        updateEllipsisIndicators();
+        let rto;
+        window.addEventListener('resize', () => { clearTimeout(rto); rto = setTimeout(updateEllipsisIndicators, 150); });
+    });
 </script>
 
 <script>

@@ -30,11 +30,12 @@
                                 <div class="card-body px-4 py-5 px-md-5">
                                     <div class="bs-icon-lg d-flex justify-content-center align-items-center mb-3 bs-icon" style="top: 1rem;right: 1rem;position: absolute;">
                                         <b class=" fa fa-money"></b>
-                                    </div>
-                                        <h5 class="fw-bold card-title">Money</h5>
-                                        <p>Cash On Hand: {{ cashOnHand }}</p>  
-                                        <p>Shortages: {{ shortage }}</p>
-                                        <p>Overages: {{ overs }}</p>
+                                        </div>
+                                            <h5 class="fw-bold card-title">Money</h5>
+                                            <p>Cash On Hand: <b><span class="badge bg-primary"><i style="color: #000000">GH&#8373</i> {{ cashOnHand|floatformat:2 }}</span></b></p>  
+                                            <p>Shortages: <b><span class="badge bg-danger"><i style="color: #000000">GH&#8373</i> {{ shortage|floatformat:2 }}</span></b></p>
+                                            <p>Overages: <b><span class="badge bg-success"><i style="color: #000000">GH&#8373</i> {{ overs|floatformat:2 }}</span></b></p>
+                                        
                                 </div>
                             </div>
                         </div>  
@@ -140,6 +141,7 @@
                                             <p>Cash On Hand: <b><span class="badge bg-primary"><i style="color: #000000">GH&#8373</i> {{ cashOnHand|floatformat:2 }}</span></b></p>  
                                             <p>Shortages: <b><span class="badge bg-danger"><i style="color: #000000">GH&#8373</i> {{ shortage|floatformat:2 }}</span></b></p>
                                             <p>Overages: <b><span class="badge bg-success"><i style="color: #000000">GH&#8373</i> {{ overs|floatformat:2 }}</span></b></p>
+                                        
                                     </div>
                                 </div>
                             </div>  

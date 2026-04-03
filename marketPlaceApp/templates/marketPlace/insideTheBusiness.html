@@ -11,7 +11,6 @@
         text-overflow: ellipsis;
         font-size: 1rem; /* fixed size */
     }
-
     </style>
 
     <!-- Navbar -->
@@ -19,17 +18,17 @@
         <div class="container-fluid">
             <!-- Logo -->
             <span class="navbar-brand d-flex align-items-center">
-                <img src="{% static 'img/rn360_4.jpeg' %}" 
-                    alt="Logo" 
-                    style="width:40px; height:40px; object-fit:cover;" 
+                <img src="{% static 'img/rn360_4.jpeg' %}"
+                    alt="Logo"
+                    style="width:40px; height:40px; object-fit:cover;"
                     class="me-2 rounded-circle">
 
                 <span class="fw-bold text-white business-name">
-                    <b>{{branch.busRef.busName}}</b> <br/> 
+                    <b>{{branch.busRef.busName}}</b> <br/>
                     <sup>{{branch.branchName}}</sup>
                 </span>
             </span>
-          <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto" 
+          <ul class="navbar-nav d-flex flex-row flex-nowrap mx-auto"
               style="overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%;">
               <li class="nav-item shadow me-2">
                 <a class="nav-link" href="{% url 'otherBranches' branch.branchID %}"><i class="fa fa-building"></i> Branches</a>
@@ -41,12 +40,12 @@
                 <a class="nav-link" href="{% url 'aboutUs' branch.branchID %}"><i class="fa fa-info"></i> About Us</a>
               </li>
           </ul>
-             <!-- Search Bar --> 
+             <!-- Search Bar -->
             <!--<form id="searchForm" class="d-flex ms-3" role="search">
               <input id="searchInputField" class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
                   <button class="btn btn-outline-light" type="submit">
-                      <i class="fa fa-search"></i> 
-                  </button> 
+                      <i class="fa fa-search"></i>
+                  </button>
             </form> -->
 
             <!-- Contact & Hours -->
@@ -61,7 +60,7 @@
                     </span>
                 {% else %}
                     <span>
-                        <i class="fa fa-clock"></i> Active from 
+                        <i class="fa fa-clock"></i> Active from
                         <b>{{branch.fromTime}}</b> to <b>{{branch.toTime}}</b>
                     </span>
                 {% endif %}
@@ -73,16 +72,16 @@
 
     <!-- Page Content -->
     <div class="container py-5">
-      <div class="row g-4">        
+      <div class="row g-4">
           {% for product in products %}
               <div class="col-md-3">
                   <div class="card h-100 shadow-sm">
-                  
+
                 <div class="position-relative">
                     {% if product.productImageRef %}
                         <img src="{{product.productImageRef.image.url}}" class="card-img-top" alt="Product Image">
                     {% else %}
-                        <img src="{% static 'img/default2.png' %}" class="card-img-top" alt="Product Image">                    
+                        <img src="{% static 'img/default2.png' %}" class="card-img-top" alt="Product Image">
                     {% endif %}
 
                     <!-- Overlay icons horizontally -->
@@ -94,38 +93,38 @@
                             <i class="fa fa-copy"></i>
                         </a>
                     </div>
-                </div>                     
-                  
+                </div>
+
                   <div class="card-body">
                       <h5 class="card-title" style="color: white"><b>{{product.productName}}</b></h5>
                       <p class="card-text mb-1"><b>Product Code:</b> {{product.productCode}}</p>
                       <p class="card-text mb-1"><b>Type:</b> {{product.productCategory}}</p>
-                      
+
                       {% if product.retailAndWholesaleRef.measureRef.soldUnit == 'Piece'  %}
                         <p class="card-text mb-1"><b>Min Order:</b> {{product.retailAndWholesaleRef.minimumOrder | floatformat:0}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</p>
                       {% else %}
-                        <p class="card-text mb-1"><b>Min Order:</b> {{product.retailAndWholesaleRef.minimumOrder}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</p>                        
-                      {% endif %}              
+                        <p class="card-text mb-1"><b>Min Order:</b> {{product.retailAndWholesaleRef.minimumOrder}} {{product.retailAndWholesaleRef.measureRef.soldUnit}}</p>
+                      {% endif %}
                       <!--<p class="card-text mb-1"><b>Delivery:</b> Available</p>-->
                       <hr>
-                                         
+
                       {% if product.totalDiscaount > 0 %}
                           <p class="card-text mb-1">
                               <b>Discount:</b> {{product.totalDiscaount|floatformat:2}}%
                           </p>
                           <p class="card-text mb-1">
-                              <b>Old Unit Price: </b> 
+                              <b>Old Unit Price: </b>
                               <i style="color: #c67605">GH&#8373</i><span class="text-decoration-line-through text-muted">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span>
                           </p>
-                          <p class="card-text mb-1"><b>New Unit Price:</b> 
+                          <p class="card-text mb-1"><b>New Unit Price:</b>
                               <i style="color: #c67605">GH&#8373</i><span class="text-success fw-bold">{{product.priceAfterDiscount|floatformat:2}}</span>
                           </p>
                       {% else %}
-                          <p class="card-text mb-1"><b>Unit Price:</b><i style="color: #c67605">GH&#8373</i><span class="fw-bold">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span></p>                        
+                          <p class="card-text mb-1"><b>Unit Price:</b><i style="color: #c67605">GH&#8373</i><span class="fw-bold">{{product.retailAndWholesaleRef.currentCostPriceRef.unitSellingPrice|floatformat:2}}</span></p>
                       {% endif %}
                   </div>
                   <div class="card-footer d-flex justify-content-between">
-                      <!-- Details button 
+                      <!-- Details button
                       <button type="button" class="btn btn-sm btn-outline-primary"  data-bs-toggle="modal" data-bs-target="#productModalP001">
                           <i class="fa fa-info-circle"></i> Details
                       </button>-->
@@ -135,15 +134,15 @@
                           <i class="fa fa-shopping-cart"></i> Add
                       </a>
                       <!-- WhatsApp button -->
-                      <a href="https://wa.me/{{product.retailAndWholesaleRef.branchRef.branchTel}}?text=Interested:%20Product%20Name%20(P001)" 
-                          target="_blank" 
+                      <a href="https://wa.me/{{product.retailAndWholesaleRef.branchRef.branchTel}}?text=Interested in {{ product.productName }} ({{ product.productCode }})"
+                          target="_blank"
                           class="btn btn-sm btn-outline-success">
                           <i class="fa fa-whatsapp"></i>
                       </a>
                   </div>
 
                   </div>
-              </div>            
+              </div>
           {% endfor %}
       </div>
     </div>
@@ -180,82 +179,88 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // toast
-        function showToast(msg = 'Link copied') 
-        {
-            const t = document.createElement('div');
-            t.className = 'copy-toast';
-            t.textContent = msg;
-            document.body.appendChild(t);
-            requestAnimationFrame(() => t.style.opacity = '1');
-            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 1400);
-        }
-
-        // clipboard helper 
-        async function copyToClipboard(text) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+            // toast
+            function showToast(msg = 'Link copied') {
+                const t = document.createElement('div');
+                t.className = 'copy-toast';
+                t.textContent = msg;
+                document.body.appendChild(t);
+                requestAnimationFrame(() => t.style.opacity = '1');
+                setTimeout(() => {
+                    t.style.opacity = '0';
+                    setTimeout(() => t.remove(), 300);
+                }, 1400);
             }
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.left = '-9999px';
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                return true;
-            } catch (e) {
-                document.body.removeChild(ta);
-                return false;
-            }
-        }
 
-        function buildUrlForBtn(btn) {
-            const id = btn.dataset.id 
-                || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim() 
-                || '';
-            const title = btn.dataset.title 
-                || btn.closest('.card')?.querySelector('h5')?.innerText?.trim() 
-                || document.title;
-            const url = btn.getAttribute('href'); // use the href directly
-
-            return { id, title, url };
-        }
-
-
-        // Copy button: silently copy link
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const { url } = buildUrlForBtn(btn);
-                const ok = await copyToClipboard(url);
-                showToast(ok ? 'Link copied' : 'Copy failed');
-            });
-        });
-
-        // Share button: open WhatsApp (mobile/desktop)
-        document.querySelectorAll('.share-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const { title, url } = buildUrlForBtn(btn);
-                if (e.shiftKey) {
-                    // open email client
-                    const mailto = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(title + '\n' + url);
-                    window.location.href = mailto;
-                    return;
+            // clipboard helper
+            async function copyToClipboard(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (e) {}
                 }
-                // open WhatsApp (wa.me works on mobile and opens web on desktop)
-                const wa = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
-                // user gesture -> should not be blocked
-                window.open(wa, '_blank', 'noopener,noreferrer');
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return true;
+                } catch (e) {
+                    document.body.removeChild(ta);
+                    return false;
+                }
+            }
+
+            function buildUrlForBtn(btn) {
+                const id = btn.dataset.id
+                    || btn.closest('.card')?.querySelector('.badge')?.textContent?.trim()
+                    || '';
+                const title = btn.dataset.title
+                    || btn.closest('.card')?.querySelector('h5')?.innerText?.trim()
+                    || document.title;
+                const url = btn.getAttribute('href'); // relative or absolute
+
+                // ensure absolute URL
+                const absoluteUrl = new URL(url, window.location.origin).href;
+
+                return { id, title, url: absoluteUrl };
+            }
+
+            // Copy button: silently copy link
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const { url } = buildUrlForBtn(btn);
+                    const ok = await copyToClipboard(url);
+                    showToast(ok ? 'Link copied' : 'Copy failed');
+                });
+            });
+
+            // Share button: open WhatsApp (mobile/desktop) — Shift+click opens email instead
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const { title, url } = buildUrlForBtn(btn);
+                    if (e.shiftKey) {
+                        // open email client
+                        const mailto = 'mailto:?subject=' + encodeURIComponent(title) +
+                                    '&body=' + encodeURIComponent(title + '\n' + url);
+                        window.location.href = mailto;
+                        return;
+                    }
+                    // open WhatsApp (wa.me works on mobile and opens web on desktop)
+                    const wa = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
+                    window.open(wa, '_blank', 'noopener,noreferrer');
+                });
             });
         });
-    });
-
     </script>
 
 {% endblock rbmsM %}
