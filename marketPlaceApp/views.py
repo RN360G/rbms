@@ -204,6 +204,8 @@ class ProductDetails(generic.View):
         with atomic():
             quantity = request.POST.get('quantity')
             customerPhone = request.POST.get('customerPhone')
+            if not customerPhone: 
+                return redirect('customerLogins')
             branch = BusinessBranch.objects.get(Q(branchID=branchID))
             generalDiscount = DiscountRate.objects.filter(Q(busRef=branch.busRef))
 

@@ -1,8 +1,6 @@
-{% extends "dashboardApp/index.html" %}
-{% load static %}
-
-
-{% block index %}
+{% extends "dashboardApp/richnet360.html" %}
+{% load  %}
+{% block richnet360 %}
     <div>
         <ul class="nav nav-tabs" role="tablist">
             <a href="{% url 'richnetDashboard' %}" class="btn btn-outline-dark fa fa-backwad-arrow">Back</a>
@@ -67,4 +65,4 @@
             </div>
         </div>
     </div>
-{% endblock index %}
+{% endblock richnet360 %}

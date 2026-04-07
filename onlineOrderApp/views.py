@@ -23,7 +23,9 @@ class OnlineOrderManager(generic.View):
             messages.warning(request, {'message': 'You do not have access to Online order management page.', 'title': 'Access Denied'}, extra_tags='accessDenied')
             return render(request, 'user/state.html') 
 
-        carts = (CustomerAddToCart.objects.filter(~Q(status='Received') & Q(branhRef=loginSessions(request, 'branch')))
+        carts = (CustomerAddToCart.objects.filter(~Q(status='Received') & 
+                                                  Q(branhRef=loginSessions(request, 'branch')) & ~Q(customerTel__isnull=True) & ~Q(customerTel='')                                                  
+                                                  )                 
                  .values('branhRef__branchName', 'branhRef__busRef__busName', 'branhRef__branchID', 'status', 'customerTel', 'batchCode')
                  .annotate(totalPrice=Sum('totalPrice'), referenceCode = F('acceptedCode')))
         accounts = OnlineAccounts.objects.filter(Q(branchRef=loginSessions(request, 'branch')))
@@ -230,16 +232,6 @@ class OnlineOrderManager(generic.View):
                     product = Product.objects.get(Q(id=cart.productRef.id))
                     if product.retailAndWholesaleRef.uintQty >= cart.quantity:
                         pass
-
-                        
-
-
-
-
-
-
-                
-
 
             elif status == 'Delivered':
                 cart.status = status

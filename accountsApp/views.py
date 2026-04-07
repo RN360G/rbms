@@ -511,6 +511,8 @@ class SuspenseAccountView(generic.View):
                                 oversAndShortages.save()
                                 # Debit staff account
                                 accountTransactions(request, fromAccount.accountNumber, 'Debit', float(cashDifference), f'Move shortage amount to shortage records')  
+                            else:
+                                oversAndShortages.save()  
                         else:
                             oversAndShortages = oversAndShortages[0]
                             if cashOnH < totalC:

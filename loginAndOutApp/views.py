@@ -51,8 +51,21 @@ class LogIn(generic.View):
                         return redirect(to='dashboard')
                     elif user[0].busRef.busRef.status == 'Inactive':
                         messages.set_level(request, messages.WARNING)
-                        messages.warning(request, {'message': 'This business account is inactive. please contact system administrator for help.', 'title': 'Business Account is blocked!'},
-                                extra_tags='businessAccountIsClodeOrInactive')
+                        messages.warning(
+                            request,
+                            {
+                                'title': 'Business Account is inactive!',
+                                'message': (
+                                    "This business account is currently inactive.\n\n"
+                                    "REASONS:\n"
+                                    "1) The account is new and must first be activated by the RN360B Administrator.\n"
+                                    "2) Your monthly subscription charges or bills may not have been settled.\n\n"
+                                    "👉 Please contact your system administrator on 0243851841 / 0547779146 (call/WhatsApp) "
+                                    "for assistance in activating or resolving this issue."
+                                )
+                            },
+                            extra_tags='businessAccountIsClodeOrInactive'
+                        )
                         return render(request, 'loginApp/state.html')
                     else:
                         messages.set_level(request, messages.WARNING)

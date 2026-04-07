@@ -811,7 +811,7 @@ class Suppliers(generic.View):
                 supplier.save()
                 sup.save()          
                 for proID in products:
-                    product = Product.objects.get(Q(productCode=proID))
+                    product = Product.objects.get(Q(productCode=proID) & Q(busRef=loginSessions(request, 'business')) & Q(retailAndWholesaleRef__branchRef=loginSessions(request, 'branch')) & Q(disbleRef__productIsDisabled=False))
                     q = qty[n]
                     c = cost[n]
                     getUnitCostTotal += float(q) * float(c) 
@@ -1007,7 +1007,7 @@ class Selling(generic.View):
         if checkActiveTransaction.exists():
             self.transactionID = checkActiveTransaction[0].transactionID
         else:
-            self.transactionID = f"{dt.datetime.now().year}{dt.datetime.now().month}{dt.datetime.now().day}{dt.datetime.now().second}{loginSessions(request, 'user').userID}{rd.randrange(1000, 9999)}" 
+            self.transactionID = f"{loginSessions(request, 'user').userID}{dt.datetime.now().year}{dt.datetime.now().month}{dt.datetime.now().day}{dt.datetime.now().hour}{dt.datetime.now().minute}{dt.datetime.now().second}{rd.randrange(0, 9)}" 
         cash = CashOnhand.objects.filter(Q(branchRef=loginSessions(request, 'branch')) & Q(userRef=loginSessions(request, 'user')))
         totalTransaction = 0
         if cash.exists():
